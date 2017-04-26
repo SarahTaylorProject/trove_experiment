@@ -4,6 +4,11 @@ Updates April 26th 2017
 Searches Trove (National Library of Australia) for historical articles matching input town name and search term
 Writes results to csv file and then proceeds to read them aloud with the "say_something" method
 
+## Usage
+```
+ruby call_the_olden_days.rb
+```
+
 ## Changes
 This version takes the two search terms DIRECT FROM USER
 It does not (as in previous versions) require a csv of town names...

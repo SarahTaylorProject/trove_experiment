@@ -5,11 +5,19 @@ Searches Trove (National Library of Australia) for historical articles matching 
 Writes results to csv file and then proceeds to read them aloud with the "say_something" method
 
 ## Usage
+### without instructions read aloud:
 ```
 ruby call_the_olden_days.rb
 ```
+### with instructions read aloud:
+```
+SAY_EVERYTHING=true ruby call_the_olden_days.rb
+```
 
 ## Changes
+This version only reads instructions if the program is called with the system setting SAY_EVERYTHING=true
+It will still read the articles but not the instructions, unless you set this at the start
+The idea is that saying the instructions is only entertaining sometimes
 This version takes the two search terms DIRECT FROM USER
 It does not (as in previous versions) require a csv of town names...
 The csv concept is likely to be useful in future, but for live-performance purposes it is too time consuming

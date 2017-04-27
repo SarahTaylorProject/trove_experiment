@@ -7,11 +7,12 @@ require "rbconfig"
 
 # GENERAL METHODS
 
-def say_something(text, also_print = false, speed = 150)
+def say_something(text, also_print = true, speed = 150)
    # This method says text aloud through the command line
    # Checks for operating system and uses appropriate say-aloud command line
    # Works for linux and mac, could expand to others later
    # Will print text either way
+   # If also_print is true, then the text is sent to puts as well
  
    if (also_print == true) then
       puts(text)
@@ -26,6 +27,19 @@ def say_something(text, also_print = false, speed = 150)
       else
          puts "say_something does not yet support this operating system"
    end     
+
+end
+
+def say_instruction(text)
+   # This method will say instructions out loud IF the environment permits this
+   # otherwise it will just send the text to puts
+   # It will not ask say_something to print it again!
+
+   puts(text)
+
+   if(ENV["SAY_EVERYTHING"] == "true") then
+      say_something(text, also_print = false)
+   end 
 
 end
 
@@ -153,29 +167,24 @@ def curate_trove_results(input_trove_file, num_articles)
 
    # loop through and ask the user if they want to mark the article for reading or not
    # the new array of results has a status element, this can be used later to mark articles of interest
-   i = 0
-   curated_trove = input_trove.first(num_articles).map { |str_heading, str_date, str_snippet|      
-
+   i = 1
+   curated_trove = input_trove[1..-1].first(num_articles).map { |str_heading, str_date, str_snippet|      
+   
       begin#error handling                  
-         status = 0
-         clear_screen()
-         if i == 0
-            puts "(skipping header row)"
-            i = i - 1
-         else         
-            puts "\nArticle #{i}"
-            puts "Heading: #{str_heading}"
-            puts "Date: #{str_date}"
-            puts "Snippet:\n#{str_snippet}"
+      status = 0
+      clear_screen()
+      
+      puts "\nArticle #{i}"
+      puts "Heading: #{str_heading}"
+      puts "Date: #{str_date}"
+      puts "Snippet:\n#{str_snippet}"
             
-            response = get_user_input("\n\tContinue with article #{i}?" + prompt_suffix)
-            response = response.downcase
+      response = get_user_input("\n\tContinue with article #{i}?" + prompt_suffix)
+      response = response.downcase
 
-            if (response != "n") then
-               status = 1
-            end#of user response for this article
-
-         end#of skipping header row      
+      if (response != "n") then
+         status = 1
+      end#of user response for this article 
 
       rescue Exception
          puts "Error at record #{i}"
@@ -251,9 +260,9 @@ puts "I send a search request to the Trove API, with your nominated search town 
 puts "All results will be written to a csv file that you can keep. I will then proceed with a live reading."
 puts "You will have a chance to curate the articles, before I preceed with the live reading."
 
-say_something("Hello. This is an experiment. I can call the olden days. I make use of the National Library of Australia Trove database.", also_print = false)
+say_instruction("Hello. This is an experiment. I can call the olden days. I make use of the National Library of Australia Trove database.")
 # Get search town from user input, use default value if no answer
-say_something("\nPlease enter a search town in Australia. (This will default to '#{default_town}', you can press enter to leave this unchanged, or type 'exit' to escape)", also_print = true)
+say_instruction("\nPlease enter a search town in Australia. (This will default to '#{default_town}', you can press enter to leave this unchanged, or type 'exit' to escape)")
 search_town = get_user_input("")
 if (search_town.length == 0) then
    search_town = default_town
@@ -264,7 +273,7 @@ end
 if (continue == true) then
    # Get search term from user input, use default value if no answer
    # Note: use 'this+AND+that' for multiple terms in term
-   say_something("Please enter a search word. (This will default to '#{default_search}', you can press enter to leave this unchanged, or type 'exit' to escape)", also_print = true)
+   say_instruction("Please enter a search word. (This will default to '#{default_search}', you can press enter to leave this unchanged, or type 'exit' to escape)")
    search_word = get_user_input("")
    if (search_word.length == 0) then
       search_word = default_search
@@ -276,7 +285,7 @@ end
 if (continue == true) then
    # Get user input on whether to num_articles the number of articles...subtract 1 from input to avoid confusion with header row
    default_num_articles = 10
-   say_something("Do you want to limit the number of articles for possible reading? (This will default to #{default_num_articles}, you can press enter to leave unchanged, or else enter a new number, or type 'exit' to escape)", also_print = true)
+   say_instruction("Do you want to limit the number of articles for possible reading? (This will default to #{default_num_articles}, you can press enter to leave unchanged, or else enter a new number, or type 'exit' to escape)")
    response = get_user_input("")
    if (response.downcase == "exit") then
       continue = false
@@ -288,13 +297,13 @@ if (continue == true) then
 end
 
 if (continue == true) then
-   say_something("Thankyou. Calling the olden days about #{search_town} #{search_word}.", also_print = true)
-   say_something("Connecting to Trove database now.", also_print = true, speed = 150)
+   say_instruction("Thankyou. Calling the olden days about #{search_town} #{search_word}.")
+   say_instruction("Connecting to Trove database now.")
 
    trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)
    output_file_name = "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_")
 
-   puts("\nWriting results to file now...")
+   puts("\nWriting all results to file now...")
    result_count = write_trove_results(trove_api_results, output_file_name, search_word, search_town)
 
    puts "\nSearch town: \n\t#{search_town}"
@@ -305,17 +314,17 @@ end
 
 if (continue == true) then
    if (result_count > 0) then
-      say_something("#{result_count} articles available about #{search_town} #{search_word}", also_print = true)
-      say_something("I will present #{num_articles} article texts for you. You can nominate any articles you do not wish me to read out loud.", also_print = true)
+      say_instruction("#{result_count} articles available about #{search_town} #{search_word}")
+      say_instruction("I will present #{num_articles} article texts for you. You can nominate any articles you do not wish me to read out loud.")
    else
-      say_something("Sorry, no results to read. Please try again. Sometimes the Trove API is busy with other requests.")
+      say_instruction("Sorry, no results to read. Please try again. Sometimes the Trove API is busy with other requests.")
       continue = false
    end
 end
 
 if (continue == true) then
    # pause before continuing, give user the chance to exit   
-   puts "Press enter to continue to curating, or type 'exit' to escape."
+   say_instruction "Press enter to continue to curating, or type 'exit' to escape."
    response = get_user_input("")
    if (response.downcase == "exit") then
       continue = false
@@ -327,7 +336,7 @@ if (continue == true) then
 
    # pause before continuing
    clear_screen()
-   puts "\nFinished curating #{num_articles} articles about #{search_town} #{search_word}. Press enter to continue to reading out loud, or type 'exit' to escape."
+   say_instruction "\nFinished curating #{num_articles} articles about #{search_town} #{search_word}. Press enter to continue to reading out loud, or type 'exit' to escape."
    response = get_user_input("")
    if (response.downcase == "exit") then
       continue = false
@@ -336,9 +345,9 @@ end
 
 if (continue == true) then
    read_curated_trove_results(curated_trove_results)
-   say_something("\n\nFinished reading articles about #{search_town} #{search_word}. Thankyou for taking part in this experiment.", also_print = true)
+   say_instruction("\n\nFinished reading articles about #{search_town} #{search_word}. Thankyou for taking part in this experiment.")
 else
-   say_something("\n\nThankyou.", also_print = true)
+   say_instruction("\n\nThankyou.")
 end
 
 puts "\nEND TROVE EXPERIMENT ******\n"

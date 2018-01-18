@@ -19,11 +19,14 @@ def say_something(text, also_print = true, speed = 150)
    end
 
    result = operating_system()
+
    case result
       when "linux"
          `echo "#{text}"|espeak -s #{speed}`
       when "mac"
          `say -r #{speed} "#{text}"`
+      when "windows"
+         `espeak -s#{speed} "#{text}"`
       else
          puts "say_something does not yet support this operating system"
    end     
@@ -44,12 +47,12 @@ def say_instruction(text)
 end
 
 def get_user_input(prompt_text = "\nPlease enter value")
-
    # This method just gets direct input from the user with a prompt
    # Returns the user input
    # Nothing fancy, just a handy function
+
    if (prompt_text.length > 0) then
-      puts prompt_text	
+      puts prompt_text  
    end
    input_text = STDIN.gets.chomp
    return(input_text)
@@ -61,10 +64,10 @@ def clear_screen()
 end
 
 def operating_system()
-
    # This method checks the operating system name and returns this, if it is in the list
    # Requires 'rbconfig' to run
    # Returns "unknown" if operating system is not recognised
+
    include RbConfig
    os_name = "unknown"
 
@@ -75,6 +78,8 @@ def operating_system()
       os_name = "mac"
    when /mswin|windows/i
       os_name = "windows"
+   when /mingw32/i
+   	   os_name = "windows"
    when /sunos|solaris/i
       os_name = "solaris"
    end
@@ -82,7 +87,6 @@ def operating_system()
    return(os_name)
 
 end
-
 
 def convert_date(text)
    new_date_array = text.split(/\/|\-/).map(&:to_i)
@@ -99,8 +103,8 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
    # Return: XML of results (if successful) or 0 if error encountered
    # Note: will not necessarily fail if no results returned
    # The search town and search term are currently both just passed as strings, eventually the town search will be expanded
+   # December 2017 this was altered to use net::HTTP rather than curl, as this is more reliable on Windows
 
-   #substitute spaces for Trove API
    current_search_word = current_search_word.gsub(/\s/, "%20")
    current_search_town = current_search_town.gsub(/\s/, "%20")
 
@@ -108,7 +112,9 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
    trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&encoding&q=#{current_search_word}+AND+#{current_search_town}"
 
    begin
-      trove_api_results = Nokogiri::XML.parse(`curl "#{trove_api_request}"`)
+      uri = URI(trove_api_request)
+      response = Net::HTTP.get(uri)
+      trove_api_results = Nokogiri::XML.parse(response)
    rescue
       puts "Error getting API results"
       return(0)
@@ -258,8 +264,8 @@ continue = true
 clear_screen()
 puts "\nSTART TROVE EXPERIMENT ******\n"
 
-# my Trove API key and default searches
-my_trove_key = 'lop9t29sfm35vfkq'
+# my Trove API key (read from accompanying text file), and default searches
+my_trove_key = File.read("my_trove.txt")
 default_town = 'Elmore'
 default_search = 'tragedy'
 
@@ -269,8 +275,8 @@ puts "All results will be written to a csv file that you can keep. I will then p
 puts "You will have a chance to curate the articles, before I preceed with the live reading."
 
 say_instruction("Hello. This is an experiment. I can call the olden days. I make use of the National Library of Australia Trove database.")
-# Get search town from user input, use default value if no answer
 say_instruction("\nPlease enter a search town in Australia. (This will default to '#{default_town}', you can press enter to leave this unchanged, or type 'exit' to escape)")
+
 search_town = get_user_input("")
 if (search_town.length == 0) then
    search_town = default_town
@@ -283,8 +289,6 @@ if (continue == true) then
 end
 
 if (continue == true) then
-   # Get search term from user input, use default value if no answer
-   # Note: use 'this+AND+that' for multiple terms in term
    say_instruction("Please enter a search word. (This will default to '#{default_search}', you can press enter to leave this unchanged, or type 'exit' to escape)")
    search_word = get_user_input("")
    if (search_word.length == 0) then

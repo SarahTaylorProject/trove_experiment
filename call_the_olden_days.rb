@@ -264,8 +264,8 @@ continue = true
 clear_screen()
 puts "\nSTART TROVE EXPERIMENT ******\n"
 
-# my Trove API key and default searches
-my_trove_key = 'lop9t29sfm35vfkq'
+# my Trove API key (read from accompanying text file), and default searches
+my_trove_key = File.read("my_trove.txt")
 default_town = 'Elmore'
 default_search = 'tragedy'
 

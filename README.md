@@ -1,7 +1,8 @@
 # Trove API Experiment
-Version at January 18th 2017, very similar to December 2017 but a minor change
+Version at January 18th 2017, very similar to December 2017
 
 Searches Trove (National Library of Australia) for historical articles matching input town name and search term
+
 Writes results to csv file and then proceeds to read them aloud with the "say_something" method
 
 ## Usage
@@ -14,8 +15,9 @@ ruby call_the_olden_days.rb
 SAY_EVERYTHING=true ruby call_the_olden_days.rb
 ```
 
-Notes in January 18th 2018:
-It doesn't hard-code the trove API key, it gets it from an accompanying file ("my_api.txt")
+Notes January 18th 2018:
+This version doesn't hard-code the trove API key, it gets it from an accompanying file ("my_api.txt")
+
 
 Notes in December 2017:
 This version can now run on Windows with the prerequisite that the user installs 'espeak' and has

@@ -11,17 +11,19 @@ SAY_EVERYTHING=true ruby call_the_olden_days.rb
 ```
 
 ## Requirements
-On Windows, you will need to install 'espeak'
+On Windows, you will need to install the free speaking package 'espeak', and set up an environment variable for the command line executable. On Linux and Mac the "speak" function is in-built.
 
-### NOTES FROM APRIL 2018
+
+
+### Notes from April 2018
 Now includes the "call_the_bible_and_poetry" set of Python files, used at Taylor Project gig in April 2018.
 
 
-### NOTES FROM JANUARY 18th 2018:
+### Notes from January 2018
 This version doesn't hard-code the trove API key, it gets it from an accompanying file ("my_api.txt")
 
 
-### NOTES FROM DECEMBER 2017:
+### Notes from December 2017
 This version can now run on Windows with the prerequisite that the user installs 'espeak' and has
 a shortcut to the espeak command line tool, in their system PATH variable. 
 This will mean it can

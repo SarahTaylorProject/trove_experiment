@@ -1,6 +1,8 @@
 # Trove API Experiment
 
-## Usage
+
+
+## Usage for 'call_the_olden_days'
 ### without instructions read aloud:
 ```
 ruby call_the_olden_days.rb
@@ -10,9 +12,19 @@ ruby call_the_olden_days.rb
 SAY_EVERYTHING=true ruby call_the_olden_days.rb
 ```
 
-## Requirements
-On Windows, you will need to install the free speaking package 'espeak', and set up an environment variable for the command line executable. On Linux and Mac the "speak" function is in-built.
+## Usage for 'call_the_bible_and_poetry'
+### without instructions read aloud:
+```
+python call_the_bible_and_poetry.py
+```
 
+## Requirements
+"call_the_olden_days" requires Ruby and "call_the_bible_and_poetry" requires Python 3 (no fancy packages though - just requests and json).
+Both programs rely on internet access, as they will send requests to API's. 
+The Taylor Project lyrics are just a text file, that should be located in the same directory (in future this may move to an online repository)
+On Linux and Mac the "speak" function is in-built and the "say_something" functions take this into account.
+To hear any speaking on Windows, you will need to install the free speaking package 'espeak', and set up an environment variable for the command line executable.
+http://espeak.sourceforge.net/download.html
 
 
 ### Notes from April 2018

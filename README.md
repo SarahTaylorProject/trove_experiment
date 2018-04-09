@@ -1,9 +1,4 @@
 # Trove API Experiment
-Version at January 18th 2017, very similar to December 2017
-
-Searches Trove (National Library of Australia) for historical articles matching input town name and search term
-
-Writes results to csv file and then proceeds to read them aloud with the "say_something" method
 
 ## Usage
 ### without instructions read aloud:
@@ -15,11 +10,20 @@ ruby call_the_olden_days.rb
 SAY_EVERYTHING=true ruby call_the_olden_days.rb
 ```
 
-NOTES FOR JANUARY 18th 2018:
+## Requirements
+On Windows, you will need to install the free speaking package 'espeak', and set up an environment variable for the command line executable. On Linux and Mac the "speak" function is in-built.
+
+
+
+### Notes from April 2018
+Now includes the "call_the_bible_and_poetry" set of Python files, used at Taylor Project gig in April 2018.
+
+
+### Notes from January 2018
 This version doesn't hard-code the trove API key, it gets it from an accompanying file ("my_api.txt")
 
 
-NOTES FOR DECEMBER 2017:
+### Notes from December 2017
 This version can now run on Windows with the prerequisite that the user installs 'espeak' and has
 a shortcut to the espeak command line tool, in their system PATH variable. 
 This will mean it can

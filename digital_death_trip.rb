@@ -31,7 +31,17 @@ default_speed = 180
 # 	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
 # end
 
-unzip_gtfs_file(main_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6], main_path_name=Dir.pwd)
+say_something("Searching zipped PTV file for towns...")
+vic_town_list = return_town_list_from_zipped_gtfs_file(main_file_name='gtfs.zip', main_path_name=Dir.pwd, stop_file_name='stops.txt', stop_name_field_num=1)
+puts(vic_town_list)
+if (vic_town_list.size == 0) then
+	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+	return(false)
+else
+	say_something("There are #{vic_town_list.length} Victorian towns in this list.", also_print = true, speed = default_speed)
+	search_town = vic_town_list.sample
+	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
+end
 
 # output_file_name = "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_")
 # trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)

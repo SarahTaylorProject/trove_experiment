@@ -7,7 +7,9 @@ def return_town_list_from_vicmap(search_state='VIC', vicmap_csv_file_name='vic_a
 	result = []
 	puts("Attempting to read VicMap town list from #{vicmap_csv_file_name}")
 	begin
-		town_list_from_csv = CSV.read(vicmap_csv_file_name).map { |row|
+		csv_contents = CSV.read(vicmap_csv_file_name)
+		csv_contents.shift
+		town_list_from_csv = csv_contents.map { |row|
 			[row[town_field_num], row[state_field_num]]
 		}.uniq
 		town_list = town_list_from_csv.select { |town, state|
@@ -19,6 +21,45 @@ def return_town_list_from_vicmap(search_state='VIC', vicmap_csv_file_name='vic_a
 	end
 
 	return(town_list)
+
+end
+
+#field_array = [stop_id,stop_name,stop_lat,stop_lon]
+def return_town_list_from_ptv_stops(ptv_stop_file_name='stops.txt', stop_name_field_num=1)
+	result = []
+	puts("Attempting to make town list from PTV stops file #{ptv_stop_file_name}")
+	csv_contents = CSV.read(ptv_stop_file_name)
+	csv_contents.shift
+	stop_list_from_csv = csv_contents.map { |row|
+		row[stop_name_field_num]
+	}.uniq
+	puts(stop_list_from_csv)
+	town_list = stop_list_from_csv.map { |stop_string|
+	 	pull_town_name_from_ptv_string(stop_string)
+	}
+	
+	puts(town_list)
+
+	return(stop_list_from_csv)
+
+end
+
+
+def pull_town_name_from_ptv_string(input_string, start_divider="(", end_divider=")")  
+	puts(input_string)
+	input_string_parts = input_string.split(start_divider)
+	#puts(input_string_parts)
+	#puts(input_string_parts.size)
+	if (input_string_parts.size != 2) then
+		puts("String format does not match PTV, will return input string.")
+		return(input_string)
+	else
+		target_string = input_string_parts[1]
+	#	puts(target_string)
+		town_string = target_string.split(end_divider)[0]
+		puts(town_string)
+		return(town_string)
+	end
 
 end
 

@@ -7,31 +7,31 @@ my_trove_key = File.read("my_trove.txt")
 search_word = 'tragedy'
 default_speed = 180
 
-test_csv_file = 'trove_result_BULGANA_tragedy.csv'
 
-vic_town_list = return_town_list_from_vicmap(search_state='VIC')
-say_something("Searching Vicmap for towns...")
-if (vic_town_list.size == 0) then
-	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
-	return(false)
-else
-	say_something("There are #{vic_town_list.length} Victorian towns in this list.", also_print = true, speed = default_speed)
-	search_town = vic_town_list.sample
-	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
-end
+# vic_town_list = return_town_list_from_vicmap(search_state='VIC')
+# say_something("Searching Vicmap for towns...")
+# if (vic_town_list.size == 0) then
+# 	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+# 	return(false)
+# else
+# 	say_something("There are #{vic_town_list.length} Victorian towns in this list.", also_print = true, speed = default_speed)
+# 	search_town = vic_town_list.sample
+# 	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
+# end
 
-say_something("Searching PTV for towns...")
-vic_town_list = return_town_list_from_ptv_stops()
-puts(vic_town_list)
-if (vic_town_list.size == 0) then
-	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
-	return(false)
-else
-	say_something("There are #{vic_town_list.length} Victorian towns in this list.", also_print = true, speed = default_speed)
-	search_town = vic_town_list.sample
-	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
-end
+# say_something("Searching PTV for towns...")
+# vic_town_list = return_town_list_from_ptv_stops()
+# puts(vic_town_list)
+# if (vic_town_list.size == 0) then
+# 	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+# 	return(false)
+# else
+# 	say_something("There are #{vic_town_list.length} Victorian towns in this list.", also_print = true, speed = default_speed)
+# 	search_town = vic_town_list.sample
+# 	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
+# end
 
+unzip_gtfs_file(main_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6], main_path_name=Dir.pwd)
 
 # output_file_name = "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_")
 # trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)

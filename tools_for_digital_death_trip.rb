@@ -58,6 +58,54 @@ def return_town_list_from_ptv_stops(ptv_stop_file_name='stops.txt', stop_name_fi
 end
 
 
+def unzip_file(file_name, path_name=Dir.pwd, overwrite = true)
+	# unzips a single file
+	# using code from https://gist.github.com/robc/217400
+	begin
+		puts(file_name)
+		puts(path_name)
+		full_file_name = File.join(path_name, file_name)
+		if (overwrite == false) then
+			command_string = "unzip " + full_file_name
+			puts(command_string)
+			system(command_string)
+		else
+			command_string = "unzip -o " + full_file_name
+			puts(command_string)
+			system(command_string)
+		end
+		puts("Successfully unzipped #{full_file_name}")
+		return(true)
+	rescue	
+		puts("Error encountered with unzipping #{file_name}")	
+		return(false)
+	end
+
+end
+
+
+def unzip_gtfs_file(main_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6], main_path_name=Dir.pwd, overwrite = true)
+
+	current_result = unzip_file(file_name = main_file_name, path_name = main_path_name, overwrite = overwrite)
+	if (current_result == true) then
+		for path_number in path_numbers_to_unzip.each do
+			current_path = File.join(main_path_name, path_number.to_s)
+			puts("Current target path: #{current_path}")
+			Dir.foreach(current_path) do |file_name|
+				if (file_name.include?(".zip")) then
+					puts("Will try to unzip #{file_name}")
+					current_result = unzip_file(file_name = file_name, path_name = current_path, overwrite = overwrite)		
+				end
+			end
+
+		end
+	else
+		puts("Error encountered unzipping main GTFS file #{main_file_name}")
+		return(false)
+	end
+
+end
+
 def pull_town_string_from_ptv_stop_string(input_string, start_divider="(", end_divider=")")  
 	result = false
 	begin 

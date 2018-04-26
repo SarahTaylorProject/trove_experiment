@@ -8,8 +8,8 @@ search_word = 'tragedy'
 default_speed = 180
 default_output_path = File.join(Dir.pwd, 'output_files')
 default_town_path = File.join(Dir.pwd, 'town_lists')
-max_articles_to_read = 5
-standard_town_data_types = ['PTV', 'VICMAP', 'SAMPLE PTV STOP FILE']
+max_articles_to_read = 3
+standard_town_data_types = ['SAMPLE PTV STOP FILE', 'PTV', 'VICMAP']
 
 say_something("Hello, this is Digital Death Trip in test mode.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)

@@ -117,3 +117,31 @@ def remove_unfinished_sentence(input_string, divider = ".")
    end
 
 end
+
+
+def get_user_input(prompt_text = "\nPlease enter value")
+   # This method just gets direct input from the user with a prompt
+   # Returns the user input
+   # Nothing fancy, just a handy function
+
+   if (prompt_text.length > 0) then
+      puts prompt_text  
+   end
+   input_text = STDIN.gets.chomp
+   return(input_text)
+
+end
+
+
+def say_instruction(text)
+   # This method will say instructions out loud IF the environment permits this
+   # otherwise it will just send the text to puts
+   # It will not ask say_something to print it again!
+
+   puts(text)
+
+   if(ENV["SAY_EVERYTHING"] == "true") then
+      say_something(text, also_print = false)
+   end 
+
+end

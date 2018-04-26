@@ -162,7 +162,7 @@ def read_trove_results(input_trove_file, read_all = false, max_articles = DEFAUL
 
             # say the three items aloud
             puts "\t...Reading Article #{i}"
-            puts("\nRead snippet:\n#{str_snippet}")
+            puts("\nSnippet with hanging sentences removed:\n#{str_snippet}")
             
             say_something("date #{new_date}", also_print = false)
             say_something(str_heading, also_print = false, speed = 140)

@@ -5,18 +5,15 @@ require "rbconfig"
 load 'tools_for_talking.rb'
 
 def return_standard_town_list(source_type, path_name)
-	say_something("I have been instructed to use #{source_type} data to compile a list of town names.")
-	say_something("Please wait while I process this. It can take some time.")
-	puts(path_name)
 	case source_type.upcase
 		when 'PTV'						
 			town_list = return_town_list_from_zipped_ptv_stop_files(main_path_name = path_name)
 			return(town_list)
-		when 'PTVSINGLE'
-			town_list = return_town_list_from_single_ptv_stop_files(path_name = path_name)
-			return(town_list)
 		when 'VICMAP'
 			town_list = return_town_list_from_vicmap(path_name = path_name)
+			return(town_list)
+		when 'SAMPLE PTV STOP FILE'
+			town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name)
 			return(town_list)
 		else
 			puts("Choice not in standard lists, please try again")
@@ -38,7 +35,10 @@ def return_town_list_from_vicmap(path_name=Dir.pwd, search_state='VIC', vicmap_c
 		full_town_list = town_list_from_csv.select { |town, state|
 			state == search_state
 		}
-		town_list = full_town_list.map { |row| row[0] }
+		puts(full_town_list)
+		town_list = full_town_list.map { |town, state|
+			town
+		}.uniq
 		puts(town_list)
 		return(town_list)
 
@@ -62,10 +62,11 @@ def return_town_list_from_zipped_ptv_stop_files(main_path_name=Dir.pwd, main_fil
 			puts("PTV stop file: #{File.join(path_name, stop_file_name)}")
 			puts("Adding #{current_town_list.size} town references to unsorted town list.")
 			full_town_list.concat current_town_list
-			say_something("Current unsorted town references: #{full_town_list.size}")
+			say_something("Working through PTV list. Current unsorted town references: #{full_town_list.size}")
 		end		
 		town_list = full_town_list.sort.uniq
-		puts("Finished searching for towns in zipped files. Sorted town count: #{town_list.size}")
+		say_something("Finished searching for town references in zipped files.")
+		puts("Sorted town count: #{town_list.size}")
 		return(town_list)
 	rescue
 		puts("Error encountered extracting towns from zipped PTV file #{File.join(main_path_name, main_file_name)}")
@@ -104,6 +105,7 @@ end
 
 
 def unzip_ptv_file_and_return_path_list(main_file_name='gtfs.zip', main_path_name=Dir.pwd, path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
+	say_something("I am now unzipping the PTV files.")
 	unzipped_path_list = Array.new
 	main_unzipped_path = unzip_single_file(file_name = main_file_name, path_name = main_path_name)
 	if (main_unzipped_path != false) then

@@ -1,12 +1,16 @@
 load 'tools_for_talking.rb'
 load 'tools_for_trove.rb'
 load 'tools_for_digital_death_trip.rb'
+require 'fileutils'
 
 clear_screen()
 my_trove_key = File.read("my_trove.txt")
 search_word = 'tragedy'
 default_speed = 180
 default_output_path = File.join(Dir.pwd, 'output_files')
+unless File.directory?(default_output_path)
+   FileUtils.mkdir_p(default_output_path)
+end
 default_town_path = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
 standard_town_data_types = ['SAMPLE PTV STOP FILE', 'PTV', 'VICMAP']

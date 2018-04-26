@@ -90,3 +90,30 @@ def convert_date(text)
    new_date = Date.new(*new_date_array)
    new_date.strftime("%Y %d %B")
 end
+
+
+def remove_unfinished_sentence(input_string, divider = ".")
+   # This method removes any unfinished sentence from a string
+   begin
+      if (input_string[-1] == divider) then
+         return(input_string)
+      end
+
+      output_string = ''
+      input_sentence_array = input_string.split(divider)
+
+      if (input_sentence_array.size == 1) then
+         return(input_string)
+      end
+
+      for sentence in input_sentence_array[0..-2].each do
+         output_string += sentence + divider      
+      end
+
+      return(output_string)
+   rescue
+      puts("Error encountered, will return input string.")
+      return(input_string)
+   end
+
+end

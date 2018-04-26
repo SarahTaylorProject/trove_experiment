@@ -26,16 +26,16 @@ def return_town_list_from_vicmap(search_state='VIC', vicmap_csv_file_name='vic_a
 end
 
 #field_array = [stop_id,stop_name,stop_lat,stop_lon]
-def return_town_list_from_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops.txt', stop_name_field_num=1)
+def return_town_list_from_single_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops.txt', stop_field_num=1)
 	result = []
 	puts("Attempting to make town list from PTV stop file #{File.join(path_name, stop_file_name)}")
 	begin
 		full_file_name = File.join(path_name, stop_file_name)
-		csv_contents = CSV.read(stop_file_name)
+		csv_contents = CSV.read(full_file_name)
 		csv_contents.shift
 		
 		stop_list_from_csv = csv_contents.map { |row|
-			row[stop_name_field_num]
+			row[stop_field_num]
 		}.uniq
 		
 		full_town_list = stop_list_from_csv.map { |stop_string|
@@ -45,7 +45,7 @@ def return_town_list_from_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops
 	   town_list = full_town_list.select { |town|
 			town != false
 		}
-		puts(town_list)
+		# puts(town_list)
 		puts(town_list.size)
 		return(town_list)
 
@@ -56,31 +56,30 @@ def return_town_list_from_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops
 end
 
 
-def return_town_list_from_zipped_gtfs_file(main_file_name='gtfs.zip', main_path_name=Dir.pwd, stop_file_name='stops.txt', stop_name_field_num=1)
+def return_town_list_from_zipped_ptv_stop_files(main_file_name='gtfs.zip', main_path_name=Dir.pwd, stop_file_name='stops.txt', stop_field_num=1)
 	full_town_list = Array.new
-	unzipped_path_list = unzip_gtfs_files_and_return_path_list(main_file_name = main_file_name, main_path_name = main_path_name)
+	unzipped_path_list = unzip_ptv_file_and_return_path_list(main_file_name = main_file_name, main_path_name = main_path_name)
 	puts(unzipped_path_list)
 	unzipped_path_list.each do |path_name|
-		puts(path_name)
-		return_town_list_from_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops.txt', stop_name_field_num=1)
-		current_town_list = return_town_list_from_ptv_stop_file(path_name = path_name, stop_file_name = stop_file_name, stop_name_field_num = stop_name_field_num)
+		current_town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name, stop_file_name = stop_file_name, stop_field_num = stop_field_num)
+		puts("Path: #{path_name}, town count: #{current_town_list.size}")
 		full_town_list.concat current_town_list
+		puts("Unsorted town count: #{full_town_list.size}")
 	end
-	town_list = full_town_list.map { |town|
-		town
-	}.uniq
+	town_list = full_town_list.sort.uniq
+	puts("Sorted town count: #{town_list.size}")
 	# puts(full_town_list)
 	# puts(full_town_list.size)
 	return(town_list)
 end
 
 
-def unzip_gtfs_files_and_return_path_list(main_file_name='gtfs.zip', main_path_name=Dir.pwd, path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
+def unzip_ptv_file_and_return_path_list(main_file_name='gtfs.zip', main_path_name=Dir.pwd, path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
 	unzipped_path_list = Array.new
-	current_result = unzip_single_file(file_name = main_file_name, path_name = main_path_name)
-	if (current_result != false) then
+	main_unzipped_path = unzip_single_file(file_name = main_file_name, path_name = main_path_name)
+	if (main_unzipped_path != false) then
 		for path_number in path_numbers_to_unzip.each do
-			target_path = File.join(main_path_name, path_number.to_s)
+			target_path = File.join(main_unzipped_path, path_number.to_s)
 			puts("Current target path: #{target_path}")
 			Dir.foreach(target_path) do |file_name|
 				if (file_name.include?(".zip")) then
@@ -103,8 +102,10 @@ end
 
 
 def unzip_single_file(file_name, path_name=Dir.pwd, overwrite = true, output_path_name=nil)
-	# unzips a single file
-	# using code from https://gist.github.com/robc/217400
+	# unzips a single zip file
+	# most code borrowed from https://gist.github.com/robc/217400
+	# returns the output path if successful, or false if error encountered
+	# if output_path_name is left as nil then it will construct a default output location using zip file norms
 	begin
 		full_file_name = File.join(path_name, file_name)
 		if (output_path_name == nil) then
@@ -145,33 +146,6 @@ def pull_town_string_from_ptv_stop_string(input_string, start_divider="(", end_d
 		puts("Error encountered extracting town from #{input_string}, will return false.")
 		return(result)
 	end
-
-end
-
-
-def remove_unfinished_sentence(input_string, divider = ".")
-   # This method removes any unfinished sentence from a string
-   begin
-   	if (input_string[-1] == divider) then
-      	return(input_string)
-   	end
-
-   	output_string = ''
-   	input_sentence_array = input_string.split(divider)
-
-   	if (input_sentence_array.size == 1) then
-      	return(input_string)
-   	end
-
-   	for sentence in input_sentence_array[0..-2].each do
-      	output_string += sentence + divider      
-   	end
-
-   	return(output_string)
-   rescue
-   	puts("Error encountered, will return input string.")
-   	return(input_string)
-   end
 
 end
 

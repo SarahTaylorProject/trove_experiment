@@ -6,7 +6,7 @@ clear_screen()
 my_trove_key = File.read("my_trove.txt")
 search_word = 'tragedy'
 default_speed = 180
-
+default_output_path = File.join(Dir.pwd, 'output_files')
 
 # vic_town_list = return_town_list_from_vicmap(search_state='VIC')
 # say_something("Searching Vicmap for towns...")
@@ -31,8 +31,8 @@ default_speed = 180
 # 	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
 # end
 
-say_something("Searching zipped PTV file for towns...")
-vic_town_list = return_town_list_from_zipped_gtfs_file(main_file_name='gtfs.zip', main_path_name=Dir.pwd, stop_file_name='stops.txt', stop_name_field_num=1)
+say_something("Searching zipped PTV file for towns, please wait...")
+vic_town_list = return_town_list_from_zipped_ptv_stop_files(main_file_name='gtfs.zip', main_path_name=File.join(Dir.pwd, 'town_lists'), stop_file_name='stops.txt', stop_name_field_num=1)
 puts(vic_town_list)
 if (vic_town_list.size == 0) then
 	say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
@@ -43,7 +43,7 @@ else
 	say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)
 end
 
-# output_file_name = "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_")
+# output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 # trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)
 # puts(trove_api_results)
 # puts("\nWriting results to file now...")

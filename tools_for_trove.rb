@@ -162,7 +162,7 @@ def read_trove_results(input_trove_file, read_all = false, max_articles = DEFAUL
 
             # say the three items aloud
             puts "\t...Reading Article #{i}"
-            puts("\n\tSnippet for talking:\n#{str_snippet}")
+            puts("\nRead snippet:\n#{str_snippet}")
             
             say_something("date #{new_date}", also_print = false)
             say_something(str_heading, also_print = false, speed = 140)
@@ -182,4 +182,4 @@ def read_trove_results(input_trove_file, read_all = false, max_articles = DEFAUL
 
 end
 
-# example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key=lop9t29sfm35vfkq&reclevel=full&include=articletext
+# example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext

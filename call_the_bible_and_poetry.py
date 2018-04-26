@@ -1,12 +1,14 @@
 import tools_for_talking
 import random
 import os
+import codecs
 
 default_speed = 180
 input_version = "input"
 meta_source_list = ["the bible", "the online poetry database"]
 default_directory = os.path.dirname(os.path.abspath(__file__))
 line_count = 0
+output_file = codecs.open("random_poem_output.txt", "w", encoding='utf-8')
 
 text_file_name = default_directory + os.path.normpath("/") + "taylor_project_lyrics_sample.txt"
 text_file_quotes = tools_for_talking.read_text_file_to_array(text_file_name)
@@ -16,6 +18,7 @@ if text_file_quotes != False:
     meta_source_list.append(os.path.basename(text_file_name))
 
 greeting_string = "Hello. I will assemble a poem, using a random mix of quotes."
+output_file.write(greeting_string)
 tools_for_talking.say_something(text=greeting_string, speed=default_speed)
 
 exclude_list = []
@@ -76,21 +79,29 @@ if (line_count > 0):
   greeting_string = "Finished collecting {} random quotes.".format(line_count)
   tools_for_talking.say_something(text=greeting_string, speed=default_speed)
 
-  print("I used the following texts:")
-  metadata_list = []
+  greeting_string = "I used the following sources:"
+  print(greeting_string)
+  output_file.write("\n\n" + greeting_string)
+
+  count = 0
   for quote in random_poetry_quotes:
-    if quote[1] not in metadata_list:
-      print(quote[1])
-      metadata_list.append(quote[1])
+    count += 1
+    metadata_string = "{}-{}".format(count, quote[1])
+    print(metadata_string)
+    output_file.write("\n" + metadata_string)
 
   print("\n")
   greeting_string = "HERE IS MY POEM"
+  output_file.write("\n\n" + greeting_string)
   tools_for_talking.say_something(text=greeting_string, speed=default_speed)
   for quote in random_poetry_quotes:
-    final_quote = tools_for_talking.modify_string_for_email(quote[0])
-    print(final_quote)
-    tools_for_talking.say_something(text=final_quote, speed=default_speed, also_print=False)
+    final_quote = tools_for_talking.modify_string_for_email(quote[0]).strip()
+    if (final_quote != False):
+      print(final_quote)
+      tools_for_talking.say_something(text=final_quote, speed=default_speed, also_print=False)
+      output_file.write("\n" + final_quote)
 
   print("\n")
   greeting_string = "End of poem. Thanks for listening."
   tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+  output_file.write("\n\n" + greeting_string)

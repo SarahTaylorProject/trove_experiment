@@ -36,13 +36,13 @@ for meta_source in exclude_list:
   meta_source_list.remove(meta_source)
 
 if (len(meta_source_list) > 0):
-  greeting_string = "Ok. I will search in: "
+  greeting_string = "I will search in: "
   for meta_source in meta_source_list:
     greeting_string += meta_source + " and "
   greeting_string = greeting_string[:-len(" and ")]
-  tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+  print(greeting_string)
 
-  greeting_string = "How many quotes would you like me to collect?"
+  greeting_string = "Ok. How many quotes would you like me to collect?"
   tools_for_talking.say_something(text=greeting_string, speed=default_speed, also_print=False)
   if (input_version == "raw_input"):
     line_count = int(raw_input(greeting_string+" [default 4] ") or "4")
@@ -95,7 +95,7 @@ if (line_count > 0):
   output_file.write("\n\n" + greeting_string)
   tools_for_talking.say_something(text=greeting_string, speed=default_speed)
   for quote in random_poetry_quotes:
-    final_quote = tools_for_talking.modify_string_for_email(quote[0]).strip()
+    final_quote = tools_for_talking.modify_string_for_email_header(quote[0]).strip()
     if (final_quote != False):
       print(final_quote)
       tools_for_talking.say_something(text=final_quote, speed=default_speed, also_print=False)

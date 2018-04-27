@@ -1,15 +1,19 @@
 load 'tools_for_talking.rb'
 load 'tools_for_trove.rb'
 load 'tools_for_digital_death_trip.rb'
+require 'fileutils'
 
 clear_screen()
-my_trove_key = File.read("my_trove.txt")
+my_trove_key = read_trove_key()
 search_word = 'tragedy'
 default_speed = 180
 default_output_path = File.join(Dir.pwd, 'output_files')
+unless File.directory?(default_output_path)
+   FileUtils.mkdir_p(default_output_path)
+end
 default_town_path = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['SAMPLE PTV STOP FILE', 'PTV', 'VICMAP']
+standard_town_data_types = ['SAMPLE PTV STOP FILE', 'PTV GTFS', 'VICMAP']
 
 say_something("Hello, this is Digital Death Trip in test mode.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
@@ -25,8 +29,8 @@ source_choice = get_user_input(prompt_text = instruction_string)
 if (source_choice.length == 0) then
    source_choice = standard_town_data_types[0]
 end
-say_something("You have instructed me to use #{source_choice} data to compile a list of town names.", also_print = true, speed = default_speed)
-say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)
+# say_something("You have instructed me to use #{source_choice} data to compile a list of town names.", also_print = true, speed = default_speed)
+# say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)
 
 vic_town_list = return_standard_town_list(source_type=source_choice, path_name = default_town_path)
 if (vic_town_list == false) then

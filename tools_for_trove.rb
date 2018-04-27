@@ -4,7 +4,17 @@ require "net/http"
 require "nokogiri"
 require "date"
 require "rbconfig"
+load 'tools_for_talking.rb'
 DEFAULT_ARTICLE_COUNT = 20
+
+def read_trove_key(my_trove_file = "my_trove.txt")
+   begin
+      my_trove_key = File.read("my_trove.txt")
+   rescue
+      my_trove_key = get_user_input(prompt_text = "\nPlease enter trove key, could not find #{my_trove_file}")
+   end
+   return(my_trove_key)
+end
 
 def fetch_trove_results(current_search_town, current_search_word, trove_key)
    # This method constructs a single search request for Trove (of a very specific format!) 

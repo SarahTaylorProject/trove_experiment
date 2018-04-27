@@ -4,21 +4,24 @@ require "date"
 require "rbconfig"
 load 'tools_for_talking.rb'
 
-def return_standard_town_list(source_type, path_name)
-   case source_type.upcase
-      when 'PTV'                 
-         town_list = return_town_list_from_zipped_ptv_stop_files(main_path_name = path_name)
-         return(town_list)
-      when 'VICMAP'
-         town_list = return_town_list_from_vicmap(path_name = path_name)
-         return(town_list)
-      when 'SAMPLE PTV STOP FILE'
-         town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name)
-         return(town_list)
-      else
-         puts("Choice not in standard lists, please try again")
-         return(false)
-      end
+def return_standard_town_list(source_choice, path_name, default_speed=180)
+   if (source_choice[0].upcase == 'S' or source_choice.upcase == 'SAMPLE PTV STOP FILE') then
+      say_something("You have instructed me to use SAMPLE PTV STOP FILE data to compile a list of town names.", also_print = true, speed = default_speed) 
+      town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name)
+      return(town_list)
+   elsif (source_choice[0].upcase == 'P' or source_choice.upcase == 'PTV GTFS') then
+      say_something("You have instructed me to use PTV GTFS data to compile a list of town names.", also_print = true, speed = default_speed)
+      say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)                  
+      town_list = return_town_list_from_zipped_ptv_stop_files(main_path_name = path_name)
+      return(town_list)
+   elsif (source_choice[0].upcase == 'V' or source_choice.upcase == 'VICMAP') then
+      say_something("You have instructed me to use VICMAP data to compile a list of town names.", also_print = true, speed = default_speed)
+      town_list = return_town_list_from_vicmap(path_name = path_name)
+      return(town_list)
+   else
+      puts("Choice not in standard lists, please try again")
+      return(false)
+   end
 end
 
 

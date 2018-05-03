@@ -1,6 +1,7 @@
 import subprocess
 import os
 import traceback
+import sys
 
 def return_operating_system():
   """
@@ -48,6 +49,25 @@ def say_something(text, also_print = True, speed = 120):
   else:
     print("\t(say_something does not yet support this operating system)")
 
+
+def get_user_input(prompt_text = "\nPlease enter value"):
+  # This method just gets direct input from the user with a prompt
+  # Returns the user input
+  # Tried two options for Python input: rawinput or input (one is in each function below)
+  # If the 'input' function returns False, it will try the 'rawinput' function
+  # Returns input_text for user input, which will be False if both functions failed
+  result = False
+  try:
+    if (sys.version_info > (3, 0)):
+      input_text = input(prompt_text)
+    else:
+      input_text = raw_input(prompt_text)
+
+    return(input_text)
+
+  except:
+    traceback.print_exc()
+    return(result)
 
 
 def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "Shakespeare", "Shelley", "Tennyson", "Wilde"], min_length=8, max_tries=10, full_metadata=True, decode_result=True):

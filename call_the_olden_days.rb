@@ -95,6 +95,21 @@ def convert_date(text)
 end
 
 
+def get_user_int_array(prompt_text = "\nPlease enter integer values...", divider = ",")
+   # reads user input to an integer array
+   # not very fancy error trapping: it will all fail if there is one non-integer value
+   begin
+      input_string = get_user_input(prompt_text = prompt_text + " (use '#{divider}' as the divider)")
+      input_array = input_string.split(divider)
+      int_array = input_array.map { |int_string|
+         int_string.to_i
+      }
+      return(int_array)
+   rescue
+      puts("Sorry, error converting input to integer array.")
+      return(Array.new)
+   end
+end
 # TROVE-SPECIFIC METHODS
 
 def fetch_trove_results(current_search_town, current_search_word, trove_key)
@@ -257,6 +272,72 @@ def read_trove_results(input_trove_file)
 
 end
 
+def read_trove_results_by_array(input_trove_file, read_all = false, article_numbers = Array(1..5))
+   # This method reads the Trove results aloud
+   # The can skip articles if the user presses 'n'. It will pause at the end of each article.
+   # Input: Trove file
+
+   clear_screen()
+   puts "\nREADING ARTICLES ******"
+   
+   if (read_all == false) then
+      say_something("\nI will only read out these article numbers: #{article_numbers}.")
+   else
+      say_something("\n\t reading all articles")
+   end
+
+   # take only the fields of interest for reading aloud, into an array of trove results
+   input_trove = CSV.read(input_trove_file).map { |row|
+     [row[4], row[6], row[8]]
+   }.uniq
+
+   i = 1
+   input_trove[1..-1].each do |str_heading, str_date, str_snippet|
+      
+      begin#error handling 
+      
+         clear_screen()
+      
+         puts "\nArticle #{i}"
+         puts "Heading: #{str_heading}"
+         puts "Date: #{str_date}"
+         puts "Snippet:\n#{str_snippet}"              
+       
+         if (article_numbers.include? i) then
+            # only proceed with the extra formatting if this article is to be said aloud
+                  
+            # fancy date format
+            new_date = convert_date(str_date)
+
+            # remove the first part of the snippet, which is the same as the headline
+            str_snippet = str_snippet.gsub(str_heading, "")
+
+            # remove annoying dart strings common to Trove...I don't know how to do this in one command rather than two
+            str_snippet = str_snippet.gsub("...", " ")
+            str_snippet = str_snippet.gsub("..", " ")
+
+            # say the three items aloud
+            puts "\t...Reading Article #{i}"
+            puts("\nSnippet with hanging sentences removed:\n#{str_snippet}")
+            
+            say_something("date #{new_date}", also_print = false)
+            say_something(str_heading, also_print = false, speed = 140)
+            say_something("#{str_snippet}", also_print = false, speed = 140)
+
+         end#of this record
+      
+      rescue Exception
+         puts "Error at record #{i}"
+      end#of error handling
+      
+      i += 1
+
+   end#of reading through input_trove
+
+   return(true)
+
+end
+
 
 # TROVE MAIN PROCEDURE
 
@@ -333,16 +414,13 @@ if (continue == true) then
 end
 
 if (continue == true) then
-   # pause before continuing, give user the chance to exit   
-   say_instruction "\n\nFinished previewing results. Press enter to continue to READING articles out loud, or type 'exit' to escape."
-   response = get_user_input("")
-   if (response.downcase == "exit") then
-      continue = false
-   end 
-end
-
-if (continue == true) then
-   read_trove_results(output_file_name)
+   default_article_numbers = [1, 2, 3]
+   say_something("Finished previewing results. Which articles would you like me to read aloud?")
+   article_numbers = get_user_int_array(prompt_text = "\nPlease enter article number choices, I will default to #{default_article_numbers}", divider = ",")
+   if (article_numbers.size == 0) then
+      article_numbers = default_article_numbers
+   end
+   read_trove_results_by_array(output_file_name, article_numbers = article_numbers)
    say_instruction("\nFinished reading articles about #{search_town} #{search_word}.")
 end
 

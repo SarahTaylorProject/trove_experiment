@@ -3,7 +3,6 @@ require "net/http"
 require "date"
 require "rbconfig"
 
-
 def say_something(text, also_print = true, speed = 150)
    # This method says text aloud through the command line
    # Checks for operating system and uses appropriate say-aloud command line
@@ -30,6 +29,7 @@ def say_something(text, also_print = true, speed = 150)
 
 end
 
+
 def say_instruction(text)
    # This method will say instructions out loud IF the environment permits this
    # otherwise it will just send the text to puts
@@ -42,6 +42,7 @@ def say_instruction(text)
    end 
 
 end
+
 
 def get_user_input(prompt_text = "\nPlease enter value")
    # This method just gets direct input from the user with a prompt
@@ -56,9 +57,31 @@ def get_user_input(prompt_text = "\nPlease enter value")
 
 end
 
+
+def get_user_int_array(prompt_text = "\nPlease enter integer values...", divider = ",")
+   # reads user input to an integer array
+   # not very fancy error trapping: it will all fail if there is one non-integer value
+   begin
+      input_string = get_user_input(prompt_text = prompt_text + " (use '#{divider}' as the divider)")
+      puts(input_string)
+      input_array = input_string.split(divider)
+      puts(input_array)
+      int_array = input_array.map { |int_string|
+         int_string.to_i
+      }
+      puts(int_array)
+      return(int_array)
+   rescue
+      puts("Sorry, error converting input to integer array.")
+      return(Array.new)
+   end
+end
+
+
 def clear_screen()
    system("clear")
 end
+
 
 def operating_system()
    # This method checks the operating system name and returns this, if it is in the list
@@ -115,20 +138,6 @@ def remove_unfinished_sentence(input_string, divider = ".")
       puts("Error encountered, will return input string.")
       return(input_string)
    end
-
-end
-
-
-def get_user_input(prompt_text = "\nPlease enter value")
-   # This method just gets direct input from the user with a prompt
-   # Returns the user input
-   # Nothing fancy, just a handy function
-
-   if (prompt_text.length > 0) then
-      puts prompt_text  
-   end
-   input_text = STDIN.gets.chomp
-   return(input_text)
 
 end
 

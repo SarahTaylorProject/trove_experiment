@@ -1,6 +1,7 @@
 import subprocess
 import os
 import traceback
+import sys
 
 def return_operating_system():
   """
@@ -49,6 +50,25 @@ def say_something(text, also_print = True, speed = 120):
     print("\t(say_something does not yet support this operating system)")
 
 
+def get_user_input(prompt_text = "\nPlease enter value"):
+  # This method just gets direct input from the user with a prompt
+  # Returns the user input
+  # Tried two options for Python input: rawinput or input (one is in each function below)
+  # If the 'input' function returns False, it will try the 'rawinput' function
+  # Returns input_text for user input, which will be False if both functions failed
+  result = False
+  try:
+    if (sys.version_info > (3, 0)):
+      input_text = input(prompt_text)
+    else:
+      input_text = raw_input(prompt_text)
+
+    return(input_text)
+
+  except:
+    traceback.print_exc()
+    return(result)
+
 
 def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "Shakespeare", "Shelley", "Tennyson", "Wilde"], min_length=8, max_tries=10, full_metadata=True, decode_result=True):
   """
@@ -93,6 +113,14 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
     metadata = ""
 
     request_string_part1 = "http://poetrydb.org/author/"
+
+    if author_list == []:
+      author_list = return_list_of_poets()
+      if (author_list == False):
+        print("Errors with retrieving author list, exiting.")
+        return(result)
+      else:
+        print("Author list: ", author_list)
 
     author_choice = random.choice(author_list)
     print("Sending poetry API request for author: %s" %author_choice)
@@ -161,7 +189,38 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
     return(result)
 
 
-def return_random_bible(book_list=None, max_chapters=80, max_tries=80, decode_result=True):
+def return_list_of_poets():
+  '''
+  Sends request to the poetry DB API for list of authors in their database. Pulls back the names, but as any follow-up
+  request for poems requires only the surnames, this function extracts only these surnames, and puts them into a list.
+
+  If successful, returns a list of the surnames of all the poets stored in the API.
+  If fails, returns False.
+  '''
+  result = False
+  try:
+    request_string_authors = "http://poetrydb.org/author"
+
+    print("Extracting list of all authors in the poetrydb database...")
+    result = requests.get(request_string_authors)
+    if (result.status_code == 200):
+      result_json = json.loads(result.content)
+    else:
+      print("No poets found...")
+      return (result)
+
+    poet_list = []
+    for poet in result_json['authors']:
+      name_pieces = poet.split()
+      poet_list.append(name_pieces[-1])
+
+    return(poet_list)
+  except:
+    traceback.print_exc()
+    return (result)
+
+
+def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translation='kjv'):
   """
   This function returns a random Bible quote using the API at bible-api.com
   If successful, it returns an array with:
@@ -172,45 +231,55 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, decode_re
   It doesn't know how many chapters are in each book; it will send an API request until successful (up to a maximum of max_tries)
   """
   result = False
-  try:
+  try:  
     import random
     import requests
     import json
-
+    
     random_bible = ""
     metadata = ""
 
     if (book_list == None):
-      book_list=["genesis", "exodus", "leviticus", "numbers", "deuteronomy", "joshua", "judges", "ruth", "jonah", "job", "matthew", "mark", "luke", "john", "romans", "1corinthians", "2corinthians", "galatians", "james", "jude", "1peter", "2peter", "revelation"]
+      #From https://en.wiktionary.org/wiki/Appendix:Books_of_the_Bible
+      book_list = return_bible_book_list()
+      if (book_list == False):
+        print("Errors with retrieving book list, exiting.")
+        return(result)
+      else:
+        print("Book list: ", book_list)
 
     request_string_part1 = "https://bible-api.com/"
-
+    
     book_choice = random.choice(book_list)
-    request_string_part2 = request_string_part1 + book_choice
+    request_string_part2 = request_string_part1 + book_choice    
     success = False
 
     try_count = 0
-    while (success == False and try_count < max_tries):
-      chapter_choice = random.randrange(1, max_chapters)
-      request_string = request_string_part2 + "+" + str(chapter_choice)
+    while (success == False and try_count < max_tries):   
+      if (try_count == max_tries-1):
+        chapter_choice = 1
+      else:
+        chapter_choice = random.randrange(1, max_chapters)
+      request_string = request_string_part2 + "+" + str(chapter_choice) + "?translation=" + translation
       print("Trying for random Bible chapter: ", request_string)
       result = requests.get(request_string)
       if (result.status_code == 200):
-        if (decode_result == True):
-          result_content = result.content.decode("utf-8")
-        else:
-          result_content = result.content
-        result_json = json.loads(result_content)
+        result_json = json.loads(result.content)
         print("Chapter found!")
         success = True
       else:
         print("No such chapter, trying again...")
         try_count += 1
+    
+    if success == False:
+      print("Errors encountered, exiting")
+      return(result)
 
     if (isinstance(result_json, dict)):
       if ("reference" in result_json.keys()):
         metadata = result_json["reference"]
-      if ("verses" in result_json.keys()):
+        metadata = modify_string_for_email_header(metadata)
+      if ("verses" in result_json.keys()):        
         verse_array = result_json["verses"]
     else:
       print("Unexpected format...")
@@ -220,12 +289,11 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, decode_re
 
     if (isinstance(verse_choice, dict)):
       if ("verse" in verse_choice.keys()):
-        metadata += ":" + str(verse_choice["verse"])
-        metadata = modify_string_for_email(metadata)
-      if ("text" in verse_choice.keys()):
+        metadata += ":" + str(verse_choice["verse"])      
+      if ("text" in verse_choice.keys()):  
         random_bible = verse_choice["text"]
-        random_bible = modify_string_for_email(random_bible)
-
+        random_bible = modify_string_for_email_header(random_bible)
+       
       print(random_bible)
       print(metadata)
 
@@ -237,6 +305,33 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, decode_re
   except:
     traceback.print_exc()
     return(result)
+
+
+def return_bible_book_list():
+  '''
+  This is a useful but not sophisticated function for returning a list of Bible books recognised by bible-api.com
+  It is essentially a placeholder for what I would like to be a dynamic function similar to the return_list_poets()
+  Currently it just lists the Bible book names (all of them!) that will be recognised by the Protestant-based bible-api.com
+
+  If successful, returns a list of the surnames of all the Bible books which will be recognised by bible-api.com
+  If fails, returns False.
+  '''
+  result = False
+  try:
+    bible_book_list = ["genesis", "exodus", "leviticus", "numbers", "deuteronomy", "joshua", "judges", "ruth", 
+      "1samuel", "2samuel", "1kings", "2kings", "1chronicles", "2chronicles", "ezra", "nehemiah", "esther",
+      "job", "psalms", "proverbs", "ecclesiastes", "songofsolomon", "isaiah", "jeremiah", "lamentations", "ezekiel",
+      "daniel", "hosea", "joel", "amos", "obadiah", "jonah", "micah", "nahum", "habbakuk", "zephaniah", 
+      "haggai", "zechariah", "malachi",
+      "matthew", "mark", "luke", "john", "acts", "1corinthians", "2corinthians", "galatians", "ephesians"
+      "matthew", "mark", "luke", "john", "acts", "ephesians", "philippians", "colossians", "1thessalonians", 
+      "2thessalonians", "1timothy", "2timothy", "titus", "philemon", "hebrews", "james", "1peter", "2peter", 
+      "1john", "2john", "3john", "jude", "revelation"]
+
+    return(bible_book_list)
+  except:
+    traceback.print_exc()
+    return (result)
 
 
 def read_text_file_to_array(input_file_name, max_lines = None):
@@ -278,7 +373,7 @@ def remove_item_from_list(input_list, remove_item=""):
     return(None)
 
 
-def modify_string_for_email(input_string):
+def modify_string_for_email_header(input_string):
   """
   This function is a workaround for the bug that Python 3 decoding doesn't work.
   It removes some typical UTC characters that may be returned from API calls and problematise use of a string in an email header.
@@ -294,4 +389,3 @@ def modify_string_for_email(input_string):
   except:
     traceback.print_exc()
     return(input_string)
-

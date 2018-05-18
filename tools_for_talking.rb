@@ -63,13 +63,10 @@ def get_user_int_array(prompt_text = "\nPlease enter integer values...", divider
    # not very fancy error trapping: it will all fail if there is one non-integer value
    begin
       input_string = get_user_input(prompt_text = prompt_text + " (use '#{divider}' as the divider)")
-      puts(input_string)
       input_array = input_string.split(divider)
-      puts(input_array)
       int_array = input_array.map { |int_string|
          int_string.to_i
       }
-      puts(int_array)
       return(int_array)
    rescue
       puts("Sorry, error converting input to integer array.")

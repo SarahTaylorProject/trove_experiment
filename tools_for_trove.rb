@@ -58,11 +58,11 @@ def write_trove_results(trove_api_results, output_file_name, search_word, search
 
    CSV.open(output_file_name, 'w') do |csv|
    
-      csv << ["search_word", "search_town", "result_number", "trove_url", "trove_article_heading", "trove_article_title", "trove_article_", "trove_article_page", "trove_article_snippet"]
+      csv << ["search_word", "search_town", "result_number", "trove_url", "trove_article_heading", "trove_article_title", "trove_article_", "trove_article_page", "trove_article_snippet", "trove_article_id"]
       
       trove_api_results.xpath('//article').each do |trove_article|
          result_count = result_count + 1      
-         csv << [search_word, search_town, result_count, trove_article.xpath('troveUrl').text, trove_article.xpath('heading').text, trove_article.xpath('title').text, trove_article.xpath('date').text, trove_article.xpath('page').text, trove_article.xpath('snippet').text.gsub(/<strong>|<\/strong>/,"")]
+         csv << [search_word, search_town, result_count, trove_article.xpath('troveUrl').text, trove_article.xpath('heading').text, trove_article.xpath('title').text, trove_article.xpath('date').text, trove_article.xpath('page').text, trove_article.xpath('snippet').text.gsub(/<strong>|<\/strong>/,""), trove_article.attr('id')]
 
        end#of article
    end#of writing csv
@@ -81,7 +81,7 @@ def preview_trove_results(input_trove_file)
    
    # take only the fields of interest for reading aloud, into an array of trove results
    input_trove = CSV.read(input_trove_file).map { |row|
-     [row[4], row[6], row[8]]
+     [row[4], row[6], row[8], row[9]]
    }.uniq
 
    prompt_suffix = "\n\t'n' to skip this article for reading "
@@ -89,12 +89,12 @@ def preview_trove_results(input_trove_file)
 
    # loop through and preview results
    i = 1
-   input_trove[i..-1].each do |str_heading, str_date, str_snippet|      
+   input_trove[i..-1].each do |str_heading, str_date, str_snippet, str_trove_id|      
    
       begin#error handling                  
       status = 0
        
-      puts "\nArticle #{i}"
+      puts "\nArticle #{i}, trove_id #{str_trove_id}"
       puts "Heading: #{str_heading}"
       puts "Date: #{str_date}"
       puts "Snippet:\n#{str_snippet}"
@@ -122,7 +122,7 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
    
    # take only the fields of interest for reading aloud, into an array of trove results
    input_trove = CSV.read(input_trove_file).map { |row|
-     [row[4], row[6], row[8]]
+     [row[4], row[6], row[8], row[9]]
    }.uniq
 
    i = 1

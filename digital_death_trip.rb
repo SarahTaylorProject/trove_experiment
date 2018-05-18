@@ -14,6 +14,7 @@ end
 default_town_path = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
 standard_town_data_types = ['SAMPLE PTV STOP FILE', 'PTV GTFS', 'VICMAP']
+continue = true
 
 say_something("Hello, this is Digital Death Trip in test mode.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)

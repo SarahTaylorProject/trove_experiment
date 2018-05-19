@@ -154,10 +154,9 @@ def unzip_single_file(file_name, path_name=Dir.pwd, overwrite = true, output_pat
       else
          command_string = "7za x " 
          if (overwrite == true) then
-            command_string += " -aoa "
+            command_string += "-aoa "
          end
-         command_string += full_file_name + " -o:" + output_path_name
-         output_path_name = "/" + output_path_name 
+         command_string += full_file_name + " -o" + output_path_name
       end
 
       puts(command_string)

@@ -32,7 +32,6 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
 
    trove_api_request = "http://api.trove.nla.gov.au/result?key="
    trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{current_search_word}+AND+#{current_search_town}"
-   #puts(trove_api_request)
 
    begin
       uri = URI(trove_api_request)
@@ -97,9 +96,9 @@ def preview_trove_results(input_trove_file)
        
       puts "\nArticle: #{i}"
       puts "trove_id: #{str_trove_id}"
-      puts "Headline: #{str_heading}"
-      puts "Date: #{str_date}"
-      puts "Preview of article content:\n#{str_snippet}"
+      puts "Headline:\n#{str_heading}"
+      puts "Date:\n#{str_date}"
+      puts "Content preview:\n#{str_snippet}"
             
       rescue Exception
          puts "Error at record #{i}"
@@ -134,11 +133,11 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
          clear_screen()    
                  
          if (article_numbers.include? i) then
-            puts "\nArticle: #{i}"
+            puts "\nArticle:#{i}"
             puts "trove_id: #{str_trove_id}"
-            puts "Headline: #{str_heading}"
-            puts "Date: #{str_date}"
-            puts "Preview of content:\n#{str_snippet}"
+            puts "Headline:\n#{str_heading}"
+            puts "Date:\n#{str_date}"
+            puts "Content preview:\n#{str_snippet}"
             
             say_something("Article #{i}", also_print = false, speed = speed)
             read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)
@@ -223,7 +222,7 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
          str_snippet_array = str_snippet_new.split(".")
          say_something("Content preview:", also_print = also_print, speed = speed)
          str_snippet_array.each do |str_sentence|
-            say_something("#{str_sentence}", also_print = also_print, speed = speed)
+            say_something("#{str_sentence.strip()}", also_print = also_print, speed = speed)
          end
       end
      

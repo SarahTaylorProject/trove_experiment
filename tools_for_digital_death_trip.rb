@@ -4,7 +4,7 @@ require "date"
 require "rbconfig"
 load 'tools_for_talking.rb'
 
-def return_town_list(source_choice, input_path_name, default_speed=180)
+def return_town_list(source_choice, input_path_name)
    result = false
    begin
       if (source_choice[0].upcase == 'S') then

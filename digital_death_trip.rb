@@ -19,12 +19,13 @@ continue = true
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
-say_something("Would you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
-input_choice = get_user_input(prompt_text = "Enter town name OR 'random'")
+say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
+user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'exit' to cancel")
 
-if (input_choice.upcase == 'RANDOM') then
-
-   say_something("Please choose a data source for me to gather town names from.", also_print = true, speed = default_speed)
+if (user_input.upcase == 'EXIT') then
+   continue = false
+elsif (user_input.upcase == 'RANDOM') then
+   say_something("Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
    instruction_string = "\nI can search in: "
    standard_town_data_types.each do |data_type|
      instruction_string += "\n\t'" + data_type + "'"
@@ -34,7 +35,7 @@ if (input_choice.upcase == 'RANDOM') then
    if (source_choice.length == 0) then
       source_choice = standard_town_data_types[0]
    end
-
+   say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
    vic_town_list = return_town_list(source_type = source_choice, main_path_name = default_town_path_name)
    puts(vic_town_list)
    if (vic_town_list == false) then
@@ -48,7 +49,7 @@ if (input_choice.upcase == 'RANDOM') then
       try_again = true
       while (continue == true and try_again == true) do
          search_town = vic_town_list.sample
-         say_something("My random town choice is #{search_town}", also_print = true, speed = default_speed)      
+         say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
          say_something("What do you think?", also_print = true, speed = default_speed)
          user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
          if (user_input.upcase == 'EXIT') then
@@ -62,7 +63,7 @@ if (input_choice.upcase == 'RANDOM') then
    end
 
 else
-   search_town = input_choice
+   search_town = user_input
 end
 
 if (continue == true) then
@@ -79,8 +80,8 @@ if (continue == true) then
       continue = false
       say_something("\nSorry, no tragedy results found for #{search_town}")
    else
-      say_something("Would you like me to read the headlines?", also_print = true, speed = default_speed)
-      user_input = get_user_input(prompt_text = "\nEnter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear headlines...")
+      say_something("\nWould you like me to read the headlines?", also_print = true, speed = default_speed)
+      user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear headlines...")
       if (user_input.upcase == 'EXIT') then
          continue = false
       elsif (user_input.upcase != 'N') then
@@ -112,7 +113,7 @@ while (continue == true) do
    end
 
    if (continue == true) then
-      say_something("Ok. I will now read previews of articles #{article_numbers}", also_print = true, speed = default_speed)
+      say_something("Ok. I will now read some of articles #{article_numbers}", also_print = true, speed = default_speed)
       read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
    end
 end

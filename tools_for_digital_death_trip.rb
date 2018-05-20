@@ -145,11 +145,20 @@ def unzip_single_file(file_name, path_name=Dir.pwd, overwrite = true, output_pat
       if (output_path_name == nil) then
          output_path_name = File.join(path_name, File.basename(file_name, '.zip'))
       end
-      command_string = "unzip "
-      if (overwrite == true) then
-         command_string += "-o "
+      if (operating_system() == 'windows') then
+         command_string = "unzip "
+         if (overwrite == true) then
+            command_string += "-o "
+         end
+         command_string += full_file_name + " -d " + output_path_name
+      else
+         command_string = "7za x " 
+         if (overwrite == true) then
+            command_string += "-aoa "
+         end
+         command_string += full_file_name + " -o" + output_path_name
       end
-      command_string += full_file_name + " -d " + output_path_name
+
       puts(command_string)
       system(command_string)
       puts("Successfully unzipped #{full_file_name}")
@@ -203,3 +212,12 @@ def convert_phrase_string_for_url(input_string, input_divider = ' ', output_quot
    return(output_string)
 
 end
+
+
+# POTENTIAL FUNCTION: READING LIST OF EXISTING FILES
+# existing_tragedy_file_list = Array.new
+# Dir.foreach(default_output_path) do |file_name|
+#    if (file_name.include?("trove_result") and file_name.include?("tragedy")) then
+#       existing_tragedy_file_list << file_name
+#    end
+# end

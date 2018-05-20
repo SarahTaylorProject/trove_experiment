@@ -31,7 +31,7 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
 
    trove_api_request = "http://api.trove.nla.gov.au/result?key="
    trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{current_search_word}+AND+#{current_search_town}"
-   puts(trove_api_request)
+   #puts(trove_api_request)
 
    begin
       uri = URI(trove_api_request)
@@ -85,9 +85,6 @@ def preview_trove_results(input_trove_file)
      [row[4], row[6], row[8], row[9]]
    }.uniq
 
-   prompt_suffix = "\n\t'n' to skip this article for reading "
-   prompt_suffix += "\n\tcarriage return or 'y' to keep this article for reading" 
-
    # loop through and preview results
    i = 1
    input_trove[i..-1].each do |str_heading, str_date, str_snippet, str_trove_id|      
@@ -95,11 +92,11 @@ def preview_trove_results(input_trove_file)
       begin#error handling                  
       status = 0
        
-      puts "\nArticle #{i}"
-      puts "trove_id #{str_trove_id}"
+      puts "\nArticle: #{i}"
+      puts "trove_id: #{str_trove_id}"
       puts "Heading: #{str_heading}"
       puts "Date: #{str_date}"
-      puts "Snippet:\n#{str_snippet}"
+      puts "Preview of article content:\n#{str_snippet}"
             
       rescue Exception
          puts "Error at record #{i}"
@@ -115,9 +112,8 @@ end
 
 
 def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
-   # This method reads the Trove results aloud
-   # The can skip articles if the user presses 'n'. It will pause at the end of each article.
-   # Input: Trove file
+   # This method reads the Trove results aloud, given an array of articles to read
+   # Input: Trove file, array of article numbers to read out
 
    clear_screen()
    puts("\nREADING ARTICLES #{article_numbers}******")
@@ -135,31 +131,14 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
          clear_screen()    
                  
          if (article_numbers.include? i) then
-            puts "\nArticle #{i}"
-            puts "trove_id #{str_trove_id}"
-            puts "Heading: #{str_heading}"
+            puts "\nArticle: #{i}"
+            puts "trove_id: #{str_trove_id}"
+            puts "Headline: #{str_heading}"
             puts "Date: #{str_date}"
-            puts "Snippet:\n#{str_snippet}"  
-            # only proceed with the extra formatting if this article is to be said aloud
-                  
-            # fancy date format
-            new_date = convert_date(str_date)
-
-            # remove the first part of the snippet, which is the same as the headline
-            str_snippet = str_snippet.gsub(str_heading, "")
-
-            # remove annoying dart strings common to Trove...I don't know how to do this in one command rather than two
-            str_snippet = str_snippet.gsub("...", " ")
-            str_snippet = str_snippet.gsub("..", " ")
-            str_snippet = remove_unfinished_sentence(str_snippet)
-
-            # say the three items aloud
-            puts "\t...Reading Article #{i}"
-            puts("\nSnippet with hanging sentences removed:\n#{str_snippet}")
+            puts "Preview of content:\n#{str_snippet}"
             
-            say_something("date #{new_date}", also_print = false)
-            say_something(str_heading, also_print = false, speed = 140)
-            say_something("#{str_snippet}", also_print = false, speed = 140)
+            say_something("Article #{i}", also_print = false, speed = 140)
+            read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)
 
          end#of this record
       
@@ -177,39 +156,36 @@ end
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
+# note may 19: make this take a default speed
 def read_trove_article(str_heading, str_date, str_snippet)
 
    begin#error handling 
       
       clear_screen()    
                  
-      #puts "\nArticle #{i}"
       puts "\nHeading: #{str_heading}"
       puts "Date: #{str_date}"
-      puts "Snippet:\n#{str_snippet}"  
+      puts "Preview of content:\n#{str_snippet}"  
                     
-         # fancy date format
-         new_date = convert_date(str_date)
+      # fancy date format
+      new_date = convert_date(str_date)
 
-         # remove the first part of the snippet, which is the same as the headline
-         str_snippet = str_snippet.gsub(str_heading, "")
+      #str_snippet = remove_unfinished_sentence(str_snippet)
+      # remove the first part of the snippet, which is the same as the headline
+      str_snippet_new = str_snippet.gsub(str_heading, "")
 
-         # remove annoying dart strings common to Trove...I don't know how to do this in one command rather than two
-         str_snippet = str_snippet.gsub("...", " ")
-         str_snippet = str_snippet.gsub("..", " ")
-         #str_snippet = remove_unfinished_sentence(str_snippet)
+      # remove annoying dart strings common to Trove...I don't know how to do this in one command rather than two
+      str_snippet_new = str_snippet_new.gsub("...", " ")
+      str_snippet_new = str_snippet_new.gsub("..", " ")
 
-         # say the three items aloud
-         puts "\t...Reading Article #{i}"
-         puts("\nSnippet with hanging sentences removed:\n#{str_snippet}")
-            
-         say_something("date #{new_date}", also_print = false)
-         say_something(str_heading, also_print = false, speed = 140)
-         say_something("#{str_snippet}", also_print = false, speed = 140)
+           
+      say_something("Date: #{new_date}", also_print = false)
+      say_something("Headline: #{str_heading}", also_print = false, speed = 140)
+      say_something("Preview of content: #{str_snippet_new}", also_print = false, speed = 140)
      
-      rescue Exception
-         puts "Error at record #{i}"
-      end#of error handling   
+   rescue Exception
+      puts "Error at record #{i}"
+   end#of error handling   
 
    return(true)
 

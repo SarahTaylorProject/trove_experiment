@@ -94,7 +94,7 @@ default_article_numbers = [1, 2, 3, 4]
 while (continue == true) do   
    clear_screen()
    result_count = preview_trove_results(output_file_name)
-   say_something("\nWould you like me to read any article content?", also_print = true, speed = default_speed)  
+   say_something("\nWould you like me to read any particular articles?", also_print = true, speed = default_speed)  
    user_input = get_user_input(prompt_text = "\Please enter article numbers separated by space or comma. \nEnter 'n' or exit' to cancel.\nI will default to #{default_article_numbers}")
          
    if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
@@ -113,7 +113,7 @@ while (continue == true) do
    end
 
    if (continue == true) then
-      say_something("Ok. I will now read some of articles #{article_numbers}", also_print = true, speed = default_speed)
+      say_something("Ok. I will read articles #{article_numbers}", also_print = true, speed = default_speed)
       read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
    end
 end

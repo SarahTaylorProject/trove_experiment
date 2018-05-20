@@ -17,6 +17,7 @@ def read_trove_key(my_trove_file = "my_trove.txt")
    return(my_trove_key)
 end
 
+
 def fetch_trove_results(current_search_town, current_search_word, trove_key)
    # This method constructs a single search request for Trove (of a very specific format!) 
    # Input: two search parameters (town name, and search term) and the API key 
@@ -31,7 +32,6 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
 
    trove_api_request = "http://api.trove.nla.gov.au/result?key="
    trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{current_search_word}+AND+#{current_search_town}"
-   #puts(trove_api_request)
 
    begin
       uri = URI(trove_api_request)
@@ -45,6 +45,7 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
    return(trove_api_results)
 
 end
+
 
 def write_trove_results(trove_api_results, output_file_name, search_word, search_town)
    # This method writes the Trove XML results to a csv file, one article at a time
@@ -72,6 +73,7 @@ def write_trove_results(trove_api_results, output_file_name, search_word, search
 
 end
 
+
 def preview_trove_results(input_trove_file)
    # This method previews the main fields of all articles
    # Input: a csv of Trove search results, written as above in the 'write_trove_results' method
@@ -94,9 +96,9 @@ def preview_trove_results(input_trove_file)
        
       puts "\nArticle: #{i}"
       puts "trove_id: #{str_trove_id}"
-      puts "Heading: #{str_heading}"
-      puts "Date: #{str_date}"
-      puts "Preview of article content:\n#{str_snippet}"
+      puts "Headline:\n#{str_heading}"
+      puts "Date:\n#{str_date}"
+      puts "Content preview:\n#{str_snippet}"
             
       rescue Exception
          puts "Error at record #{i}"
@@ -111,7 +113,7 @@ def preview_trove_results(input_trove_file)
 end
 
 
-def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
+def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5), speed = 180)
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
@@ -131,13 +133,13 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
          clear_screen()    
                  
          if (article_numbers.include? i) then
-            puts "\nArticle: #{i}"
+            puts "\nArticle:#{i}"
             puts "trove_id: #{str_trove_id}"
-            puts "Headline: #{str_heading}"
-            puts "Date: #{str_date}"
-            puts "Preview of content:\n#{str_snippet}"
+            puts "Headline:\n#{str_heading}"
+            puts "Date:\n#{str_date}"
+            puts "Content preview:\n#{str_snippet}"
             
-            say_something("Article #{i}", also_print = false, speed = 140)
+            say_something("Article #{i}", also_print = false, speed = speed)
             read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)
 
          end#of this record
@@ -156,32 +158,73 @@ end
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
-# note may 19: make this take a default speed
-def read_trove_article(str_heading, str_date, str_snippet)
+def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
+   # This method reads the Trove results aloud, given an array of articles to read
+   # Input: Trove file, array of article numbers to read out
 
-   begin#error handling 
+   clear_screen()
+   puts("\nREADING DATES AND HEADLINES ******")
+   
+   # take only the fields of interest for reading aloud, into an array of trove results
+   input_trove = CSV.read(input_trove_file).map { |row|
+     [row[4], row[6], row[8], row[9]]
+   }.uniq
+
+   i = 1
+   input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
       
-      clear_screen()    
-                 
-      puts "\nHeading: #{str_heading}"
-      puts "Date: #{str_date}"
-      puts "Preview of content:\n#{str_snippet}"  
-                    
-      # fancy date format
-      new_date = convert_date(str_date)
+      begin#error handling     
+            
+         if (article_numbers.include? i) then
+            puts("\nArticle: #{i}")            
+            read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, year_only = true, also_print = true)
+         end
+      
+      rescue Exception
+         puts "Error at record #{i}"
+      end#of error handling
+      
+      i += 1
 
-      #str_snippet = remove_unfinished_sentence(str_snippet)
-      # remove the first part of the snippet, which is the same as the headline
-      str_snippet_new = str_snippet.gsub(str_heading, "")
+   end#of reading through input_trove
 
-      # remove annoying dart strings common to Trove...I don't know how to do this in one command rather than two
-      str_snippet_new = str_snippet_new.gsub("...", " ")
-      str_snippet_new = str_snippet_new.gsub("..", " ")
+   return(true)
 
+end
+
+
+def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, year_only = false, also_print = false)
+
+   begin#error handling                           
+      if (str_date != '') then
+         new_date = convert_date(str_date)
+         if (year_only == true) then
+            new_date = return_year_from_date_string(str_date)
+            say_something("Year: ", also_print = also_print, speed = speed)
+         else
+            say_something("Date: ", also_print = also_print, speed = speed)
+         end
+         say_something("#{new_date}", also_print = also_print, speed = speed)
+      end
+
+      if (str_heading != '') then
+         say_something("Headline:", also_print = also_print, speed = speed)
+         str_heading_array = str_heading.split(".")
+         str_heading_array.first(3).each do |str_sentence|
+            say_something("#{str_sentence}", also_print = also_print, speed = speed)
+         end
+      end
            
-      say_something("Date: #{new_date}", also_print = false)
-      say_something("Headline: #{str_heading}", also_print = false, speed = 140)
-      say_something("Preview of content: #{str_snippet_new}", also_print = false, speed = 140)
+      if (str_snippet != '') then
+         str_snippet_new = str_snippet.gsub(str_heading, "")
+         str_snippet_new = str_snippet_new.gsub("...", " ")
+         str_snippet_new = str_snippet_new.gsub("..", " ")
+         str_snippet_array = str_snippet_new.split(".")
+         say_something("Content preview:", also_print = also_print, speed = speed)
+         str_snippet_array.each do |str_sentence|
+            say_something("#{str_sentence.strip()}", also_print = also_print, speed = speed)
+         end
+      end
      
    rescue Exception
       puts "Error at record #{i}"

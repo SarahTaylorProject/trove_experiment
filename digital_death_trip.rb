@@ -65,7 +65,7 @@ if (input_choice.upcase == 'RANDOM') then
 else
    search_town = input_choice
 end
-continue = false
+
 if (continue == true) then
    say_something("I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
    output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
@@ -74,12 +74,12 @@ if (continue == true) then
    puts("\nWriting results to file now...")
    result_count = write_trove_results(trove_api_results, output_file_name, search_word, search_town)
    puts(result_count)
-end
 
-result_count = preview_trove_results(output_file_name)
-if (result_count == 0) then
-   continue = false
-   say_something("\nSorry, no tragedy results found for #{search_town}")
+   result_count = preview_trove_results(output_file_name)
+   if (result_count == 0) then
+      continue = false
+      say_something("\nSorry, no tragedy results found for #{search_town}")
+   end
 end
 
 default_article_numbers = [1, 2, 3, 4]

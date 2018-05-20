@@ -7,13 +7,13 @@ load 'tools_for_talking.rb'
 def return_town_list(source_choice, input_path_name, default_speed=180)
    result = false
    begin
-      if (source_choice[0].upcase == 'E' or source_choice.upcase == 'EXISTING PTV STOP FILES') then
-         say_something("You have instructed me to use the EXISTING PTV STOP FILES to compile a list of town names.", also_print = true, speed = default_speed) 
+      if (source_choice[0].upcase == 'S') then
+         puts("You have instructed me to use the exiting PTV STOP FILES to compile a list of town names.") 
          town_list = return_town_list_from_existing_ptv_stop_files(path_name = input_path_name)
          return(town_list)
-      elsif (source_choice[0].upcase == 'P' or source_choice.upcase == 'PTV GTFS ZIP FILE') then
-         say_something("You have instructed me to UNZIP the PTV General Transit Feed Specification file in order to compile a list of town names.", also_print = true, speed = default_speed)
-         say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)                  
+      elsif (source_choice[0].upcase == 'P') then
+         puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
+         puts("Please wait while I process this. It can take some time.")
          unzip_result = unzip_ptv_gtfs_file(input_path_name = input_path_name)
          if (unzip_result == true) then
             town_list = return_town_list_from_existing_ptv_stop_files(input_path_name = input_path_name)
@@ -21,8 +21,8 @@ def return_town_list(source_choice, input_path_name, default_speed=180)
             puts("\nSorry, could not complete the unzip of the GTFS file. You could try searching for existing stop files though.")
          end
          return(town_list)
-      elsif (source_choice[0].upcase == 'V' or source_choice.upcase == 'VICMAP') then
-         say_something("You have instructed me to use VICMAP data to compile a list of town names.", also_print = true, speed = default_speed)
+      elsif (source_choice[0].upcase == 'V') then
+         puts("You have instructed me to use VICMAP data to compile a list of town names.")
          town_list = return_town_list_from_vicmap(path_name = input_path_name)
          return(town_list)
       else

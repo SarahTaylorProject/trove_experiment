@@ -13,7 +13,7 @@ unless File.directory?(default_output_path)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['E for Existing PTV stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
+standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
@@ -24,9 +24,8 @@ input_choice = get_user_input(prompt_text = "Enter town name OR 'random'")
 
 if (input_choice.upcase == 'RANDOM') then
 
-   instruction_string = "Please choose a data source for me to gather town names from."
-   say_something(instruction_string, also_print = false, speed = default_speed)
-   instruction_string += "\nI can search in: "
+   say_something("Please choose a data source for me to gather town names from.", also_print = true, speed = default_speed)
+   instruction_string = "\nI can search in: "
    standard_town_data_types.each do |data_type|
      instruction_string += "\n\t'" + data_type + "'"
    end
@@ -79,6 +78,15 @@ if (continue == true) then
    if (result_count == 0) then
       continue = false
       say_something("\nSorry, no tragedy results found for #{search_town}")
+   else
+      say_something("Would you like me to read the headlines?", also_print = true, speed = default_speed)
+      user_input = get_user_input(prompt_text = "\nEnter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear headlines...")
+      say_something("\nHere are the dates and headlines...")
+      if (user_input.upcase == 'EXIT') then
+         continue = false
+      elsif (user_input.upcase != 'N') then
+         read_trove_headlines(input_trove_file = output_file_name, speed = default_speed)
+      end
    end
 end
 
@@ -86,8 +94,7 @@ default_article_numbers = [1, 2, 3, 4]
 while (continue == true) do   
    clear_screen()
    result_count = preview_trove_results(output_file_name)
-   
-   say_something("\nWould you like me to read any articles?", also_print = true, speed = default_speed)  
+   say_something("\nWould you like me to read any article content?", also_print = true, speed = default_speed)  
    user_input = get_user_input(prompt_text = "\Please enter article numbers separated by space or comma. \nEnter 'n' or exit' to cancel.\nI will default to #{default_article_numbers}")
          
    if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then

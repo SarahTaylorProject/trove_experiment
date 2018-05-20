@@ -3,7 +3,7 @@ require "net/http"
 require "date"
 require "rbconfig"
 
-def say_something(text, also_print = true, speed = 150)
+def say_something(text, also_print = true, speed = 180)
    # This method says text aloud through the command line
    # Checks for operating system and uses appropriate say-aloud command line
    # Works for linux and mac, could expand to others later

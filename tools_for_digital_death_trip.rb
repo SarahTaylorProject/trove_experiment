@@ -131,43 +131,79 @@ def unzip_ptv_file_and_return_path_list(main_file_name='gtfs.zip', main_path_nam
       puts("Error encountered unzipping PTV file #{File.join(main_path_name, main_file_name)}")
       return(unzipped_path_list)
    end
-
 end
 
 
-def unzip_single_file(file_name, path_name=Dir.pwd, overwrite = true, output_path_name=nil)
+def unzip_single_file(file_name, path_name=Dir.pwd, overwrite=true, output_path_name=nil)
    # unzips a single zip file
    # most code borrowed from https://gist.github.com/robc/217400
    # returns the output path if successful, or false if error encountered
    # if output_path_name is left as nil then it will construct a default output location using zip file norms
+   result = false
    begin
       full_file_name = File.join(path_name, file_name)
       if (output_path_name == nil) then
          output_path_name = File.join(path_name, File.basename(file_name, '.zip'))
       end
-      if (operating_system() == 'windows') then
-         command_string = "unzip "
-         if (overwrite == true) then
-            command_string += "-o "
-         end
-         command_string += full_file_name + " -d " + output_path_name
-      else
-         command_string = "7za x " 
-         if (overwrite == true) then
-            command_string += "-aoa "
-         end
-         command_string += full_file_name + " -o" + output_path_name
+      result = unzip_file_with_7z_command(full_file_name=full_file_name, output_path_name=output_path_name, overwrite=overwrite)
+      if (result == false) then
+         result = unzip_file_with_unzip_command(full_file_name=full_file_name, output_path_name=output_path_name, overwrite=overwrite)
       end
-
-      puts(command_string)
-      system(command_string)
-      puts("Successfully unzipped #{full_file_name}")
       return(output_path_name)
+
    rescue   
       puts("Error encountered with unzipping #{file_name}") 
-      return(false)
+      return(result)
    end
+end
 
+
+def unzip_file_with_unzip_command(full_file_name, output_path_name, overwrite=true)
+   # tries unzipping with the 'unzip' command, returns true if successful, false if error encountered
+   result = false
+   begin
+      puts("unzip_file_with_unzip_command")
+      command_string = "unzip "
+      if (overwrite == true) then
+         command_string += "-o "
+      end
+      command_string += full_file_name + " -d " + output_path_name
+      puts(command_string)
+      system(command_string)
+      puts("Successfully unzipped #{full_file_name} to #{output_path_name} using 'unzip' command")
+      result = true
+      return(result)
+   rescue
+      puts("Error encountered with unzipping #{full_file_name} to #{output_path_name}using 'unzip' command")
+      return(result)
+   end
+end
+
+
+def unzip_file_with_7z_command(full_file_name, output_path_name, overwrite=true)
+   # tries unzipping with the 'unzip' command line, returns true if successful, false if error encountered
+   result = false
+   begin
+      puts("unzip_file_with_7z_command")
+      if (operating_system() == 'windows') then
+         command_string = "7z"
+      else
+         command_string = "7za"
+      end
+      command_string += " x " 
+      if (overwrite == true) then
+         command_string += "-aoa "
+      end
+      command_string += full_file_name + " -o" + output_path_name
+      puts(command_string)
+      system(command_string)
+      puts("Successfully unzipped #{full_file_name} to #{output_path_name} using '7z' command")
+      result = true
+      return(result)
+   rescue
+      puts("Error encountered with unzipping #{full_file_name} to #{output_path_name} using '7z' command")
+      return(result)
+   end
 end
 
 
@@ -175,7 +211,6 @@ def pull_town_string_from_ptv_stop_string(input_string, start_divider="(", end_d
    result = false
    begin 
       input_string_parts = input_string.split(start_divider)
-
       if (input_string_parts.size != 2) then
          puts("String format for #{input_string} does not match PTV stop names, will return false.")
          return(result)

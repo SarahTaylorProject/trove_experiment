@@ -4,71 +4,55 @@ require "date"
 require "rbconfig"
 load 'tools_for_talking.rb'
 
-def return_standard_town_list(source_choice, path_name, default_speed=180)
-   if (source_choice[0].upcase == 'S' or source_choice.upcase == 'SAMPLE PTV STOP FILE') then
-      say_something("You have instructed me to use SAMPLE PTV STOP FILE data to compile a list of town names.", also_print = true, speed = default_speed) 
-      town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name)
-      return(town_list)
-   elsif (source_choice[0].upcase == 'P' or source_choice.upcase == 'PTV GTFS') then
-      say_something("You have instructed me to use PTV GTFS data to compile a list of town names.", also_print = true, speed = default_speed)
-      say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)                  
-      town_list = return_town_list_from_zipped_ptv_stop_files(main_path_name = path_name)
-      return(town_list)
-   elsif (source_choice[0].upcase == 'V' or source_choice.upcase == 'VICMAP') then
-      say_something("You have instructed me to use VICMAP data to compile a list of town names.", also_print = true, speed = default_speed)
-      town_list = return_town_list_from_vicmap(path_name = path_name)
-      return(town_list)
-   else
-      puts("Choice not in standard lists, please try again")
-      return(false)
-   end
-end
-
-
-def return_town_list_from_vicmap(path_name=Dir.pwd, search_state='VIC', vicmap_csv_file_name='vic_and_border_locality_list.csv', town_field_num=5, state_field_num=6)
-   result = []
-   puts("Attempting to read VicMap town list from #{File.join(path_name, vicmap_csv_file_name)}")
-   begin    
-      full_file_name = File.join(path_name, vicmap_csv_file_name)
-      csv_contents = CSV.read(full_file_name)
-      csv_contents.shift
-      town_list_from_csv = csv_contents.map { |row|
-         [row[town_field_num], row[state_field_num]]
-      }.uniq
-      full_town_list = town_list_from_csv.select { |town, state|
-         state == search_state
-      }
-      puts(full_town_list)
-      town_list = full_town_list.map { |town, state|
-         town
-      }.uniq
-      puts(town_list)
-      return(town_list)
-
+def return_town_list(source_choice, main_path_name, default_speed=180)
+   result = false
+   begin
+      if (source_choice[0].upcase == 'E' or source_choice.upcase == 'EXISTING PTV STOP FILES') then
+         say_something("You have instructed me to use the EXISTING PTV STOP FILES to compile a list of town names.", also_print = true, speed = default_speed) 
+         town_list = return_town_list_from_existing_ptv_stop_files(path_name = main_path_name)
+         return(town_list)
+      elsif (source_choice[0].upcase == 'P' or source_choice.upcase == 'PTV GTFS ZIP FILE') then
+         say_something("You have instructed me to UNZIP the PTV General Transit Feed Specification file in order to compile a list of town names.", also_print = true, speed = default_speed)
+         say_something("Please wait while I process this. It can take some time.", also_print = true, speed = default_speed)                  
+         unzip_result = unzip_ptv_gtfs_file(main_path_name = main_path_name)
+         if (unzip_result == true) then
+            town_list = return_town_list_from_existing_ptv_stop_files(main_path_name = main_path_name)
+         else
+            puts("Sorry, could not unzip file. You could try searching for existing stop files though.")
+         end
+         return(town_list)
+      elsif (source_choice[0].upcase == 'V' or source_choice.upcase == 'VICMAP') then
+         say_something("You have instructed me to use VICMAP data to compile a list of town names.", also_print = true, speed = default_speed)
+         town_list = return_town_list_from_vicmap(path_name = main_path_name)
+         return(town_list)
+      else
+         puts("Choice not in standard lists, please try again")
+      end
+      return(result)
    rescue
+      puts("Error encountered, exiting.")
       return(result)
    end
-
 end
 
 
-def return_town_list_from_zipped_ptv_stop_files(main_path_name=Dir.pwd, main_file_name='gtfs.zip', stop_file_name='stops.txt', stop_field_num=1)
+def return_town_list_from_existing_ptv_stop_files(main_path_name, main_file_name='gtfs.zip', default_stop_file_name='stops.txt', stop_field_num=1)
    result = false
    begin
       full_town_list = Array.new 
-      unzipped_path_list = unzip_ptv_file_and_return_path_list(main_file_name = main_file_name, main_path_name = main_path_name)
-      unzipped_path_list.each do |path_name|
-         puts(path_name)
+      
+      stop_file_list = Dir.glob("#{main_path_name}/**/#{default_stop_file_name}")
+
+      stop_file_list.each do |stop_file_name|
          puts(stop_file_name)
-         puts(stop_field_num)
-         current_town_list = return_town_list_from_single_ptv_stop_file(path_name = path_name, stop_file_name = stop_file_name, stop_field_num = stop_field_num)
-         puts("PTV stop file: #{File.join(path_name, stop_file_name)}")
+         puts("Found PTV stop file: #{stop_file_name}")
+         current_town_list = return_town_list_from_single_ptv_stop_file(stop_file_name = stop_file_name, stop_field_num = stop_field_num)
          puts("Adding #{current_town_list.size} town references to unsorted town list.")
          full_town_list.concat current_town_list
-         say_something("Working through PTV list. Current unsorted town references: #{full_town_list.size}")
+         puts("Working through PTV list. Current unsorted town references: #{full_town_list.size}")
       end      
       town_list = full_town_list.sort.uniq
-      say_something("Finished searching for town references in zipped files.")
+      puts("Finished searching for town references in zipped files.")
       puts("Sorted town count: #{town_list.size}")
       return(town_list)
    rescue
@@ -78,12 +62,11 @@ def return_town_list_from_zipped_ptv_stop_files(main_path_name=Dir.pwd, main_fil
 end
 
 
-def return_town_list_from_single_ptv_stop_file(path_name=Dir.pwd, stop_file_name='stops.txt', stop_field_num=1)
+def return_town_list_from_single_ptv_stop_file(stop_file_name, stop_field_num=1)
    result = []
-   puts("Attempting to make town list from PTV stop file #{File.join(path_name, stop_file_name)}")
+   puts("Attempting to make town list from PTV stop file #{stop_file_name}")
    begin
-      full_file_name = File.join(path_name, stop_file_name)
-      csv_contents = CSV.read(full_file_name)
+      csv_contents = CSV.read(stop_file_name)
       csv_contents.shift
       
       stop_list_from_csv = csv_contents.map { |row|
@@ -103,33 +86,65 @@ def return_town_list_from_single_ptv_stop_file(path_name=Dir.pwd, stop_file_name
    rescue
       return(result)
    end
-
 end
 
 
-def unzip_ptv_file_and_return_path_list(main_file_name='gtfs.zip', main_path_name=Dir.pwd, path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
-   say_something("I am now unzipping the PTV files.")
-   unzipped_path_list = Array.new
-   main_unzipped_path = unzip_single_file(file_name = main_file_name, path_name = main_path_name)
-   if (main_unzipped_path != false) then
-      for path_number in path_numbers_to_unzip.each do
+def pull_town_string_from_ptv_stop_string(input_string, start_divider="(", end_divider=")")  
+   result = false
+   begin 
+      input_string_parts = input_string.split(start_divider)
+      if (input_string_parts.size != 2) then
+         puts("String format for #{input_string} does not match PTV stop names, will return false.")
+         return(result)
+      else
+         target_string = input_string_parts[1]
+         town_string = target_string.split(end_divider)[0]
+         puts(town_string)
+         return(town_string)
+      end
+   rescue
+      puts("Error encountered extracting town from #{input_string}, will return false.")
+      return(result)
+   end
+end
+
+
+def unzip_ptv_gtfs_file(main_path_name, main_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
+   # unzipping the gtfs format file: very particular, they are zipped-zipped files, with numbered subdirectories
+   # returns true if successful in unzipping the main file and at least one zipped file from within this
+   # returns false if errors enountered and/or no zipped file from within the initial zip file, is successfully unzipped
+   result = false
+   begin
+      puts("Now unzipping the PTV GTFS file #{main_file_name}")
+      unzipped_path_list = Array.new
+      main_unzipped_path = unzip_single_file(file_name = main_file_name, path_name = main_path_name)
+      if (main_unzipped_path == false) then
+         return(result)
+      end
+      # unzip the zip files that came out of the initial unzip, but only for the specified path numbers
+      path_numbers_to_unzip.each do |path_number|
+         
          target_path = File.join(main_unzipped_path, path_number.to_s)
          puts("Current target path: #{target_path}")
-         Dir.foreach(target_path) do |file_name|
-            if (file_name.include?(".zip")) then
-               puts("Will try to unzip #{File.join(target_path, file_name)}")             
-               unzipped_path = unzip_single_file(file_name = file_name, path_name = target_path)      
-               if (unzipped_path != false) then
-                  unzipped_path_list << unzipped_path
-               end
-            end      
+         zip_file_list = Dir.glob("#{target_path}/**/*.zip")
+         
+         zip_file_list.each do |file_name|       
+            unzipped_path = unzip_single_file(file_name = file_name, path_name = target_path)      
+            if (unzipped_path != false) then
+               unzipped_path_list << unzipped_path
+            end                    
+         end# of zip_file_list.each               
+         puts(unzipped_path_list)
+         
+         if (unzipped_path_list.size > 1) then
+            result = true
          end
-      end      
-      puts(unzipped_path_list)
-      return(unzipped_path_list)
-   else
+      
+      end#of path_numbers_to_unzip.each
+      return(result)
+   rescue
       puts("Error encountered unzipping PTV file #{File.join(main_path_name, main_file_name)}")
-      return(unzipped_path_list)
+      return(result)
    end
 end
 
@@ -207,26 +222,30 @@ def unzip_file_with_7z_command(full_file_name, output_path_name, overwrite=true)
 end
 
 
-def pull_town_string_from_ptv_stop_string(input_string, start_divider="(", end_divider=")")  
-   result = false
-   begin 
-      input_string_parts = input_string.split(start_divider)
-      if (input_string_parts.size != 2) then
-         puts("String format for #{input_string} does not match PTV stop names, will return false.")
-         return(result)
-      else
-         target_string = input_string_parts[1]
-         town_string = target_string.split(end_divider)[0]
-         puts(town_string)
-         return(town_string)
-      end
+def return_town_list_from_vicmap(main_path_name, search_state='VIC', vicmap_csv_file_name='vic_and_border_locality_list.csv', town_field_num=5, state_field_num=6)
+   result = []
+   puts("Attempting to read VicMap town list from #{File.join(main_path_name, vicmap_csv_file_name)}")
+   begin    
+      full_file_name = File.join(main_path_name, vicmap_csv_file_name)
+      csv_contents = CSV.read(full_file_name)
+      csv_contents.shift
+      town_list_from_csv = csv_contents.map { |row|
+         [row[town_field_num], row[state_field_num]]
+      }.uniq
+      full_town_list = town_list_from_csv.select { |town, state|
+         state == search_state
+      }
+      puts(full_town_list)
+      town_list = full_town_list.map { |town, state|
+         town
+      }.uniq
+      puts(town_list)
+      return(town_list)
    rescue
-      puts("Error encountered extracting town from #{input_string}, will return false.")
       return(result)
    end
 
 end
-
 
 def convert_phrase_string_for_url(input_string, input_divider = ' ', output_quotemark='%22', output_divider='%20')
    # changes a phrase string with spaces, to string suitable for use in a URL

@@ -61,8 +61,24 @@ end
 def get_user_int_array(prompt_text = "\nPlease enter integer values...", divider = ",")
    # reads user input to an integer array
    # not very fancy error trapping: it will all fail if there is one non-integer value
+   result = false
    begin
       input_string = get_user_input(prompt_text = prompt_text + " (use '#{divider}' as the divider)")
+      input_string = get_user_input(prompt_text = prompt_text)
+      result = return_int_array_from_string(input_string = input_string, divider = divider)
+      return(result)
+   rescue
+      puts("Sorry, error converting input to integer array.")
+      return(result)
+   end
+end
+
+
+def return_int_array_from_string(input_string, divider = ",")
+   # convert input to an integer array
+   # not very fancy error trapping: it will all fail if there is one non-integer value
+   result = false
+   begin
       input_array = input_string.split(divider)
       int_array = input_array.map { |int_string|
          int_string.to_i
@@ -70,10 +86,9 @@ def get_user_int_array(prompt_text = "\nPlease enter integer values...", divider
       return(int_array)
    rescue
       puts("Sorry, error converting input to integer array.")
-      return(Array.new)
+      return(result)
    end
 end
-
 
 def clear_screen()
    system("clear")

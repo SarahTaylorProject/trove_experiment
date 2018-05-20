@@ -159,7 +159,7 @@ end
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
-def read_trove_headlines(input_trove_file, article_numbers = Array(1..3), speed = 180)
+def read_trove_headlines(input_trove_file, speed = 180, article_numbers = [1, 2])
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
@@ -175,15 +175,17 @@ def read_trove_headlines(input_trove_file, article_numbers = Array(1..3), speed 
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
       
       begin#error handling     
-                
-         # puts "\nArticle: #{i}"
-         # puts "trove_id: #{str_trove_id}"
-         puts "Headline: #{str_heading}"
-         puts "Date: #{str_date}"
+            
+         if (article_numbers.include? i) then    
+            puts "\nArticle: #{i}"
+            puts "Date: #{str_date}"
+            #puts "Headline: #{str_heading}"
          
-         if (article_numbers.include? i) then
             say_something("Article #{i}", speed = speed)
-            read_trove_article(str_heading = str_heading, str_date = str_date, speed = speed, include_labels = false, year_only = true)
+
+            #read_trove_article(str_heading = str_heading, str_date = str_date, speed = speed, include_labels = false, year_only = true)
+            #read_trove_article(str_heading = str_heading = str_heading_clip, str_date = str_date, speed = speed, include_labels = false, also_print = true)
+            read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, also_print = true)
          end
       
       rescue Exception
@@ -200,10 +202,9 @@ end
 
 
 
-def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, include_labels = true, year_only = false)
+def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, include_labels = true, year_only = false, also_print = false)
 
-   begin#error handling     
-                                   
+   begin#error handling                           
       if (str_date != '') then
          new_date = convert_date(str_date)
          if (year_only == true) then
@@ -214,26 +215,35 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
             current_label = "DATE"
          end
          if (include_labels == true) then
-            say_something(current_label, also_print = false, speed = speed)
+            say_something(current_label, also_print = also_print, speed = speed)
          end
-         say_something("#{new_date}", also_print = false, speed = speed)
+         say_something("#{new_date}", also_print = also_print, speed = speed)
       end
 
       if (str_heading != '') then
          if (include_labels == true) then
-            say_something("HEADLINE", also_print = false, speed = speed)
+            say_something("HEADLINE", also_print = also_print, speed = speed)
          end
-         say_something("#{str_heading}", also_print = false, speed = speed)
+         str_heading_array = str_heading.split(".")
+         print(str_heading_array.size)
+         str_heading_array.first(3).each do |str_sentence|
+            puts(str_sentence)
+            say_something("#{str_sentence}", also_print = also_print, speed = speed)
+         end
       end
            
       if (str_snippet != '') then
          str_snippet_new = str_snippet.gsub(str_heading, "")
          str_snippet_new = str_snippet_new.gsub("...", " ")
          str_snippet_new = str_snippet_new.gsub("..", " ")
+         str_snippet_array = str_snippet_new.split(".")
          if (include_labels == true) then
-            say_something("PREVIEW OF CONTENT", also_print = false, speed = speed)
+            say_something("PREVIEW OF CONTENT", also_print = also_print, speed = speed)
          end
-         say_something("#{str_snippet_new}", also_print = false, speed = speed)
+         str_snippet_array.each do |str_sentence|
+            puts(str_sentence)
+            say_something("#{str_sentence}", also_print = also_print, speed = speed)
+         end
       end
      
    rescue Exception

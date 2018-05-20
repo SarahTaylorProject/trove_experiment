@@ -81,7 +81,6 @@ if (continue == true) then
    else
       say_something("Would you like me to read the headlines?", also_print = true, speed = default_speed)
       user_input = get_user_input(prompt_text = "\nEnter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear headlines...")
-      say_something("\nHere are the dates and headlines...")
       if (user_input.upcase == 'EXIT') then
          continue = false
       elsif (user_input.upcase != 'N') then

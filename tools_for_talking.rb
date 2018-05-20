@@ -127,6 +127,13 @@ def convert_date(text)
 end
 
 
+def return_year_from_date_string(text)
+   new_date_array = text.split(/\/|\-/).map(&:to_i)
+   new_date = Date.new(*new_date_array)
+   new_date.year
+end
+
+
 def remove_unfinished_sentence(input_string, divider = ".")
    # This method removes any unfinished sentence from a string
    begin

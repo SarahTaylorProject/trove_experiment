@@ -159,7 +159,7 @@ end
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
-def read_trove_headlines(input_trove_file, speed = 180, article_numbers = [1, 2])
+def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
@@ -176,16 +176,9 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = [1, 2]
       
       begin#error handling     
             
-         if (article_numbers.include? i) then    
-            puts "\nArticle: #{i}"
-            puts "Date: #{str_date}"
-            #puts "Headline: #{str_heading}"
-         
-            say_something("Article #{i}", speed = speed)
-
-            #read_trove_article(str_heading = str_heading, str_date = str_date, speed = speed, include_labels = false, year_only = true)
-            #read_trove_article(str_heading = str_heading = str_heading_clip, str_date = str_date, speed = speed, include_labels = false, also_print = true)
-            read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, also_print = true)
+         if (article_numbers.include? i) then
+            puts("\nArticle: #{i}")            
+            read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, year_only = true, also_print = true)
          end
       
       rescue Exception
@@ -201,33 +194,24 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = [1, 2]
 end
 
 
-
-def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, include_labels = true, year_only = false, also_print = false)
+def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, year_only = false, also_print = false)
 
    begin#error handling                           
       if (str_date != '') then
          new_date = convert_date(str_date)
          if (year_only == true) then
-            new_date = new_date.year
-            puts("Year: #{new_date}")
-            current_label = "YEAR"
+            new_date = return_year_from_date_string(str_date)
+            say_something("Year: ", also_print = also_print, speed = speed)
          else
-            current_label = "DATE"
-         end
-         if (include_labels == true) then
-            say_something(current_label, also_print = also_print, speed = speed)
+            say_something("Date: ", also_print = also_print, speed = speed)
          end
          say_something("#{new_date}", also_print = also_print, speed = speed)
       end
 
       if (str_heading != '') then
-         if (include_labels == true) then
-            say_something("HEADLINE", also_print = also_print, speed = speed)
-         end
+         say_something("Headline:", also_print = also_print, speed = speed)
          str_heading_array = str_heading.split(".")
-         print(str_heading_array.size)
          str_heading_array.first(3).each do |str_sentence|
-            puts(str_sentence)
             say_something("#{str_sentence}", also_print = also_print, speed = speed)
          end
       end
@@ -237,11 +221,8 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
          str_snippet_new = str_snippet_new.gsub("...", " ")
          str_snippet_new = str_snippet_new.gsub("..", " ")
          str_snippet_array = str_snippet_new.split(".")
-         if (include_labels == true) then
-            say_something("PREVIEW OF CONTENT", also_print = also_print, speed = speed)
-         end
+         say_something("Content preview:", also_print = also_print, speed = speed)
          str_snippet_array.each do |str_sentence|
-            puts(str_sentence)
             say_something("#{str_sentence}", also_print = also_print, speed = speed)
          end
       end

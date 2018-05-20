@@ -13,7 +13,7 @@ unless File.directory?(default_output_path)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['[E]XISTING PTV STOP FILES', '[P]TV GTFS ZIP FILE', '[V]ICMAP']
+standard_town_data_types = ['E for Existing PTV stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
@@ -37,6 +37,7 @@ if (input_choice.upcase == 'RANDOM') then
    end
 
    vic_town_list = return_town_list(source_type = source_choice, main_path_name = default_town_path_name)
+   puts(vic_town_list)
    if (vic_town_list == false) then
       say_something("I'm sorry, I encountered an error, please check and try again.", also_print = true, speed = default_speed)
       return(false)
@@ -64,7 +65,7 @@ if (input_choice.upcase == 'RANDOM') then
 else
    search_town = input_choice
 end
-
+continue = false
 if (continue == true) then
    say_something("I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
    output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
@@ -93,21 +94,20 @@ while (continue == true) do
       continue = false
    else
       article_numbers = return_int_array_from_string(user_input, divider = ",")
-   end
+      if (article_numbers == false) then
+        article_numbers = return_int_array_from_string(user_input, divider = " ")
+      end           
 
-   if (article_numbers == false) then
-      article_numbers = return_int_array_from_string(user_input, divider = " ")
-   end           
-
-   if (article_numbers == false) then
-      continue = false
-   elsif (article_numbers.size == 0) then
-      article_numbers = default_article_numbers
+      if (article_numbers == false) then
+         continue = false
+      elsif (article_numbers.size == 0) then
+         article_numbers = default_article_numbers
+      end
    end
 
    if (continue == true) then
       say_something("Ok. I will now read previews of articles #{article_numbers}", also_print = true, speed = default_speed)
-      read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers)
+      read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
    end
 end
 

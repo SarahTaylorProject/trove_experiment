@@ -94,7 +94,7 @@ def preview_trove_results(input_trove_file)
        
       puts "\nArticle: #{i}"
       puts "trove_id: #{str_trove_id}"
-      puts "Heading: #{str_heading}"
+      puts "Headline: #{str_heading}"
       puts "Date: #{str_date}"
       puts "Preview of article content:\n#{str_snippet}"
             
@@ -111,7 +111,7 @@ def preview_trove_results(input_trove_file)
 end
 
 
-def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
+def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5), speed = 140)
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
@@ -137,7 +137,7 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5))
             puts "Date: #{str_date}"
             puts "Preview of content:\n#{str_snippet}"
             
-            say_something("Article #{i}", also_print = false, speed = 140)
+            say_something("Article #{i}", also_print = false, speed = speed)
             read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)
 
          end#of this record
@@ -156,17 +156,10 @@ end
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
-# note may 19: make this take a default speed
-def read_trove_article(str_heading, str_date, str_snippet)
+def read_trove_article(str_heading, str_date, str_snippet, speed = 140)
 
-   begin#error handling 
-      
-      clear_screen()    
-                 
-      puts "\nHeading: #{str_heading}"
-      puts "Date: #{str_date}"
-      puts "Preview of content:\n#{str_snippet}"  
-                    
+   begin#error handling     
+                                   
       # fancy date format
       new_date = convert_date(str_date)
 
@@ -179,9 +172,9 @@ def read_trove_article(str_heading, str_date, str_snippet)
       str_snippet_new = str_snippet_new.gsub("..", " ")
 
            
-      say_something("Date: #{new_date}", also_print = false)
-      say_something("Headline: #{str_heading}", also_print = false, speed = 140)
-      say_something("Preview of content: #{str_snippet_new}", also_print = false, speed = 140)
+      say_something("Date: #{new_date}", also_print = false, speed = speed)
+      say_something("Headline: #{str_heading}", also_print = false, speed = speed)
+      say_something("Preview of content: #{str_snippet_new}", also_print = false, speed = speed)
      
    rescue Exception
       puts "Error at record #{i}"

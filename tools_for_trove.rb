@@ -127,11 +127,8 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
 
    i = 1
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
-      
       begin#error handling 
-      
-         clear_screen()    
-                 
+         clear_screen()                
          if (article_numbers.include? i) then
             puts "\nArticle:#{i}"
             puts "trove_id: #{str_trove_id}"
@@ -141,15 +138,11 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
             
             say_something("Article #{i}", also_print = false, speed = speed)
             read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)
-
          end#of this record
-      
       rescue Exception
          puts "Error at record #{i}"
       end#of error handling
-      
       i += 1
-
    end#of reading through input_trove
 
    return(true)
@@ -172,21 +165,16 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(
 
    i = 1
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
-      
-      begin#error handling     
-            
+      begin#error handling
          if (article_numbers.include? i) then
             puts("\nArticle: #{i}")            
             read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, year_only = true, also_print = true)
          end
-      
       rescue Exception
          puts "Error at record #{i}"
-      end#of error handling
-      
+      end#error handling 
       i += 1
-
-   end#of reading through input_trove
+   end
 
    return(true)
 
@@ -195,7 +183,7 @@ end
 
 def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, year_only = false, also_print = false)
 
-   begin#error handling                           
+   begin                           
       if (str_date != '') then
          new_date = convert_date(str_date)
          if (year_only == true) then
@@ -228,7 +216,7 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
      
    rescue Exception
       puts "Error at record #{i}"
-   end#of error handling   
+   end   
 
    return(true)
 

@@ -1,30 +1,33 @@
 # Trove API Experiment
 
-
-
-## Usage for 'call_the_olden_days'
-### without instructions read aloud:
+## Usage for 'digital_death_trip'
 ```
-ruby call_the_olden_days.rb
-```
-### with instructions read aloud:
-```
-SAY_EVERYTHING=true ruby call_the_olden_days.rb
+ruby digital_death_trip.rb
 ```
 
 ## Usage for 'call_the_bible_and_poetry'
-### without instructions read aloud:
 ```
 python call_the_bible_and_poetry.py
 ```
 
+## the 'call_the_olden_days.rb' file has been largely superseded by 'digital_death_trip.rb'
+
 ## Requirements
-"call_the_olden_days" requires Ruby and "call_the_bible_and_poetry" requires Python 3 (no fancy packages though - just requests and json).
+"digital death trip" requires Ruby
+"call_the_bible_and_poetry" requires Python 3 (no fancy packages though - just 'requests' and 'json')
 Both programs rely on internet access, as they will send requests to API's. 
 The Taylor Project lyrics are just a text file, that should be located in the same directory (in future this may move to an online repository)
 On Linux and Mac the "speak" function is in-built and the "say_something" functions take this into account.
 To hear any speaking on Windows, you will need to install the free speaking package 'espeak', and set up an environment variable for the command line executable.
 http://espeak.sourceforge.net/download.html
+Otherwise, you will only see the results
+
+
+### Notes from May 2018
+Most of the focus is now on the 'digital_death_trip.rb' file, as this will be used for a podcast prototype.
+It can now write results to geojson, using just the centroid objects to represent search localities. 
+It can read all existing output files and write these into one big geojson. 
+This is suirted to Google Maps but more work is needed to make this open.
 
 
 ### Notes from April 2018
@@ -58,15 +61,13 @@ The search is very simplified: just the town name string, not a clever geographi
 ## General Comments
 The program works but has a lot of overheads for the setup. 
 When the program runs well, it can be both memorable and emotionally affecting. When the program runs poorly it is just distracting and annoying!
-The program should be spruced up but – more importantly – be used as a stepping stone to other ideas. It is a proof of a general concept but needn't be so specific.
 
 ## Improvements Needed/Ideas
-- A visual interface, with greater flexibility and lower overheads for setup;
 - A general cleanup of code is needed. It is clunky and embarrassing at times, not modular enough. It was written quickly and with a low level of familiarity with Ruby. There are many opportunities to improve efficiency, clarity and error catching. 
+- Greater use of the map files it creates; plus more sophisticated map production than just centroids;
 - The search terms could definitely be more effective for comprehensiveness, e.g. sorting results differently (to avoid repetition), and/or adding newspaper information to make the geography of the searches smarter (not just sending the raw text of a town name). 
 - There could be the option for fetching the whole article rather than the snippets (some articles sound promising but are cut off bluntly);
-- The ability to graph or map the results somehow (so, not just reading out loud), will be very exciting, as the ability to see historical events tied to geographical locations tends to make them more “real” (plus more entertaining); 
 - Improving user experience in many ways: speed, access (not just through command line), GUI, less reliance on writing a csv, etc. 
 - More map-based elements, geographical searches.
-- More ability for multiple users and ongoing improvements, rather than something that only runs on a computer with Ruby and with very specific files present. This is where a web based application would be great.
+- A web based application would be great, to reduce reliance on command line. But this is not necessarily needed for the podcast concept.
 - More inclusion of interesting mashups: e.g. interacting with Twitter to send search terms.

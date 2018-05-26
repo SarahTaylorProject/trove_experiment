@@ -38,6 +38,14 @@ def return_town_data(source_choice, input_path_name)
 end
 
 
+def return_town_coordinate_dictionary(input_path_name)
+   town_dictionary = return_town_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
+   vicmap_town_dictionary = return_town_dictionary_from_vicmap_file(input_path_name = input_path_name)
+   town_dictionary.merge!(vicmap_town_dictionary)
+   return(town_dictionary)
+end
+
+
 def return_town_dictionary_from_vicmap_file(input_path_name, file_name = 'vic_and_border_locality_list.csv')
    result = false
    begin
@@ -51,7 +59,6 @@ def return_town_dictionary_from_vicmap_file(input_path_name, file_name = 'vic_an
       return(result)
    end
 end
-
 
 
 def return_town_dictionary_from_multiple_ptv_stop_files(input_path_name, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
@@ -214,9 +221,6 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
       return(result)
    end
 end
-
-
-
 
 
 

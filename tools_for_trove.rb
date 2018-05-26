@@ -4,7 +4,7 @@ require "net/http"
 require "nokogiri"
 require "date"
 require "rbconfig"
-load 'tools_for_talking.rb'
+load 'tools_for_general_use.rb'
 DEFAULT_ARTICLE_COUNT = 20
 
 
@@ -134,7 +134,7 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
             puts "trove_id: #{str_trove_id}"
             puts "Headline:\n#{str_heading}"
             puts "Date:\n#{str_date}"
-            puts "Content preview:\n#{str_snippet}"
+            puts "Content:\n#{str_snippet}"
             
             say_something("Article #{i}", also_print = false, speed = speed)
             read_trove_article(str_heading = str_heading, str_date = str_date, str_snippet = str_snippet)

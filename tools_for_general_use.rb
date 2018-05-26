@@ -35,20 +35,6 @@ def say_something(text, also_print = true, speed = 180)
 end
 
 
-def say_instruction(text)
-   # This method will say instructions out loud IF the environment permits this
-   # otherwise it will just send the text to puts
-   # It will not ask say_something to print it again!
-
-   puts(text)
-
-   if(ENV["SAY_EVERYTHING"] == "true") then
-      say_something(text, also_print = false)
-   end 
-
-end
-
-
 def get_user_input(prompt_text = "\nPlease enter value")
    # This method just gets direct input from the user with a prompt
    # Returns the user input
@@ -237,7 +223,7 @@ def convert_phrase_string_for_url(input_string, input_divider = ' ', output_quot
    # (i.e. puts a URL-friendly quote symbol at the start and end, and URL-friendly dividers in the middle)
    # https://www.w3schools.com/tags/ref_urlencode.asp
    begin
-      
+
       input_words = input_string.split(input_divider)
       if (input_words.size == 1) then
          return(input_string)
@@ -256,3 +242,14 @@ def convert_phrase_string_for_url(input_string, input_divider = ' ', output_quot
    end
 end
 
+
+def proper_case(input_string)
+   begin
+      output_string = input_string.split(" ").map { |word|
+         word.capitalize
+      }.join(" ")
+      return(output_string)
+   rescue
+      return(input_string)
+   end
+end

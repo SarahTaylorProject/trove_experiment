@@ -4,12 +4,12 @@ require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
 
-def return_town_list(source_choice, input_path_name)
+def return_town_data(source_choice, input_path_name)
    result = false
    begin
       if (source_choice[0].upcase == 'S') then
          puts("You have instructed me to use the existing PTV STOP FILES to compile a list of town names.") 
-         town_dictionary = return_town_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name, town_field_num=1, lat_field_num=2, long_field_num=3)
+         town_dictionary = return_town_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
          town_list = return_town_list_from_town_dictionary(town_dictionary)
          return([town_list, town_dictionary])
       elsif (source_choice[0].upcase == 'P') then
@@ -33,44 +33,6 @@ def return_town_list(source_choice, input_path_name)
       return(result)
    rescue
       puts("Error encountered, exiting.")
-      return(result)
-   end
-end
-
-
-def return_town_dictionary_from_single_file(file_name, file_type = 'ptv', town_field_num=1, lat_field_num=2, long_field_num=3, select_field_num=nil, select_field_value=nil)
-   result = false
-   puts("Attempting to make town dictionary from file #{file_name}")
-   begin
-      csv_contents = CSV.read(file_name)
-      csv_contents.shift
-      town_dictionary = Hash.new()
-      csv_contents.each do |row|
-         if (file_type == 'ptv') then
-            town_name = pull_town_string_from_ptv_stop_string(row[town_field_num])
-         elsif (file_type == 'vicmap') then
-            town_name = pull_town_string_from_vicmap_string(row[town_field_num])
-         else
-            town_name = row[town_field_num]
-         end     
-         puts(town_name)
-         if (select_field_num.nil? == false) then
-            if (row[select_field_num] != select_field_value) then
-               puts("Removing, #{row[select_field_num]} != #{select_field_value}")
-               town_name = false
-            end
-         end
-
-         if (town_name != false) then
-            town_dictionary[town_name] = [Float(row[lat_field_num]), Float(row[long_field_num])]
-         end
-      end
-      puts(town_dictionary)
-      puts(town_dictionary.length)
-      return(town_dictionary)
-
-   rescue
-      puts("Encountered error in return_town_dictionary_from_single_file...")
       return(result)
    end
 end
@@ -116,6 +78,44 @@ def return_town_dictionary_from_multiple_ptv_stop_files(input_path_name, default
       return(town_dictionary_sorted)
    rescue
       puts("Error encountered extracting towns from zipped PTV file, exiting...")
+      return(result)
+   end
+end
+
+
+def return_town_dictionary_from_single_file(file_name, file_type = 'ptv', town_field_num=1, lat_field_num=2, long_field_num=3, select_field_num=nil, select_field_value=nil)
+   result = false
+   puts("Attempting to make town dictionary from file #{file_name}")
+   begin
+      csv_contents = CSV.read(file_name)
+      csv_contents.shift
+      town_dictionary = Hash.new()
+      csv_contents.each do |row|
+         if (file_type == 'ptv') then
+            town_name = pull_town_string_from_ptv_stop_string(row[town_field_num])
+         elsif (file_type == 'vicmap') then
+            town_name = pull_town_string_from_vicmap_string(row[town_field_num])
+         else
+            town_name = row[town_field_num]
+         end     
+         puts(town_name)
+         if (select_field_num.nil? == false) then
+            if (row[select_field_num] != select_field_value) then
+               puts("Removing, #{row[select_field_num]} != #{select_field_value}")
+               town_name = false
+            end
+         end
+
+         if (town_name != false) then
+            town_dictionary[town_name] = [Float(row[lat_field_num]), Float(row[long_field_num])]
+         end
+      end
+      print_town_dictionary(town_dictionary)
+      puts(town_dictionary.length)
+      return(town_dictionary)
+
+   rescue
+      puts("Encountered error in return_town_dictionary_from_single_file...")
       return(result)
    end
 end

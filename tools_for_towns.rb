@@ -16,7 +16,7 @@ def return_town_data(source_choice, input_path_name)
          puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
          unzip_result = unzip_ptv_gtfs_file(input_path_name = input_path_name)
          if (unzip_result == true) then
-            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(input_path_name = input_path_name, town_field_num = 1, lat_field_num = 2, long_field_num = 3)
+            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
             town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
             return([town_list, town_coordinate_dictionary])
          else

@@ -3,7 +3,6 @@ require 'csv'
 require 'json'
 load 'tools_for_towns.rb'
 load 'tools_for_general_use.rb'
-DEFAULT_ARTICLE_COUNT = 20
 
 
 def make_single_town_article_geojson_object(town_name, town_coordinates=[0, 0], article_properties={})

@@ -17,6 +17,17 @@ max_articles_to_read = 3
 standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
+town_data_types = {'1' => "All PTV stop files already on file;", 
+   '2' => "PTV GTFS zip file (use this option if the GTFS file has not been unzipped);", 
+   '3' => "VicMap Locality CSV file"}
+
+
+town_data_types.each do |key, value|
+   puts("#{key}: #{value}")
+end
+
+exit()
+
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 

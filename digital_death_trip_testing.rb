@@ -18,7 +18,6 @@ max_articles_to_read = 3
 continue = true
 
 # say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
-# say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
 say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
 user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'exit' to cancel")
@@ -26,18 +25,20 @@ user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'e
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif (user_input.upcase == 'RANDOM') then
+	# nb. divide this into choose_town_data and choose_town_from_data or just choose_town
    say_something("I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
-   instruction_string = "\nI can search in: "
    town_data_options = return_town_data_options()
-   print_town_options(town_data_options)
-   instruction_string += "\nWhich would you like me to use? I will default to #{town_data_source_options['1']}"
+   puts("\nI can search in: ")
+   print_town_data_options(town_data_options)
+   default_option = '1'
+   instruction_string = "\nWhich would you like me to use? I will default to #{town_data_options[default_option].source_name}"
    source_choice = get_user_input(prompt_text = instruction_string)
    if (source_choice.length == 0) then
-      source_choice = standard_town_data_types[0]
+      source_choice = default_option
    end
    say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
    
-   town_data = return_town_data(source_type = source_choice, main_path_name = default_town_path_name)
+   town_data = return_chosen_town_list_and_town_coordinate_dictionary(source_choice = source_choice, town_data_options = town_data_options, town_path_name = default_town_path_name)
    town_list = town_data[0]
    town_dictionary = town_data[1]
    print_town_coordinate_dictionary(town_dictionary)
@@ -49,7 +50,7 @@ elsif (user_input.upcase == 'RANDOM') then
       say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
       return(false)
    else
-      say_something("I found #{town_list.length} unique Victorian towns in this data.", also_print = true, speed = default_speed)
+      say_something("I found #{town_list.length} towns in this data.", also_print = true, speed = default_speed)
       try_again = true
       while (continue == true and try_again == true) do
          search_town = town_list.sample

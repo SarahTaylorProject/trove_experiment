@@ -20,21 +20,22 @@ end
 
 def return_town_data_options
    town_data_source_dictionary = {}
-   town_data_source_dictionary['1'] = Town_data_option.new('Stop files', "(will use all stops.txt files found)", method(:return_town_coordinate_dictionary_from_multiple_ptv_stop_files))
-   town_data_source_dictionary['2'] = Town_data_option.new('PTV GTFS zip file', "(only necessary if the GTFS file has not been unzipped)", method(:return_town_coordinate_dictionary_from_gtfs_file))
-   town_data_source_dictionary['3'] = Town_data_option.new('VicMap', "(VicMap Locality CSV file)", method(:return_town_coordinate_dictionary_from_vicmap_file))
+   town_data_source_dictionary['1'] = Town_data_option.new('Stop files', "(will use all stops.txt files found in directory)", method(:return_town_coordinate_dictionary_from_multiple_ptv_stop_files))
+   town_data_source_dictionary['2'] = Town_data_option.new('PTV GTFS zip file', "(only needed if the GTFS file has not been unzipped)", method(:return_town_coordinate_dictionary_from_gtfs_file))
+   town_data_source_dictionary['3'] = Town_data_option.new('VicMap', "(will use the VicMap Locality CSV file in directory)", method(:return_town_coordinate_dictionary_from_vicmap_file))
    return(town_data_source_dictionary)
 end
 
 
-def print_town_data_options(town_data_source_dictionary)
-   town_data_source_dictionary.each do |key, value|
+def print_town_data_options(town_data_options)
+   puts("\n")
+   town_data_options.each do |key, value|
       puts("#{key}: #{value.source_name} #{value.source_description}\n")
    end
 end
 
 
-def return_chosen_town_list_and_town_coordinate_dictionary(source_choice, town_data_options, town_data_path_name=File.join(Dir.pwd, 'town_lists'))
+def return_chosen_town_list_and_town_coordinate_dictionary(source_choice, town_data_options, town_path_name=File.join(Dir.pwd, 'town_lists'))
    result = false
    begin
       if not (town_data_options.keys.include? source_choice) then
@@ -44,7 +45,7 @@ def return_chosen_town_list_and_town_coordinate_dictionary(source_choice, town_d
       source_choice_details = town_data_options[source_choice]
       puts("You have instructed me to use: #{source_choice_details.source_name}")
       puts(source_choice_details.source_function)
-      town_coordinate_dictionary = source_choice_details.source_function.call(town_data_path_name)
+      town_coordinate_dictionary = source_choice_details.source_function.call(town_path_name)
       if (town_coordinate_dictionary != false) then
          town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
       end
@@ -56,7 +57,7 @@ def return_chosen_town_list_and_town_coordinate_dictionary(source_choice, town_d
 end
 
 
-def return_hybrid_town_coordinate_dictionaryinput_path_name)
+def return_hybrid_town_coordinate_dictionary(input_path_name)
    town_coordinate_dictionary = {}
    ptv_town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
    if (ptv_town_coordinate_dictionary != false) then

@@ -4,33 +4,51 @@ require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
 
-def return_town_data(source_choice, input_path_name)
+
+class Town_data_option
+   attr_accessor :source_name, :source_description, :source_function
+   def initialize(source_name, source_description, source_function=nil)
+      @source_name = source_name
+      @source_description = source_description
+      @source_function = source_function
+   end
+   def display
+      puts("#{@source_name}: #{@source_description}\n")
+   end
+end
+
+
+def return_town_data_options
+   town_data_source_dictionary = {}
+   town_data_source_dictionary['1'] = Town_data_option.new('Stop files', "(will use all stops.txt files found)", method(:return_town_coordinate_dictionary_from_multiple_ptv_stop_files))
+   town_data_source_dictionary['2'] = Town_data_option.new('PTV GTFS zip file', "(only necessary if the GTFS file has not been unzipped)", method(:return_town_coordinate_dictionary_from_gtfs_file))
+   town_data_source_dictionary['3'] = Town_data_option.new('VicMap', "(VicMap Locality CSV file)", method(:return_town_coordinate_dictionary_from_vicmap_file))
+   return(town_data_source_dictionary)
+end
+
+
+def print_town_data_options(town_data_source_dictionary)
+   town_data_source_dictionary.each do |key, value|
+      puts("#{key}: #{value.source_name} #{value.source_description}\n")
+   end
+end
+
+
+def return_chosen_town_list_and_town_coordinate_dictionary(source_choice, town_data_options, town_data_path_name=File.join(Dir.pwd, 'town_lists'))
    result = false
    begin
-      if (source_choice[0].upcase == 'S') then
-         puts("You have instructed me to use the existing PTV STOP FILES to compile a list of town names.") 
-         town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
-         town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-         return([town_list, town_coordinate_dictionary])
-      elsif (source_choice[0].upcase == 'P') then
-         puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
-         unzip_result = unzip_ptv_gtfs_file(input_path_name = input_path_name)
-         if (unzip_result == true) then
-            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
-            town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-            return([town_list, town_coordinate_dictionary])
-         else
-            return(result)
-         end
-      elsif (source_choice[0].upcase == 'V') then
-         puts("You have instructed me to use VICMAP data to compile a list of town names.")
-         town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(input_path_name = input_path_name)
-         town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-         return([town_list, town_coordinate_dictionary])
-      else
-         puts("Choice not in standard lists, please try again")
+      if not (town_data_options.keys.include? source_choice) then
+         puts("Choice not available, exiting...")
+         return(result)
       end
-      return(result)
+      source_choice_details = town_data_options[source_choice]
+      puts("You have instructed me to use: #{source_choice_details.source_name}")
+      puts(source_choice_details.source_function)
+      town_coordinate_dictionary = source_choice_details.source_function.call(town_data_path_name)
+      if (town_coordinate_dictionary != false) then
+         town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
+      end
+      return([town_list, town_coordinate_dictionary])
    rescue
       puts("Error encountered, exiting.")
       return(result)
@@ -38,10 +56,16 @@ def return_town_data(source_choice, input_path_name)
 end
 
 
-def return_town_coordinate_dictionary(input_path_name)
-   town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
+def return_hybrid_town_coordinate_dictionaryinput_path_name)
+   town_coordinate_dictionary = {}
+   ptv_town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
+   if (ptv_town_coordinate_dictionary != false) then
+      town_coordinate_dictionary.merge!(ptv_town_coordinate_dictionary)
+   end
    vicmap_town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(input_path_name = input_path_name)
-   town_coordinate_dictionary.merge!(vicmap_town_coordinate_dictionary)
+   if (vicmap_town_coordinate_dictionary != false) then
+      town_coordinate_dictionary.merge!(vicmap_town_coordinate_dictionary)
+   end
    return(town_coordinate_dictionary)
 end
 
@@ -171,6 +195,23 @@ def print_town_coordinate_dictionary(town_coordinate_dictionary)
       end
    rescue
       return
+   end
+end
+
+
+def return_town_coordinate_dictionary_from_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
+   result = false
+   begin
+      puts("return_town_coordinates_from_gtfs_file")
+      unzip_result = unzip_ptv_gtfs_file(input_path_name = input_path_name)
+      if (unzip_result == true) then
+         town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
+         return(town_coordinate_dictionary)
+      end
+      return(result)
+   rescue
+      puts("Error encountered...")
+      return(result)
    end
 end
 

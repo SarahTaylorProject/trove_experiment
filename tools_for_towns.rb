@@ -14,9 +14,9 @@ def return_town_data(source_choice, input_path_name)
          return([town_list, town_coordinate_dictionary])
       elsif (source_choice[0].upcase == 'P') then
          puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
-         unzip_result = unzip_ptv_gtfs_file(input_path_name = input_path_name)
-         if (unzip_result == true) then
-            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(input_path_name = input_path_name, town_field_num = 1, lat_field_num = 2, long_field_num = 3)
+         unzipped_path_list = unzip_ptv_gtfs_file(input_path_name = input_path_name)
+         if (unzipped_path_list != false) then
+            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path_list = unzipped_path_list, default_stop_file_name = 'stops.txt', town_field_num = 1, lat_field_num = 2, long_field_num = 3)
             town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
             return([town_list, town_coordinate_dictionary])
          else
@@ -32,7 +32,7 @@ def return_town_data(source_choice, input_path_name)
       end
       return(result)
    rescue
-      puts("Error encountered, exiting.")
+      puts("Error encountered, HERE, exiting.")
       return(result)
    end
 end
@@ -61,13 +61,17 @@ def return_town_coordinate_dictionary_from_vicmap_file(input_path_name, file_nam
 end
 
 
-def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(input_path_name, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
+def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path_list, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
    result = false
    begin
       town_coordinate_dictionary = Hash.new() 
 
-      stop_file_list = Dir.glob("#{input_path_name}/**/#{default_stop_file_name}")
-      stop_file_list.each do |stop_file_name|
+      #stop_file_list = Dir.glob("#{input_path_name}/**/#{default_stop_file_name}")
+      unzipped_path_list.each do |unzipped_path|
+         puts("Unzipped path: #{unzipped_path}")
+         puts(default_stop_file_name)
+         puts(File.join(unzipped_path, default_stop_file_name))
+         stop_file_name = File.join(unzipped_path, default_stop_file_name) 
          puts("PTV stop file: #{stop_file_name}")
          current_town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(stop_file_name = stop_file_name, file_type = 'ptv', town_field_num = town_field_num, lat_field_num = lat_field_num, long_field_num = long_field_num)
          if (current_town_coordinate_dictionary != false) then 
@@ -202,13 +206,13 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
             end                    
          end# of zip_file_list.each               
          puts(unzipped_path_list)
-         
-         if (unzipped_path_list.size > 1) then
-            result = true
-         end
       
-      end#of path_numbers_to_unzip.each
-      return(result)
+      end#of path_numbers_to_unzip.each     
+      if (unzipped_path_list.size > 1) then
+         return(unzipped_path_list)
+      else
+         return(result)
+      end
    rescue
       puts("Error encountered unzipping PTV GTFS file #{File.join(input_path_name, gtfs_file_name)}")
       return(result)

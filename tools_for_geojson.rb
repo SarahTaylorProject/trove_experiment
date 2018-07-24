@@ -3,6 +3,7 @@ require 'csv'
 require 'json'
 load 'tools_for_towns.rb'
 load 'tools_for_general_use.rb'
+DEFAULT_ARTICLE_COUNT = 20
 
 
 def make_single_town_article_geojson_object(town_name, town_coordinates=[0, 0], article_properties={})
@@ -67,7 +68,7 @@ def write_geojson_for_all_csv_files(default_town_path_name, default_output_path,
          output_file_name = File.join(default_output_path, "map_collection_" + search_word + ".json")
       end
 
-      town_coordinate_dictionary = return_hybrid_town_coordinate_dictionary(input_path_name = default_town_path_name)
+      town_coordinate_dictionary = return_town_coordinate_dictionary(input_path_name = default_town_path_name)
       print_town_coordinate_dictionary(town_coordinate_dictionary)
 
       csv_file_list = Dir.glob("#{default_output_path}/**/*#{search_word}.csv")

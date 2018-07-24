@@ -88,9 +88,9 @@ continue = true
 #    end
 # end
 
-### TESTING AREA
+
 default_article_numbers = Array(1..5)
-random_article_numbers = Array.new(5) { rand(1..20) }
+random_article_range = Array(1..20)
 search_town = 'Elmore'
 output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 
@@ -104,47 +104,48 @@ if (continue == true) then
       # just reads the default first 5
       read_trove_headlines_sample(input_trove_file = output_file_name, speed = default_speed, article_numbers = default_article_numbers)
    elsif (user_input.upcase != 'N') then
-      # reads the random sample
+      # reads random sample of 5
+      random_article_numbers = Array.new(5) { rand(1..20) }
       read_trove_headlines_sample(input_trove_file = output_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
 end
 
-# while (continue == true) do   
-#    clear_screen()
-#    result_count = preview_trove_results(output_file_name)
+while (continue == true) do   
+   clear_screen()
+   result_count = preview_trove_results(output_file_name)
    
-#    say_something("\nShall I pick a random tragedy from this place? Or let me know if you would you like to pick from some specific articles", also_print = true, speed = default_speed)  
-#    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'n' or exit' to cancel.")
-#    if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
-#       continue = false
-#    elsif (user_input.upcase == 'PICK') then 
-#       say_something("\nWhich articles are you interested in?", also_print = true, speed = default_speed)  
-#       user_input = get_user_input(prompt_text = "\Please enter article numbers separated by space or comma. \nEnter 'n' or exit' to cancel.\nI will default to #{default_article_numbers}")   
-#       if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
-#          continue = false
-#       else
-#          article_numbers = return_int_array_from_string(user_input, divider = ",")
-#          if (article_numbers == false) then
-#             article_numbers = return_int_array_from_string(user_input, divider = " ")
-#          end           
-#          if (article_numbers == false) then
-#             continue = false
-#          elsif (article_numbers.size == 0) then
-#             article_numbers = default_article_numbers
-#          end
-#       end
-#       if (continue == true) then
-#          say_something("Ok. I will read articles #{article_numbers}", also_print = true, speed = default_speed)
-#          read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
-#       end
+   say_something("\nShall I pick a random tragedy from this place? Or let me know if you would you like to pick from some specific articles", also_print = true, speed = default_speed)  
+   user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'n' or exit' to cancel.")
+   if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
+      continue = false
+   elsif (user_input.upcase == 'PICK') then 
+      say_something("\nWhich articles are you interested in?", also_print = true, speed = default_speed)  
+      user_input = get_user_input(prompt_text = "\Please enter article numbers separated by space or comma. \nEnter 'n' or exit' to cancel.\nI will default to #{default_article_numbers}")   
+      if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
+         continue = false
+      else
+         article_numbers = return_int_array_from_string(user_input, divider = ",")
+         if (article_numbers == false) then
+            article_numbers = return_int_array_from_string(user_input, divider = " ")
+         end           
+         if (article_numbers == false) then
+            continue = false
+         elsif (article_numbers.size == 0) then
+            article_numbers = default_article_numbers
+         end
+      end
+      if (continue == true) then
+         say_something("Ok. I will read articles #{article_numbers}", also_print = true, speed = default_speed)
+         read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
+      end
 
-#    else
-#       random_article_number = random_article_range.sample
-#       say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
-#       read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = [random_article_number], speed = default_speed)
-#    end               
-# end
-###
+   else
+      random_article_number = random_article_range.sample
+      say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
+      read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = [random_article_number], speed = default_speed)
+   end               
+end
+
 # say_something("\nOk. Before I go, would you like me to update your map files?", also_print = true, speed = default_speed)
 # user_input = get_user_input(prompt_text = "Enter 'n' if not interested\nEnter any other key to update map files...")
 # if (user_input.upcase == 'EXIT') then

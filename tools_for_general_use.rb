@@ -147,15 +147,18 @@ def unzip_single_file(input_file_name, input_path_name=nil, overwrite=true, outp
          full_output_path_name = output_path_name
       end
 
-      print("1. First trying unzip with '7z'")
+      print("\n1. First trying unzip with '7z'")
       unzip_result = unzip_file_with_7z_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite, use_7za_suffix = false)
+      print(unzip_result)
       if (unzip_result == false) then
-         print("2. Now trying unzip with '7za'")
+         print("\n2. Now trying unzip with '7za'")
          unzip_result = unzip_file_with_7z_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite, use_7za_suffix = true)
+         print(unzip_result)
       end
       if (unzip_result == false) then
-         print("2. Now trying unzip with 'unzip'")
+         print("\n3. Now trying unzip with 'unzip'")
          unzip_result = unzip_file_with_unzip_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite)      
+         print(unzip_result)
       end
    
       if (unzip_result == true) then
@@ -165,7 +168,7 @@ def unzip_single_file(input_file_name, input_path_name=nil, overwrite=true, outp
       end
 
    rescue   
-      puts("Error encountered with unzipping #{input_file_name}") 
+      puts("FunctioN: unzip_single_file, error encountered with unzipping #{input_file_name}") 
       return(result)
    end
 end
@@ -184,17 +187,19 @@ def unzip_file_with_unzip_command(full_zip_file_name, full_output_path_name=nil,
       if (full_output_path_name != nil) then
          command_string += " -d " + full_output_path_name
       end
+      puts("Command:")
       puts(command_string)
       system_result = system(command_string)
+      puts(system_result)
       if (system_result == true) then
-         puts("system_result == true, Successfully unzipped #{full_zip_file_name} to #{output_path_name} with this command")         
+         puts("system_result == true, Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
          result = true
       else
-         puts("system_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{output_path_name} with this command")
+         puts("system_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
       end
       return(result)
    rescue
-      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
+      puts("Function: unzip_file_with_unzip_command, error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end
@@ -218,17 +223,19 @@ def unzip_file_with_7z_command(full_zip_file_name, full_output_path_name=nil, ov
       if (full_output_path_name != nil) then
          command_string += " -o" + full_output_path_name
       end
+      puts("Command:")
       puts(command_string)
       system_result = system(command_string)
+      puts(system_result)
       if (system_result == true) then
-         puts("system_result == true, successfully unzipped #{full_zip_file_name} to #{output_path_name} with this command")         
+         puts("system_result == true, successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
          result = true
       else
-         puts("system_result != true, could not successfully unzip to #{full_zip_file_name} to #{output_path_name} with this command")
+         puts("system_result != true, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
       end
       return(result)
    rescue
-      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
+      puts("Function: unzip_file_with_7z_command, error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end

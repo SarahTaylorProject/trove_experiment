@@ -146,14 +146,23 @@ def unzip_single_file(input_file_name, input_path_name=nil, overwrite=true, outp
       else
          full_output_path_name = output_path_name
       end
-      
-      result = unzip_file_with_7z_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite)
-      
-      if (result == false) then
-         result = unzip_file_with_unzip_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite)
+
+      print("1. First trying unzip with '7z'")
+      unzip_result = unzip_file_with_7z_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite, use_7za_suffix = false)
+      if (unzip_result == false) then
+         print("2. Now trying unzip with '7za'")
+         unzip_result = unzip_file_with_7z_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite, use_7za_suffix = true)
       end
-      
-      return(full_output_path_name)
+      if (unzip_result == false) then
+         print("2. Now trying unzip with 'unzip'")
+         unzip_result = unzip_file_with_unzip_command(full_zip_file_name = full_zip_file_name, full_output_path_name = full_output_path_name, overwrite = overwrite)      
+      end
+   
+      if (unzip_result == true) then
+         return(full_output_path_name)
+      else
+         return(result)
+      end
 
    rescue   
       puts("Error encountered with unzipping #{input_file_name}") 
@@ -166,7 +175,7 @@ def unzip_file_with_unzip_command(full_zip_file_name, full_output_path_name=nil,
    # tries unzipping a file with the 'unzip' command, returns true if successful, false if error encountered
    result = false
    begin
-      puts("unzip_file_with_unzip_command")
+      puts("\nFunction: unzip_file_with_unzip_command")
       command_string = "unzip "
       if (overwrite == true) then
          command_string += "-o "
@@ -176,26 +185,30 @@ def unzip_file_with_unzip_command(full_zip_file_name, full_output_path_name=nil,
          command_string += " -d " + full_output_path_name
       end
       puts(command_string)
-      system(command_string)
-      puts("Successfully unzipped #{full_zip_file_name} to #{output_path_name} using 'unzip' command")
-      result = true
+      system_result = system(command_string)
+      if (system_result == true) then
+         puts("system_result == true, Successfully unzipped #{full_zip_file_name} to #{output_path_name} with this command")         
+         result = true
+      else
+         puts("system_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{output_path_name} with this command")
+      end
       return(result)
    rescue
-      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}using 'unzip' command")
+      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end
 
 
-def unzip_file_with_7z_command(full_zip_file_name, full_output_path_name=nil, overwrite=true)
+def unzip_file_with_7z_command(full_zip_file_name, full_output_path_name=nil, overwrite=true, use_7za_suffix=true)
    # tries unzipping a file with the 'unzip' command line, returns true if successful, false if error encountered
    result = false
    begin
-      puts("unzip_file_with_7z_command")
-      if (operating_system() == 'windows') then
-         command_string = "7z"
-      else
-         command_string = "7za"
+      puts("\nFunction: unzip_file_with_7z_command")
+      command_string = "7z"            
+      if (use_7za_suffix == true) then
+         puts("Using suffix: '7za'")
+         command_string += "a"
       end
       command_string += " x " 
       if (overwrite == true) then
@@ -206,12 +219,16 @@ def unzip_file_with_7z_command(full_zip_file_name, full_output_path_name=nil, ov
          command_string += " -o" + full_output_path_name
       end
       puts(command_string)
-      system(command_string)
-      puts("Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} using '7z' command")
-      result = true
+      system_result = system(command_string)
+      if (system_result == true) then
+         puts("system_result == true, successfully unzipped #{full_zip_file_name} to #{output_path_name} with this command")         
+         result = true
+      else
+         puts("system_result != true, could not successfully unzip to #{full_zip_file_name} to #{output_path_name} with this command")
+      end
       return(result)
    rescue
-      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name} using '7z' command")
+      puts("Error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end

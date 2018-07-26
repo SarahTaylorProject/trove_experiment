@@ -66,7 +66,6 @@ def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path
    begin
       town_coordinate_dictionary = Hash.new() 
 
-      #stop_file_list = Dir.glob("#{input_path_name}/**/#{default_stop_file_name}")
       unzipped_path_list.each do |unzipped_path|
          puts("Unzipped path: #{unzipped_path}")
          puts(default_stop_file_name)

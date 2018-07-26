@@ -17,6 +17,12 @@ max_articles_to_read = 3
 standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
+# Testing
+existing_file_list = search_for_existing_trove_result_files(default_output_path = default_output_path)
+puts("here")
+puts(existing_file_list)
+exit()
+
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 

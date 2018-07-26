@@ -5,14 +5,17 @@ require "nokogiri"
 require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
-DEFAULT_ARTICLE_COUNT = 20
 
-
-def read_trove_key(my_trove_file = "my_trove.txt")
+def read_trove_key(my_trove_file = "my_trove.txt", my_directory = "keys")
+   # Read Trove key from text file, first try in directory, then try file name without directory
    begin
-      my_trove_key = File.read("my_trove.txt")
+      full_file_name = File.join(my_directory, my_trove_file)
+      if not File.exist?(full_file_name)
+         full_file_name = my_trove_file
+      end
+      my_trove_key = File.read(full_file_name)
    rescue
-      my_trove_key = get_user_input(prompt_text = "\nPlease enter trove key, could not find #{my_trove_file}")
+      my_trove_key = get_user_input(prompt_text = "\nPlease enter trove key, could not find #{full_file_name}")
    end
    return(my_trove_key)
 end
@@ -220,4 +223,19 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
 
    return(true)
 
+end
+
+
+def search_for_existing_trove_result_files(default_output_path = "", search_pattern = "trove_result", search_extension=".csv")
+   result = false
+   begin
+      puts(default_output_path)
+      trove_result_file_list = Dir.glob("#{default_output_path}/*#{search_pattern}*#{search_extension}")
+      puts("Existing Trove result files:")
+      puts(trove_result_file_list)
+      return(trove_result_file_list)
+   rescue
+      print("Error in function: return_list_of_trove_result_files_in_directory")
+      return(false)
+   end
 end

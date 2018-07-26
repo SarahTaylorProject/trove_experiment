@@ -3,6 +3,7 @@ require "net/http"
 require "date"
 require "rbconfig"
 
+
 def clear_screen()
    system("clear")
 end

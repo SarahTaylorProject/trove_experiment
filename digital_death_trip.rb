@@ -4,6 +4,8 @@ load 'tools_for_towns.rb'
 load 'tools_for_geojson.rb'
 require 'fileutils'
 
+DEFAULT_ARTICLE_COUNT = 20
+
 clear_screen()
 my_trove_key = read_trove_key()
 search_word = 'tragedy'
@@ -19,9 +21,8 @@ continue = true
 
 # Testing
 existing_file_list = search_for_existing_trove_result_files(default_output_path = default_output_path)
-puts("here")
+puts("existing files:")
 puts(existing_file_list)
-exit()
 
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
@@ -31,8 +32,9 @@ user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'e
 
 if (user_input.upcase == 'EXIT') then
    continue = false
-elsif (user_input.upcase == 'RANDOM') then
-   say_something("I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
+elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
+   puts("You have asked for a RANDOM town.")
+   say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
    instruction_string = "\nI can search in: "
    standard_town_data_types.each do |data_type|
      instruction_string += "\n\t'" + data_type + "'"

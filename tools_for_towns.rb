@@ -12,7 +12,7 @@ def return_town_data(source_choice, input_path_name)
          town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
          town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
          return([town_list, town_coordinate_dictionary])
-      elsif (source_choice[0].upcase == 'P') then
+      elsif ((source_choice[0].upcase == 'P') or (source_choice[0].upcase == 'G')) then
          puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
          unzipped_path_list = unzip_ptv_gtfs_file(input_path_name = input_path_name)
          if (unzipped_path_list != false) then

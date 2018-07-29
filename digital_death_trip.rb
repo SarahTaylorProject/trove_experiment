@@ -111,11 +111,11 @@ if (continue == true) then
       continue = false
    elsif (user_input.upcase == 'ALL') then
       # just reads the default first 5
-      read_trove_headlines_sample(input_trove_file = output_file_name, speed = default_speed, article_numbers = default_article_numbers)
+      read_trove_headlines(input_trove_file = output_file_name, speed = default_speed, article_numbers = default_article_numbers)
    elsif (user_input.upcase != 'N') then
       # reads random sample of 5
       random_article_numbers = Array.new(5) { rand(1..20) }
-      read_trove_headlines_sample(input_trove_file = output_file_name, speed = default_speed, article_numbers = random_article_numbers)
+      read_trove_headlines(input_trove_file = output_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
 end
 

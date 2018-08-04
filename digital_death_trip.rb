@@ -3,6 +3,7 @@ load 'tools_for_trove.rb'
 load 'tools_for_towns.rb'
 load 'tools_for_geojson.rb'
 require 'fileutils'
+require 'find'
 
 DEFAULT_ARTICLE_COUNT = 20
 
@@ -21,9 +22,20 @@ continue = true
 
 # Testing
 existing_file_list = search_for_existing_trove_result_files(default_output_path = default_output_path)
-puts("existing files:")
+puts("existing files version 1:")
 puts(existing_file_list)
+existing_file_list2 = return_matching_file_names(input_path = default_output_path, file_extension = "csv", file_pattern = "trove")
+puts("existing files version 2:")
+puts(existing_file_list2)
+#stop_file_list = Dir.glob("#{default_town_path_name}/**/*#stops.txt")
 
+stop_file_list = return_matching_file_names(input_path=Dir.pwd, file_extension = "txt", file_pattern = "stops")
+puts("stop file list:")
+puts(stop_file_list)
+exit()
+#current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path = default_output_path, write_individual_files = true, search_word = search_word)
+
+###
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 

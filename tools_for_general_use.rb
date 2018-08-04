@@ -281,15 +281,16 @@ end
 
 
 def return_matching_file_names(input_path=Dir.pwd, file_extension="", file_pattern="")
+   # this function returns file list for any files matching the pattern and/or extension
+   # useful for matching within subdirectories
    matching_file_paths = []
-   Find.find(Dir.pwd) do |path|
-      #matching_file_paths << path if path =~ /.*\.#{file_extension}$/
-      #matching_file_paths << path if path =~ /.*\*#{file_pattern}*.#{file_extension}$/
+   Find.find(input_path) do |path|
       if path =~ /.*\.#{file_extension}/ then
          if path =~ /.*#{file_pattern}./ then
             matching_file_paths << path
          end
       end
    end
+   puts(input_path)
    return(matching_file_paths)
 end

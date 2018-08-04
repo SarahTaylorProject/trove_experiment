@@ -21,15 +21,16 @@ standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip
 continue = true
 
 # Testing
-existing_file_list = search_for_existing_trove_result_files(default_output_path = default_output_path)
-puts("existing files version 1:")
-puts(existing_file_list)
+# existing_file_list = search_for_existing_trove_result_files(default_output_path = default_output_path)
+# puts("existing files version 1:")
+# puts(existing_file_list)
 existing_file_list2 = return_matching_file_names(input_path = default_output_path, file_extension = "csv", file_pattern = "trove")
 puts("existing files version 2:")
 puts(existing_file_list2)
+puts(default_output_path)
 #stop_file_list = Dir.glob("#{default_town_path_name}/**/*#stops.txt")
 
-stop_file_list = return_matching_file_names(input_path=Dir.pwd, file_extension = "txt", file_pattern = "stops")
+stop_file_list = return_matching_file_names(input_path = default_town_path_name, file_extension = "txt", file_pattern = "stops")
 puts("stop file list:")
 puts(stop_file_list)
 exit()

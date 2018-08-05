@@ -66,11 +66,11 @@ def return_town_coordinate_dictionary_from_vicmap_file(input_path_name, file_nam
    end
 end
 
-def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(default_town_path_name)
+def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(town_path_name)
 #def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path_list, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
    town_coordinate_dictionary = Hash.new() 
    begin
-      stop_file_list = return_existing_stop_file_list(default_town_path_name = default_town_path_name)
+      stop_file_list = return_existing_stop_file_list(town_path_name = town_path_name)
       ##NOTE: swapped here, and should return empty hash if error encountered
       stop_file_list.each do |stop_file|
          puts("PTV stop file: #{stop_file_name}")
@@ -225,10 +225,10 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
 end
 
 
-def return_existing_stop_file_list(default_town_path_name)
+def return_existing_stop_file_list(town_path_name)
    stop_file_list = []
    begin
-      stop_file_list = return_matching_file_names(input_path = default_town_path_name, 
+      stop_file_list = return_matching_file_names(input_path = town_path_name, 
          file_extension = "txt", 
          file_pattern = "stops")
       return(stop_file_list)

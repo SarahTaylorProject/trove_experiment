@@ -28,14 +28,14 @@ puts(existing_file_list)
 existing_trove_result_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
 
 # 2 test existing stop file list
-stop_file_list = return_existing_stop_file_list(default_town_path_name = default_town_path_name)
+stop_file_list = return_existing_stop_file_list(town_path_name = default_town_path_name)
 puts("stop file list:")
 puts(stop_file_list)
 puts(stop_file_list.size)
 
 # 3 test random town choice: also an opportunity to enforce not zipping unless needed
 source_choice = 'V'
-town_data = return_town_data(source_type = source_choice, main_path_name = default_town_path_name)
+town_data = return_town_data(source_type = source_choice, town_path_name = default_town_path_name)
 town_list = town_data[0]
 town_dictionary = town_data[1]
 print_town_coordinate_dictionary(town_dictionary)
@@ -43,7 +43,7 @@ search_town = town_list.sample
 puts("\nRandom choice: #{search_town}")
 
 # 4 test geojson files
-#current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
+#current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
 
 
 exit()
@@ -70,7 +70,7 @@ elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    end
    say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
    
-   town_data = return_town_data(source_type = source_choice, main_path_name = default_town_path_name)
+   town_data = return_town_data(source_type = source_choice, town_path_name = default_town_path_name)
    town_list = town_data[0]
    town_dictionary = town_data[1]
    print_town_coordinate_dictionary(town_dictionary)
@@ -186,7 +186,7 @@ user_input = get_user_input(prompt_text = "Enter 'n' if not interested\nEnter an
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif (user_input.upcase != 'N') then
-   current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
+   current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
    if (current_result != false) then
       say_something("\nOk, I have written #{current_result} map objects to your output directory.\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.", also_print = true, speed = default_speed)
    else

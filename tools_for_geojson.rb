@@ -59,7 +59,7 @@ def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates,
 end
 
 
-def write_geojson_for_all_csv_files(default_town_path_name, csv_file_list=[], write_individual_files = true, search_word='tragedy', output_geojson_file_name=nil)
+def write_geojson_for_all_csv_files(town_path_name, csv_file_list=[], write_individual_files = true, search_word='tragedy', output_geojson_file_name=nil)
    result = false
    begin
       if (output_geojson_file_name.nil? == true) then
@@ -74,7 +74,7 @@ def write_geojson_for_all_csv_files(default_town_path_name, csv_file_list=[], wr
       puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
       ##NOTE
-      town_coordinate_dictionary = return_town_coordinate_dictionary(input_path_name = default_town_path_name)
+      town_coordinate_dictionary = return_town_coordinate_dictionary(input_path_name = town_path_name)
       print_town_coordinate_dictionary(town_coordinate_dictionary)
 
       full_geojson_array = []
@@ -104,5 +104,5 @@ end
 
 
 # default_output_path_name = File.join(Dir.pwd, 'output_files')
-# default_town_path_name = File.join(Dir.pwd, 'town_lists')
-# write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, search_word='tragedy')
+# town_path_name = File.join(Dir.pwd, 'town_lists')
+# write_geojson_for_all_csv_files(town_path_name = town_path_name, default_output_path_name = default_output_path_name, search_word='tragedy')

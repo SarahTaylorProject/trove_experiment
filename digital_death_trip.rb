@@ -20,26 +20,33 @@ max_articles_to_read = 3
 standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
-# Testing area
+# START TESTING AREA
+# 1 test existing file list
 existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
 puts("existing files:")
 puts(existing_file_list)
 existing_trove_result_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
 
-town_data = return_town_data(source_type = 'G', main_path_name = default_town_path_name)
-town_list = town_data[0]
-town_dictionary = town_data[1]
-print_town_coordinate_dictionary(town_dictionary)
-
+# 2 test existing stop file list
 stop_file_list = return_existing_stop_file_list(default_town_path_name = default_town_path_name)
 puts("stop file list:")
 puts(stop_file_list)
 puts(stop_file_list.size)
 
-exit()
-# END TESTING AREA
+# 3 test random town choice: also an opportunity to enforce not zipping unless needed
+source_choice = 'V'
+town_data = return_town_data(source_type = source_choice, main_path_name = default_town_path_name)
+town_list = town_data[0]
+town_dictionary = town_data[1]
+print_town_coordinate_dictionary(town_dictionary)
+search_town = town_list.sample
+puts("\nRandom choice: #{search_town}")
+
+# 4 test geojson files
 #current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
 
+
+exit()
 ###
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)

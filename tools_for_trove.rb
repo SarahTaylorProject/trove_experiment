@@ -226,19 +226,6 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
 end
 
 
-# def search_for_existing_trove_result_files(default_output_path_name = "", search_pattern = "trove_result", search_extension=".csv")
-#    result = false
-#    begin
-#       puts(default_output_path_name)
-#       trove_result_file_list = Dir.glob("#{default_output_path_name}/*#{search_pattern}*#{search_extension}")
-#       puts("Existing Trove result files:")
-#       puts(trove_result_file_list)
-#       return(trove_result_file_list)
-#    rescue
-#       print("Error in function: return_list_of_trove_result_files_in_directory")
-#       return(false)
-#    end
-# end
 def return_existing_trove_result_file_list(default_output_path_name)
    trove_result_file_list = []
    begin

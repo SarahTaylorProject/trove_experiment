@@ -293,3 +293,23 @@ def return_matching_file_names(input_path_name = Dir.pwd, file_extension = "", f
    end
    return(matching_file_names)
 end
+
+def return_matching_file_names_from_regx_array(input_path_name = Dir.pwd, regx_list = [])
+   # TESTING ONLY
+   # this function returns file list for any files matching multiple regx patterns
+   # useful for matching within subdirectories AND with multiple criteria
+   # necessary to supply the regx array! e.g. regx_list = [/.*\.#{file_extension}/]
+   matching_file_names = []
+   Find.find(input_path_name) do |path|
+      pattern_match = true
+      regx_list.each do current_regx
+         if not path ~= current_regx then
+            pattern_match = false
+         end
+      end
+      if pattern_match == true then
+         matching_file_names << path
+      end
+   end
+   return(matching_file_names)
+end

@@ -32,7 +32,7 @@ def return_town_data(source_choice, input_path_name)
       end
       return(result)
    rescue
-      puts("Error encountered, HERE, exiting.")
+      puts("Error encountered in 'return_town_data', exiting.")
       return(result)
    end
 end
@@ -216,5 +216,19 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
    rescue
       puts("Error encountered unzipping PTV GTFS file #{File.join(input_path_name, gtfs_file_name)}")
       return(result)
+   end
+end
+
+
+def return_existing_stop_file_list(default_town_path_name)
+   stop_file_list = []
+   begin
+      stop_file_list = return_matching_file_names(input_path = default_town_path_name, 
+         file_extension = "txt", 
+         file_pattern = "stops")
+      return(stop_file_list)
+   rescue
+      puts("Encountered error in 'return_existing_stop_file_list'")
+      return(stop_file_list)
    end
 end

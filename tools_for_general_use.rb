@@ -280,17 +280,16 @@ def proper_case(input_string)
 end
 
 
-def return_matching_file_names(input_path=Dir.pwd, file_extension="", file_pattern="")
+def return_matching_file_names(input_path_name = Dir.pwd, file_extension = "", file_pattern="")
    # this function returns file list for any files matching the pattern and/or extension
    # useful for matching within subdirectories
-   matching_file_paths = []
-   Find.find(input_path) do |path|
+   matching_file_names = []
+   Find.find(input_path_name) do |path|
       if path =~ /.*\.#{file_extension}/ then
          if path =~ /.*#{file_pattern}./ then
-            matching_file_paths << path
+            matching_file_names << path
          end
       end
    end
-   puts(input_path)
-   return(matching_file_paths)
+   return(matching_file_names)
 end

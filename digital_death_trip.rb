@@ -11,9 +11,9 @@ clear_screen()
 my_trove_key = read_trove_key()
 search_word = 'tragedy'
 default_speed = 180
-default_output_path = File.join(Dir.pwd, 'output_files')
-unless File.directory?(default_output_path)
-   FileUtils.mkdir_p(default_output_path)
+default_output_path_name = File.join(Dir.pwd, 'output_files')
+unless File.directory?(default_output_path_name)
+   FileUtils.mkdir_p(default_output_path_name)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
@@ -21,17 +21,24 @@ standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip
 continue = true
 
 # Testing area
-existing_file_list = return_matching_file_names(input_path = default_output_path, file_extension = "csv", file_pattern = "trove")
+existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
 puts("existing files:")
 puts(existing_file_list)
+existing_trove_result_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
 
-stop_file_list = return_matching_file_names(input_path = default_town_path_name, file_extension = "txt", file_pattern = "stops")
+town_data = return_town_data(source_type = 'G', main_path_name = default_town_path_name)
+town_list = town_data[0]
+town_dictionary = town_data[1]
+print_town_coordinate_dictionary(town_dictionary)
+
+stop_file_list = return_existing_stop_file_list(default_town_path_name = default_town_path_name)
 puts("stop file list:")
 puts(stop_file_list)
 puts(stop_file_list.size)
 
 exit()
-#current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path = default_output_path, write_individual_files = true, search_word = search_word)
+# END TESTING AREA
+#current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
 
 ###
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
@@ -94,7 +101,7 @@ end
 
  if (continue == true) then
     say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
-    output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
+    output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
     trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)
     puts("\nWriting results to file now...")
     result_count = write_trove_results(trove_api_results, output_file_name, search_word, search_town)
@@ -111,7 +118,7 @@ end
 default_article_numbers = Array(1..5)
 random_article_range = Array(1..20)
 # search_town = 'Elmore'
-output_file_name = File.join(default_output_path, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
+output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 
 if (continue == true) then
    result_count = preview_trove_results(output_file_name)
@@ -172,7 +179,7 @@ user_input = get_user_input(prompt_text = "Enter 'n' if not interested\nEnter an
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif (user_input.upcase != 'N') then
-   current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path = default_output_path, write_individual_files = true, search_word = search_word)
+   current_result = write_geojson_for_all_csv_files(default_town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
    if (current_result != false) then
       say_something("\nOk, I have written #{current_result} map objects to your output directory.\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.", also_print = true, speed = default_speed)
    else

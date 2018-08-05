@@ -65,12 +65,16 @@ def write_geojson_for_all_csv_files(default_town_path_name, default_output_path,
       if (output_geojson_file_name.nil? == true) then
          output_file_name = File.join(default_output_path, "map_collection_" + search_word + ".json")
       end
+      puts(output_file_name)
+
+      puts(default_town_path_name)
+      puts(default_output_path)
+      csv_file_list = Dir.glob("#{default_output_path}/**/*#{search_word}.csv")
+      puts(csv_file_list)
+      puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
       town_coordinate_dictionary = return_town_coordinate_dictionary(input_path_name = default_town_path_name)
       print_town_coordinate_dictionary(town_coordinate_dictionary)
-
-      csv_file_list = Dir.glob("#{default_output_path}/**/*#{search_word}.csv")
-      puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
       full_geojson_array = []
 

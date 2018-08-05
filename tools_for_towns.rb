@@ -65,7 +65,7 @@ def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path
    result = false
    begin
       town_coordinate_dictionary = Hash.new() 
-
+      # NOTE: swap this for stop file search, remove requirement for unzipped_path_list
       unzipped_path_list.each do |unzipped_path|
          puts("Unzipped path: #{unzipped_path}")
          puts(default_stop_file_name)
@@ -184,6 +184,7 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
    # returns false if errors enountered and/or no zipped file from within the initial zip file, is successfully unzipped
    result = false
    begin
+      # NOTE: CHECK IF UNZIPPED FILES HERE FIRST
       puts("Now unzipping the PTV GTFS file #{gtfs_file_name}")
       puts("Please wait while I process this. It can take some time.")
       unzipped_path_list = Array.new

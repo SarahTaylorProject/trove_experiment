@@ -226,15 +226,27 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
 end
 
 
-def return_existing_trove_result_file_list(default_output_path_name)
+def return_existing_trove_result_file_list(output_path_name)
    trove_result_file_list = []
    begin
-      trove_result_file_list = return_matching_file_names(input_path = default_output_path_name, 
+      trove_result_file_list = return_matching_file_names(input_path = output_path_name, 
          file_extension = "csv", 
          file_pattern = "trove_result")
       return(trove_result_file_list)
    rescue
-      puts("Encountered error in 'return_existing_trove_result_file_list'")
+      puts("Encountered error in 'return_existing_trove_result_file_list'...")
       return(trove_result_file_list)
    end
+end
+
+
+def return_trove_file_town_info(input_trove_file)
+   #NOTE more needed here
+   puts("Town name from #{input_trove_file}")
+   input_trove = CSV.read(input_trove_file).map { |row|
+     [row[0], row[1]]
+   }.uniq
+   town_name = input_trove[1][1]
+   puts(town_name)
+   return(town_name)
 end

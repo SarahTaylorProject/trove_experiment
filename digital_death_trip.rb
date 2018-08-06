@@ -26,7 +26,7 @@ continue = true
 existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
 puts("existing files:")
 puts(existing_file_list)
-existing_trove_result_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
+existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
 
 # 2 test existing stop file list
 stop_file_list = return_existing_stop_file_name_list(town_path_name = default_town_path_name)
@@ -35,7 +35,7 @@ puts(stop_file_list)
 puts(stop_file_list.size)
 
 # 3 test random town choice: also an opportunity to enforce not zipping unless needed
-source_choice = 'V'
+source_choice = 'S'
 town_data = return_town_data(source_type = source_choice, town_path_name = default_town_path_name)
 town_list = town_data[0]
 town_dictionary = town_data[1]
@@ -44,7 +44,8 @@ search_town = town_list.sample
 puts("\nRandom choice: #{search_town}")
 
 # 4 test geojson files
-#current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
+current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
+   output_path_name = default_output_path_name)
 
 
 exit()
@@ -182,16 +183,13 @@ end
 
 # END PASTE
 
-say_something("\nOk. Before I go, would you like me to update your map files?", also_print = true, speed = default_speed)
-user_input = get_user_input(prompt_text = "Enter 'n' if not interested\nEnter any other key to update map files...")
-if (user_input.upcase == 'EXIT') then
-   continue = false
-elsif (user_input.upcase != 'N') then
-   current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true, search_word = search_word)
-   if (current_result != false) then
-      say_something("\nOk, I have written #{current_result} map objects to your output directory.\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.", also_print = true, speed = default_speed)
-   else
-      puts("\nSorry, encountered error with updating map files.")
-   end
-end
 say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
+
+puts("\nWill update map files before exiting...")
+current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true)
+if (current_result != false) then
+   puts("\nHave written #{current_result} map objects to your output directory.")
+   puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")
+else
+   puts("\nSorry, encountered error with updating map files.")
+end

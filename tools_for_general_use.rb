@@ -193,14 +193,14 @@ def unzip_file_with_unzip_command(full_zip_file_name, full_output_path_name=nil,
       system_result = system(command_string)
       puts(system_result)
       if (system_result == true) then
-         puts("system_result == true, Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
+         puts("\nsystem_result == true, Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
          result = true
       else
-         puts("system_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
+         puts("\nsystem_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
       end
       return(result)
    rescue
-      puts("Function: unzip_file_with_unzip_command, error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
+      puts("Error encountered in 'unzip_file_with_unzip_command', unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end

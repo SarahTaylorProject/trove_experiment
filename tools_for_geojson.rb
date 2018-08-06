@@ -23,13 +23,15 @@ def make_collection_of_geojson_objects(geojson_array)
 end
 
 
-def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates, write_individual_files = true, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
-   # note: will read better if can translate the headline reader into dictionary outputs
+def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates, write_individual_article_json = false, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
+   # ADD METHOD NOTES HERE
+   # ADD ERROR HANDLING
+   # note: resulting json files will read better if can translate the headline reader into dictionary outputs
 
    input_trove = CSV.read(input_trove_file).map { |row|
      [row[4], row[6], row[8], row[9]]
    }.uniq
-
+   # NOTE ADD TOWN AND SEARCH TERM HERE
    geojson_array = []
 
    i = 1
@@ -39,7 +41,8 @@ def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates,
             article_properties = {"headline"=> str_heading, "date"=> str_date, "snippet"=> str_snippet, "trove_id" => str_trove_id}
             geojson_object = make_single_town_article_geojson_object(town_name = town_name, town_coordinates = town_coordinates, article_properties = article_properties)
             geojson_array.push(geojson_object)
-            if (write_individual_files == true) then
+            
+            if (write_individual_article_json == true) then
                output_file_name = "map_" + File.basename(input_trove_file).split(".")[0] + "_article_" + str_trove_id + ".json"
                output_file_name = File.join(File.dirname(input_trove_file), output_file_name)
                puts("Article #{i} in #{input_trove_file}.\nWriting single article geojson object to:\n#{output_file_name}")
@@ -59,22 +62,16 @@ def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates,
 end
 
 
-def write_geojson_for_all_csv_files(town_path_name, csv_file_list=[], write_individual_files = true, search_word='tragedy', output_geojson_file_name=nil)
+def write_geojson_for_all_csv_files(town_path_name, output_path_name)
+   # ADD METHOD NOTES HERE
    result = false
    begin
-      if (output_geojson_file_name.nil? == true) then
-         output_file_name = File.join(default_output_path_name, "map_collection_" + search_word + ".json")
-      end
-      ##NOTE
-      if (csv_file_list.size < 1) then
-         csv_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
-      end
+      output_file_name = File.join(output_path_name, "map_collection_" + Time.now.strftime("%d_%m_%Y") + ".json")
+      csv_file_list = return_existing_trove_result_file_list(output_path_name = output_path_name)
 
-      puts(csv_file_list)
       puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
-      ##NOTE
-      town_coordinate_dictionary = return_town_coordinate_dictionary(town_path_name = town_path_name)
+      town_coordinate_dictionary = return_combined_town_coordinate_dictionary(town_path_name = town_path_name)
       print_town_coordinate_dictionary(town_coordinate_dictionary)
 
       full_geojson_array = []
@@ -82,10 +79,12 @@ def write_geojson_for_all_csv_files(town_path_name, csv_file_list=[], write_indi
       i = 1
       csv_file_list.each do |file_name|
          town_name = File.basename(file_name)
-         town_name = town_name[/#{"trove_result_"}(.*?)#{"_tragedy.csv"}/m, 1].gsub("_", " ")
+         #town_name = town_name[/#{"trove_result_"}(.*?)#{"_tragedy.csv"}/m, 1].gsub("_", " ")
+         town_name = return_trove_file_town_info(input_trove_file = file_name)
+         puts(town_name)
          town_coordinates = town_coordinate_dictionary[town_name]
-         puts("\nProcessing geojson for #{search_word} output file #{i}\n#{file_name}.\nTown name: #{town_name}, Coordinates: #{town_coordinates}")
-         current_geojson_array = make_trove_file_geojson_array(input_trove_file = file_name, town_name = town_name, town_coordinates = town_coordinates, write_individual_files = write_individual_files)
+         puts("\nProcessing geojson for output file #{i}\n#{file_name}.\nTown name: #{town_name}, Coordinates: #{town_coordinates}")
+         current_geojson_array = make_trove_file_geojson_array(input_trove_file = file_name, town_name = town_name, town_coordinates = town_coordinates)
          full_geojson_array.push(*current_geojson_array)
          i += 1
       end
@@ -94,15 +93,12 @@ def write_geojson_for_all_csv_files(town_path_name, csv_file_list=[], write_indi
       File.open(output_file_name, "w") do |f|
          f.write(JSON.pretty_generate(geojson_collection))
       end
-      puts("\nMap collection geojson file for ALL #{search_word} output files:\n#{output_file_name}\nTotal of #{full_geojson_array.size} map objects, from #{i} files.")
+      puts("HERE...")
+      puts("\nMap collection geojson file for ALL Trove outputs in directory:\n#{output_file_name}\n")
+      puts("Total of #{full_geojson_array.size} map objects, from #{i} files.")
       return(full_geojson_array.size)
    rescue
-      puts("Encountered error in write_geojson_for_all_csv_files")
+      puts("Encountered error in 'write_geojson_for_all_csv_files'...")
       return(result)
    end
 end
-
-
-# default_output_path_name = File.join(Dir.pwd, 'output_files')
-# town_path_name = File.join(Dir.pwd, 'town_lists')
-# write_geojson_for_all_csv_files(town_path_name = town_path_name, default_output_path_name = default_output_path_name, search_word='tragedy')

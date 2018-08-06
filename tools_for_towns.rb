@@ -4,36 +4,30 @@ require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
 
-def return_town_data(source_choice, town_path_name)
+def return_town_data(source_choice, town_path_name, min_stop_files = 2)
    result = false
    begin
       if (source_choice[0].upcase == 'S') then
-         puts("You have instructed me to use the existing PTV STOP FILES to compile a list of town names.") 
-         town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(town_path_name = town_path_name)
+         puts("You have instructed me to use the existing PTV STOP FILES...") 
+         stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
+         if (existing_stop_file_name_list.size < min_stop_files) then
+            puts("Fewer than 2 stop files found...")
+            unzip_result = unzip_ptv_gtfs_file(town_path_name = town_path_name)
+            if (unzip_result == false) then
+               puts("Unzip result: #{unzip_result}")
+               return(result)
+            end
+         end
+         town_coordinate_dictionary = return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list) 
          town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
          return([town_list, town_coordinate_dictionary])
-      elsif ((source_choice[0].upcase == 'P') or (source_choice[0].upcase == 'G')) then
-         ##NOTE look for stop files first
-         puts("You have instructed me to unzip the PTV General Transit Feed Specification file in order to compile a list of town names.")
-         ##NOTE only need to do this if no stop files
-         ##NOTE unzipped_path_list can potentially just return True
-         unzipped_path_list = unzip_ptv_gtfs_file(town_path_name = town_path_name)
-         ##NOTE this error handling probably ok
-         if (unzipped_path_list != false) then
-            ##NOTE This function should be simpler, these variables are unlikely to change
-            town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(town_path_name = town_path_name) 
-            town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-            return([town_list, town_coordinate_dictionary])
-         else
-            return(result)
-         end
       elsif (source_choice[0].upcase == 'V') then
          puts("You have instructed me to use VICMAP data to compile a list of town names.")
          town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(town_path_name = town_path_name)
          town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
          return([town_list, town_coordinate_dictionary])
       else
-         puts("Choice not in standard lists, please try again")
+         puts("Choice not in list, please try again")
       end
       return(result)
    rescue
@@ -43,36 +37,42 @@ def return_town_data(source_choice, town_path_name)
 end
 
 
-def return_town_coordinate_dictionary(input_path_name)
+def return_town_coordinate_dictionary(town_path_name)
    ##NOTE these function should be made to use the stops file search; plus need to add error handling here
-   town_coordinate_dictionary = return_town_coordinate_dictionary_from_multiple_ptv_stop_files(path_name = input_path_name)
-   vicmap_town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(input_path_name = input_path_name)
+   stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
+   town_coordinate_dictionary = return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list)
+   vicmap_town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(town_path_name = town_path_name)
    town_coordinate_dictionary.merge!(vicmap_town_coordinate_dictionary)
    return(town_coordinate_dictionary)
 end
 
 
-def return_town_coordinate_dictionary_from_vicmap_file(input_path_name, file_name = 'vic_and_border_locality_list.csv')
+def return_town_coordinate_dictionary_from_vicmap_file(town_path_name, file_name = 'vic_and_border_locality_list.csv')
    result = false
    begin
-      if (input_path_name == nil) then
-         input_path_name = Dir.pwd
+      if (town_path_name == nil) then
+         town_path_name = Dir.pwd
       end
-      full_file_name = File.join(input_path_name, file_name)
-      town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(file_name = full_file_name, file_type = 'vicmap', town_field_num = 3, lat_field_num = 11, long_field_num = 12, select_field_num = 6, select_field_value = 'VIC')
+      full_file_name = File.join(town_path_name, file_name)
+      town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(file_name = full_file_name, 
+         file_type = 'vicmap', 
+         town_field_num = 3, 
+         lat_field_num = 11, 
+         long_field_num = 12, 
+         select_field_num = 6, 
+         select_field_value = 'VIC')
    rescue
-      puts("Error encountered in return_town_coordinate_dictionary_from_vicmap...")
+      puts("Error encountered in 'return_town_coordinate_dictionary_from_vicmap_file'...")
       return(result)
    end
 end
 
-def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(town_path_name)
-#def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(unzipped_path_list, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
+def return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list)
+#def return_town_coordinate_dictionary_from_stop_file_name_list(unzipped_path_list, default_stop_file_name='stops.txt', town_field_num=1, lat_field_num=2, long_field_num=3)
    town_coordinate_dictionary = Hash.new() 
    begin
-      stop_file_list = return_existing_stop_file_list(town_path_name = town_path_name)
       ##NOTE: swapped here, and should return empty hash if error encountered
-      stop_file_list.each do |stop_file|
+      stop_file_name_list.each do |stop_file_name|
          puts("PTV stop file: #{stop_file_name}")
          current_town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(stop_file_name = stop_file_name, 
             file_type = 'ptv', 
@@ -90,7 +90,7 @@ def return_town_coordinate_dictionary_from_multiple_ptv_stop_files(town_path_nam
       town_coordinate_dictionary_sorted = Hash[ town_coordinate_dictionary.sort_by { |key, val| key } ]
       return(town_coordinate_dictionary_sorted)
    rescue
-      puts("Error encountered in 'return_town_coordinate_dictionary_from_multiple_ptv_stop_files'...")
+      puts("Error encountered in 'return_town_coordinate_dictionary_from_stop_file_name_list'...")
       return(town_coordinate_dictionary)
    end
 end
@@ -193,7 +193,7 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
       # NOTE: CHECK IF UNZIPPED FILES HERE FIRST
       puts("Now unzipping the PTV GTFS file #{gtfs_file_name}")
       puts("Please wait while I process this. It can take some time.")
-      unzipped_path_list = Array.new
+      #unzipped_path_list = Array.new
       gtfs_unzipped_path = unzip_single_file(input_file_name = gtfs_file_name, input_path_name = input_path_name)
       if (gtfs_unzipped_path == false) then
          return(result)
@@ -225,7 +225,7 @@ def unzip_ptv_gtfs_file(input_path_name, gtfs_file_name='gtfs.zip', path_numbers
 end
 
 
-def return_existing_stop_file_list(town_path_name)
+def return_existing_stop_file_name_list(town_path_name)
    stop_file_list = []
    begin
       stop_file_list = return_matching_file_names(input_path = town_path_name, 
@@ -233,7 +233,7 @@ def return_existing_stop_file_list(town_path_name)
          file_pattern = "stops")
       return(stop_file_list)
    rescue
-      puts("Encountered error in 'return_existing_stop_file_list'")
+      puts("Encountered error in 'return_existing_stop_file_name_list'")
       return(stop_file_list)
    end
 end

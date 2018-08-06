@@ -17,7 +17,8 @@ unless File.directory?(default_output_path_name)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['S for existing PTV Stop files', 'P for PTV GTFS zip file', 'V for VICMAP']
+standard_town_data_types = ['S for PTV Stop Files (will unzip GTFS file if required)', 'V for VICMAP']
+#standard_town_data_types = ['S or P for all existing PTV Stop files', 'G to unzip PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
 # START TESTING AREA
@@ -28,7 +29,7 @@ puts(existing_file_list)
 existing_trove_result_file_list = return_existing_trove_result_file_list(default_output_path_name = default_output_path_name)
 
 # 2 test existing stop file list
-stop_file_list = return_existing_stop_file_list(town_path_name = default_town_path_name)
+stop_file_list = return_existing_stop_file_name_list(town_path_name = default_town_path_name)
 puts("stop file list:")
 puts(stop_file_list)
 puts(stop_file_list.size)

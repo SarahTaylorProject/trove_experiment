@@ -23,36 +23,29 @@ continue = true
 
 # START TESTING AREA
 # 1 test existing file list
-existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
-puts("existing files:")
-puts(existing_file_list)
-existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
+# existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
+# puts("existing files:")
+# puts(existing_file_list)
+# existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
 
-# 2 test existing stop file list
-stop_file_list = return_existing_stop_file_name_list(town_path_name = default_town_path_name)
-puts("stop file list:")
-puts(stop_file_list)
-puts(stop_file_list.size)
+# # 2 test existing stop file list
+# stop_file_list = return_existing_stop_file_name_list(town_path_name = default_town_path_name)
+# puts("stop file list:")
+# puts(stop_file_list)
+# puts(stop_file_list.size)
 
-# 3 test random town choice: also an opportunity to enforce not zipping unless needed
-source_choice = 'S'
-town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
-print_town_dictionary(town_dictionary)
-search_town = town_dictionary.keys.sample
-puts("\nRandom choice: #{search_town}")
+# # 3 test random town choice: also an opportunity to enforce not zipping unless needed
+# source_choice = 'V'
+# town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
+# print_town_dictionary(town_dictionary)
+# search_town = town_dictionary.keys.sample
+# puts("\nRandom choice: #{search_town}")
 
 # 4 test geojson files
 # current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
 #    output_path_name = default_output_path_name)
 
-# town_test = town_dictionary.keys
-
-# puts("\ntown-test:")
-# puts(town_test)
-# test_random = town_test.sample
-# puts("\nNew random choice: #{test_random}")
-
-exit()
+#exit()
 ###
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
@@ -79,17 +72,14 @@ elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
    print_town_dictionary(town_dictionary)
 
-   if (town_dictionary == false) then
-      say_something("I'm sorry, I encountered an error, please check and try again.", also_print = true, speed = default_speed)
-      return(false)
-   elsif (town_dictionary.size == 0) then   
+   if (town_dictionary.size == 0) then   
       say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
       return(false)
    else
-      say_something("I found #{town_list.length} unique Victorian towns in this data.", also_print = true, speed = default_speed)
+      say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
       try_again = true
       while (continue == true and try_again == true) do
-         search_town = town_list.sample
+         search_town = town_dictionary.keys.sample
          say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
          say_something("What do you think?", also_print = true, speed = default_speed)
          user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
@@ -107,6 +97,8 @@ else
    search_town = user_input
 end
 
+# TEST EXIT
+exit()
 # nb. need function here to gather coordinates for town choices not made through town_dictionary
 # START PASTE
 

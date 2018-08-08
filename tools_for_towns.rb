@@ -5,7 +5,7 @@ require "rbconfig"
 load 'tools_for_general_use.rb'
 
 def return_town_dictionary_from_choice(source_choice, town_path_name, min_stop_files = 2)
-   result = false
+   result = Hash.new()
    begin
       if (source_choice[0].upcase == 'S' or source_choice[0].upcase == 'P') then
          puts("You have instructed me to use PTV STOP FILES...") 
@@ -50,7 +50,7 @@ def return_combined_town_dictionary(town_path_name)
 end
 
 def return_town_dictionary_from_vicmap_file(town_path_name, file_name = 'vic_and_border_locality_list.csv')
-   result = false
+   town_dictionary = Hash.new()
    begin
       if (town_path_name == nil) then
          town_path_name = Dir.pwd
@@ -63,9 +63,10 @@ def return_town_dictionary_from_vicmap_file(town_path_name, file_name = 'vic_and
          long_field_num = 12, 
          select_field_num = 6, 
          select_field_value = 'VIC')
+      return(town_dictionary)
    rescue
       puts("Error encountered in 'return_town_dictionary_from_vicmap_file'...")
-      return(result)
+      return(town_dictionary)
    end
 end
 
@@ -81,12 +82,10 @@ def return_town_dictionary_from_stop_file_name_list(stop_file_name_list)
             lat_field_num = 2, 
             long_field_num = 3)
          if (current_town_dictionary != false) then 
-            puts("Adding #{current_town_dictionary.size} town references to dictionary.")
             town_dictionary.merge!(current_town_dictionary)
          end
-         puts("Current unsorted town references: #{town_dictionary.size}")
       end      
-      puts("Finished town search. Town count: #{town_dictionary.size}")
+      puts("Finished. Town count: #{town_dictionary.size}")
       town_dictionary_sorted = Hash[ town_dictionary.sort_by { |key, val| key } ]
       return(town_dictionary_sorted)
    rescue

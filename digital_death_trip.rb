@@ -17,7 +17,7 @@ unless File.directory?(default_output_path_name)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
+#standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
 #standard_town_data_types = ['S or P for all existing PTV Stop files', 'G to unzip PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
@@ -28,24 +28,14 @@ continue = true
 # puts(existing_file_list)
 # existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
 
-# # 2 test existing stop file list
-# stop_file_list = return_existing_stop_file_name_list(town_path_name = default_town_path_name)
-# puts("stop file list:")
-# puts(stop_file_list)
-# puts(stop_file_list.size)
-
-# # 3 test random town choice: also an opportunity to enforce not zipping unless needed
-# source_choice = 'V'
-# town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
-# print_town_dictionary(town_dictionary)
-# search_town = town_dictionary.keys.sample
-# puts("\nRandom choice: #{search_town}")
-
-# 4 test geojson files
+# 2 test geojson files
 # current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
 #    output_path_name = default_output_path_name)
 
-#exit()
+search_town = select_random_town_with_user_input(default_speed, town_path_name = default_town_path_name)
+puts(search_town)
+
+exit()
 ###
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
@@ -56,42 +46,42 @@ user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'e
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
-   puts("You have asked for a RANDOM town.")
-   say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
-   instruction_string = "\nI can search in: "
-   standard_town_data_types.each do |data_type|
-     instruction_string += "\n\t'" + data_type + "'"
-   end
-   instruction_string += "\nWhich would you like me to use? I will default to #{standard_town_data_types[0]}"
-   source_choice = get_user_input(prompt_text = instruction_string)
-   if (source_choice.length == 0) then
-      source_choice = standard_town_data_types[0]
-   end
-   say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
+   # puts("You have asked for a RANDOM town.")
+   # say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
+   # instruction_string = "\nI can search in: "
+   # standard_town_data_types.each do |data_type|
+   #   instruction_string += "\n\t'" + data_type + "'"
+   # end
+   # instruction_string += "\nWhich would you like me to use? I will default to #{standard_town_data_types[0]}"
+   # source_choice = get_user_input(prompt_text = instruction_string)
+   # if (source_choice.length == 0) then
+   #    source_choice = standard_town_data_types[0]
+   # end
+   # say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
    
-   town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
-   print_town_dictionary(town_dictionary)
+   # town_dictionary = return_chosen_town_dictionary(source_type = source_choice, town_path_name = default_town_path_name)
+   # print_town_dictionary(town_dictionary)
 
-   if (town_dictionary.size == 0) then   
-      say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
-      return(false)
-   else
-      say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
-      try_again = true
-      while (continue == true and try_again == true) do
-         search_town = town_dictionary.keys.sample
-         say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
-         say_something("What do you think?", also_print = true, speed = default_speed)
-         user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
-         if (user_input.upcase == 'EXIT') then
-            continue = false
-         elsif (user_input.upcase == 'N') then
-            try_again = true
-         else
-            try_again = false
-         end
-      end
-   end
+   # if (town_dictionary.size == 0) then   
+   #    say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+   #    return(false)
+   # else
+   #    say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
+   #    try_again = true
+   #    while (continue == true and try_again == true) do
+   #       search_town = town_dictionary.keys.sample
+   #       say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
+   #       say_something("What do you think?", also_print = true, speed = default_speed)
+   #       user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
+   #       if (user_input.upcase == 'EXIT') then
+   #          continue = false
+   #       elsif (user_input.upcase == 'N') then
+   #          try_again = true
+   #       else
+   #          try_again = false
+   #       end
+   #    end
+   # end
 
 else
    search_town = user_input
@@ -105,12 +95,11 @@ exit()
  if (continue == true) then
     say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
     output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
-    trove_api_results = fetch_trove_results(search_town, search_word, my_trove_key)
+    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
     puts("\nWriting results to file now...")
-    result_count = write_trove_results(trove_api_results, output_file_name, search_word, search_town)
+    result_count = write_trove_search_results(trove_api_results, output_file_name, search_word, search_town)
     puts(result_count)
 
-    result_count = preview_trove_results(output_file_name)
     if (result_count == 0) then
        continue = false
        say_something("\nSorry, no tragedy results found for #{search_town}")

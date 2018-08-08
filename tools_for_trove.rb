@@ -20,7 +20,7 @@ def read_trove_key(my_trove_file = "my_trove.txt", my_directory = "keys")
    return(my_trove_key)
 end
 
-def fetch_trove_results(current_search_town, current_search_word, trove_key)
+def fetch_trove_search_results(current_search_town, current_search_word, trove_key)
    # This method constructs a single search request for Trove (of a very specific format!) 
    # Input: two search parameters (town name, and search term) and the API key 
    # Return: XML of results (if successful) or 0 if error encountered
@@ -30,6 +30,7 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
 
    current_search_word = convert_phrase_string_for_url(current_search_word)
    # note: April 2018 search word may suit treatment as multiple words, not string literal
+   # note: should build search phrase here, loop through: upper and proper case, and different order for split words
    current_search_town = convert_phrase_string_for_url(current_search_town)
 
    trove_api_request = "http://api.trove.nla.gov.au/result?key="
@@ -46,7 +47,7 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
    return(trove_api_results)
 end
 
-def write_trove_results(trove_api_results, output_file_name, search_word, search_town)
+def write_trove_search_results(trove_api_results, output_file_name, search_word, search_town)
    # This method writes the Trove XML results to a csv file, one article at a time
    # Input: XML results, output file name, search term and search town 
    # (the latter are just written to the csv to help assess results later)
@@ -70,9 +71,13 @@ def write_trove_results(trove_api_results, output_file_name, search_word, search
    return(result_count)
 end
 
+# NOTE: here make a simple "count trove search results in csv"
+# NOTE: here make a function "count trove search results total"
+# AND: function to count trove total results
+
 def preview_trove_results(input_trove_file)
    # This method previews the main fields of all articles
-   # Input: a csv of Trove search results, written as above in the 'write_trove_results' method
+   # Input: a csv of Trove search results, written as above in the 'write_trove_search_results' method
    # Note: Only takes in the more interesting parts of Trove results: heading (field 4), date (field 6), snippet (field 8)
 
    puts "\nPREVIEW ARTICLES ******"

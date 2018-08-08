@@ -4,7 +4,50 @@ require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
 
-def return_town_dictionary_from_choice(source_choice, town_path_name, min_stop_files = 2)
+def select_random_town_with_user_input(default_speed, town_path_name)
+   # NOTE: moved here August 9th; add error handling and neaten
+   standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
+   continue = true
+
+   puts("You have asked for a RANDOM town.")
+   say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
+   instruction_string = "I can search in: "
+   standard_town_data_types.each do |data_type|
+     instruction_string += "\n\t'" + data_type + "'"
+   end
+   instruction_string += "\nWhich would you like me to use? I will default to '#{standard_town_data_types[0]}'"
+   source_choice = get_user_input(prompt_text = instruction_string)
+   if (source_choice.length == 0) then
+      source_choice = standard_town_data_types[0]
+   end
+   say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
+   
+   town_dictionary = return_chosen_town_dictionary(source_type = source_choice, town_path_name = town_path_name)
+   print_town_dictionary(town_dictionary)
+
+   if (town_dictionary.size == 0) then   
+      say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+      return(false)
+   else
+      say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
+      try_again = true
+      while (continue == true and try_again == true) do
+         search_town = town_dictionary.keys.sample
+         say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
+         say_something("What do you think?", also_print = true, speed = default_speed)
+         user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
+         if (user_input.upcase == 'EXIT') then
+            continue = false
+         elsif (user_input.upcase == 'N') then
+            try_again = true
+         else
+            try_again = false
+         end
+      end
+   end
+end
+
+def return_chosen_town_dictionary(source_choice, town_path_name, min_stop_files = 2)
    result = Hash.new()
    begin
       if (source_choice[0].upcase == 'S' or source_choice[0].upcase == 'P') then

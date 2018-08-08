@@ -17,7 +17,7 @@ unless File.directory?(default_output_path_name)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-standard_town_data_types = ['S for PTV Stop Files (will unzip GTFS file if required)', 'V for VICMAP']
+standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
 #standard_town_data_types = ['S or P for all existing PTV Stop files', 'G to unzip PTV GTFS zip file', 'V for VICMAP']
 continue = true
 
@@ -36,17 +36,21 @@ puts(stop_file_list.size)
 
 # 3 test random town choice: also an opportunity to enforce not zipping unless needed
 source_choice = 'S'
-town_data = return_town_data(source_type = source_choice, town_path_name = default_town_path_name)
-town_list = town_data[0]
-town_dictionary = town_data[1]
-print_town_coordinate_dictionary(town_dictionary)
-search_town = town_list.sample
+town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
+print_town_dictionary(town_dictionary)
+search_town = town_dictionary.keys.sample
 puts("\nRandom choice: #{search_town}")
 
 # 4 test geojson files
-current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
-   output_path_name = default_output_path_name)
+# current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
+#    output_path_name = default_output_path_name)
 
+# town_test = town_dictionary.keys
+
+# puts("\ntown-test:")
+# puts(town_test)
+# test_random = town_test.sample
+# puts("\nNew random choice: #{test_random}")
 
 exit()
 ###
@@ -72,15 +76,13 @@ elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    end
    say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
    
-   town_data = return_town_data(source_type = source_choice, town_path_name = default_town_path_name)
-   town_list = town_data[0]
-   town_dictionary = town_data[1]
-   print_town_coordinate_dictionary(town_dictionary)
+   town_dictionary = return_town_dictionary_from_choice(source_type = source_choice, town_path_name = default_town_path_name)
+   print_town_dictionary(town_dictionary)
 
-   if (town_list == false) then
+   if (town_dictionary == false) then
       say_something("I'm sorry, I encountered an error, please check and try again.", also_print = true, speed = default_speed)
       return(false)
-   elsif (town_list.size == 0) then   
+   elsif (town_dictionary.size == 0) then   
       say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
       return(false)
    else

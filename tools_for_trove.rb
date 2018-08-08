@@ -20,7 +20,6 @@ def read_trove_key(my_trove_file = "my_trove.txt", my_directory = "keys")
    return(my_trove_key)
 end
 
-
 def fetch_trove_results(current_search_town, current_search_word, trove_key)
    # This method constructs a single search request for Trove (of a very specific format!) 
    # Input: two search parameters (town name, and search term) and the API key 
@@ -44,11 +43,8 @@ def fetch_trove_results(current_search_town, current_search_word, trove_key)
       puts "Error getting API results"
       return(0)
    end
-
    return(trove_api_results)
-
 end
-
 
 def write_trove_results(trove_api_results, output_file_name, search_word, search_town)
    # This method writes the Trove XML results to a csv file, one article at a time
@@ -71,11 +67,8 @@ def write_trove_results(trove_api_results, output_file_name, search_word, search
 
        end#of article
    end#of writing csv
-
    return(result_count)
-
 end
-
 
 def preview_trove_results(input_trove_file)
    # This method previews the main fields of all articles
@@ -108,13 +101,10 @@ def preview_trove_results(input_trove_file)
       end#of error handling
       
       i += 1
-   end
-   
+   end  
    article_count = i - 1
    return(article_count)
-
 end
-
 
 def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5), speed = 180)
    # This method reads the Trove results aloud, given an array of articles to read
@@ -147,12 +137,8 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
       end#of error handling
       i += 1
    end#of reading through input_trove
-
    return(true)
-
 end
-
-# example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
 
 def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
    # This method reads the Trove results aloud, given an array of articles to read
@@ -183,9 +169,7 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(
 
 end
 
-
 def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, year_only = false, also_print = false)
-
    begin                           
       if (str_date != '') then
          new_date = convert_date(str_date)
@@ -215,16 +199,12 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
          str_snippet_array.each do |str_sentence|
             say_something("#{str_sentence.strip()}", also_print = also_print, speed = speed)
          end
-      end
-     
+      end   
    rescue Exception
       puts "Error at record #{i}"
    end   
-
    return(true)
-
 end
-
 
 def return_existing_trove_result_file_list(output_path_name)
    trove_result_file_list = []
@@ -239,7 +219,6 @@ def return_existing_trove_result_file_list(output_path_name)
    end
 end
 
-
 def return_trove_file_town_info(input_trove_file)
    #NOTE more needed here
    puts("Town name from #{input_trove_file}")
@@ -250,3 +229,6 @@ def return_trove_file_town_info(input_trove_file)
    puts(town_name)
    return(town_name)
 end
+
+
+# example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext

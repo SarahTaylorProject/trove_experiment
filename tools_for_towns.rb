@@ -4,24 +4,22 @@ require "date"
 require "rbconfig"
 load 'tools_for_general_use.rb'
 
-def return_town_data(source_choice, town_path_name, min_stop_files = 2)
+def return_town_dictionary_from_choice(source_choice, town_path_name, min_stop_files = 2)
    result = false
    begin
-      if (source_choice[0].upcase == 'S') then
-         puts("You have instructed me to use the existing PTV STOP FILES...") 
+      if (source_choice[0].upcase == 'S' or source_choice[0].upcase == 'P') then
+         puts("You have instructed me to use PTV STOP FILES...") 
          stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
          if (stop_file_name_list.size < min_stop_files) then
             puts("Fewer than #{min_stop_files} stop files found, will initiate GTFS unzip...")
             unzip_result = unzip_ptv_gtfs_file(town_path_name = town_path_name)
          end
-         town_coordinate_dictionary = return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list) 
-         town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-         return([town_list, town_coordinate_dictionary])      
+         town_dictionary = return_town_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list) 
+         return(town_dictionary)      
       elsif (source_choice[0].upcase == 'V') then
-         puts("You have instructed me to use VICMAP data to compile a list of town names.")
-         town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(town_path_name = town_path_name)
-         town_list = return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-         return([town_list, town_coordinate_dictionary])      
+         puts("You have instructed me to use VICMAP data...")
+         town_dictionary = return_town_dictionary_from_vicmap_file(town_path_name = town_path_name)
+         return(town_dictionary)      
       else
          puts("Choice not in list, please try again")      
       end      
@@ -32,35 +30,33 @@ def return_town_data(source_choice, town_path_name, min_stop_files = 2)
    end
 end
 
-
-def return_combined_town_coordinate_dictionary(town_path_name)   
+def return_combined_town_dictionary(town_path_name)   
    # NOTE this method needs explanatory header
-   combined_town_coordinate_dictionary = Hash.new()
+   combined_town_dictionary = Hash.new()
    begin
       stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
       
-      ptv_town_coordinate_dictionary = return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list)
-      combined_town_coordinate_dictionary.merge!(ptv_town_coordinate_dictionary)
+      ptv_town_dictionary = return_town_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list)
+      combined_town_dictionary.merge!(ptv_town_dictionary)
       
-      vicmap_town_coordinate_dictionary = return_town_coordinate_dictionary_from_vicmap_file(town_path_name = town_path_name)
-      combined_town_coordinate_dictionary.merge!(vicmap_town_coordinate_dictionary)
+      vicmap_town_dictionary = return_town_dictionary_from_vicmap_file(town_path_name = town_path_name)
+      combined_town_dictionary.merge!(vicmap_town_dictionary)
       
-      return(combined_town_coordinate_dictionary)
+      return(combined_town_dictionary)
    rescue
-      puts("Error encountered in 'return_combined_town_coordinate_dictionary'...")
-      return(combined_town_coordinate_dictionary)
+      puts("Error encountered in 'return_combined_town_dictionary'...")
+      return(combined_town_dictionary)
    end
 end
 
-
-def return_town_coordinate_dictionary_from_vicmap_file(town_path_name, file_name = 'vic_and_border_locality_list.csv')
+def return_town_dictionary_from_vicmap_file(town_path_name, file_name = 'vic_and_border_locality_list.csv')
    result = false
    begin
       if (town_path_name == nil) then
          town_path_name = Dir.pwd
       end
       full_file_name = File.join(town_path_name, file_name)
-      town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(file_name = full_file_name, 
+      town_dictionary = return_town_dictionary_from_single_file(file_name = full_file_name, 
          file_type = 'vicmap', 
          town_field_num = 3, 
          lat_field_num = 11, 
@@ -68,41 +64,40 @@ def return_town_coordinate_dictionary_from_vicmap_file(town_path_name, file_name
          select_field_num = 6, 
          select_field_value = 'VIC')
    rescue
-      puts("Error encountered in 'return_town_coordinate_dictionary_from_vicmap_file'...")
+      puts("Error encountered in 'return_town_dictionary_from_vicmap_file'...")
       return(result)
    end
 end
 
-def return_town_coordinate_dictionary_from_stop_file_name_list(stop_file_name_list)
+def return_town_dictionary_from_stop_file_name_list(stop_file_name_list)
    # NOTE this method needs an explanation header
-   town_coordinate_dictionary = Hash.new() 
+   town_dictionary = Hash.new() 
    begin
       stop_file_name_list.each do |stop_file_name|
          puts("Current PTV stop file: #{stop_file_name}")
-         current_town_coordinate_dictionary = return_town_coordinate_dictionary_from_single_file(stop_file_name = stop_file_name, 
+         current_town_dictionary = return_town_dictionary_from_single_file(stop_file_name = stop_file_name, 
             file_type = 'ptv', 
             town_field_num = 1, 
             lat_field_num = 2, 
             long_field_num = 3)
-         if (current_town_coordinate_dictionary != false) then 
-            puts("Adding #{current_town_coordinate_dictionary.size} town references to dictionary.")
-            town_coordinate_dictionary.merge!(current_town_coordinate_dictionary)
+         if (current_town_dictionary != false) then 
+            puts("Adding #{current_town_dictionary.size} town references to dictionary.")
+            town_dictionary.merge!(current_town_dictionary)
          end
-         puts("Current unsorted town references: #{town_coordinate_dictionary.size}")
+         puts("Current unsorted town references: #{town_dictionary.size}")
       end      
-      puts("Finished town search. Town count: #{town_coordinate_dictionary.size}")
-      town_coordinate_dictionary_sorted = Hash[ town_coordinate_dictionary.sort_by { |key, val| key } ]
-      return(town_coordinate_dictionary_sorted)
+      puts("Finished town search. Town count: #{town_dictionary.size}")
+      town_dictionary_sorted = Hash[ town_dictionary.sort_by { |key, val| key } ]
+      return(town_dictionary_sorted)
    rescue
-      puts("Error encountered in 'return_town_coordinate_dictionary_from_stop_file_name_list'...")
-      return(town_coordinate_dictionary)
+      puts("Error encountered in 'return_town_dictionary_from_stop_file_name_list'...")
+      return(town_dictionary)
    end
 end
 
-
-def return_town_coordinate_dictionary_from_single_file(file_name, file_type = 'ptv', town_field_num=1, lat_field_num=2, long_field_num=3, select_field_num=nil, select_field_value=nil)
+def return_town_dictionary_from_single_file(file_name, file_type = 'ptv', town_field_num=1, lat_field_num=2, long_field_num=3, select_field_num=nil, select_field_value=nil)
    # NOTE this method needs greater explanation
-   town_coordinate_dictionary = Hash.new()
+   town_dictionary = Hash.new()
    puts("Attempting to make town dictionary from file #{file_name}")
    begin
       csv_contents = CSV.read(file_name)
@@ -123,18 +118,17 @@ def return_town_coordinate_dictionary_from_single_file(file_name, file_type = 'p
          end
 
          if (town_name != false) then
-            town_coordinate_dictionary[town_name] = [Float(row[lat_field_num]), Float(row[long_field_num])]
+            town_dictionary[town_name] = [Float(row[lat_field_num]), Float(row[long_field_num])]
          end
       end
-      print_town_coordinate_dictionary(town_coordinate_dictionary)
-      return(town_coordinate_dictionary)
+      print_town_dictionary(town_dictionary)
+      return(town_dictionary)
 
    rescue
-      puts("Encountered error in return_town_coordinate_dictionary_from_single_file...")
-      return(town_coordinate_dictionary)
+      puts("Encountered error in return_town_dictionary_from_single_file...")
+      return(town_dictionary)
    end
 end
-
 
 def extract_town_string_from_ptv_stop_string(input_string, start_divider="(", end_divider=")")  
    result = false
@@ -153,7 +147,6 @@ def extract_town_string_from_ptv_stop_string(input_string, start_divider="(", en
    end
 end
 
-
 def extract_town_string_from_vicmap_string(input_string)
    begin
       output_string = proper_case(input_string.split("(")[0])
@@ -163,30 +156,15 @@ def extract_town_string_from_vicmap_string(input_string)
    end
 end
 
-
-def return_town_list_from_town_coordinate_dictionary(town_coordinate_dictionary)
-   result = false
+def print_town_dictionary(town_dictionary)
    begin
-      town_list = town_coordinate_dictionary.map { |town, coordinates|
-         town
-      }
-   rescue
-      puts("Encountered error in return_town_list_from_town_coordinate_dictionary...")
-      return(result)
-   end
-end
-
-
-def print_town_coordinate_dictionary(town_coordinate_dictionary)
-   begin
-      town_coordinate_dictionary.each do |town_name, coordinates|
+      town_dictionary.each do |town_name, coordinates|
          puts("Town: #{town_name}, Coordinates: #{coordinates}")
       end
    rescue
       return
    end
 end
-
 
 def unzip_ptv_gtfs_file(town_path_name, gtfs_file_name='gtfs.zip', path_numbers_to_unzip=[1, 2, 3, 4, 5, 6])
    # This methods handles the unzipping of a GTFS (General Transit Feed) file
@@ -238,7 +216,6 @@ def unzip_ptv_gtfs_file(town_path_name, gtfs_file_name='gtfs.zip', path_numbers_
       return(result)
    end
 end
-
 
 def return_existing_stop_file_name_list(town_path_name)
    stop_file_name_list = []

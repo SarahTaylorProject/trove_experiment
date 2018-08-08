@@ -13,7 +13,6 @@ def make_single_town_article_geojson_object(town_name, town_coordinates=[0, 0], 
    return(geojson_object)
 end
 
-
 def make_collection_of_geojson_objects(geojson_array)
    geojson_object = {
       "type"=> "FeatureCollection", 
@@ -21,7 +20,6 @@ def make_collection_of_geojson_objects(geojson_array)
    }
    return(geojson_object)
 end
-
 
 def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates, write_individual_article_json = false, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
    # ADD METHOD NOTES HERE
@@ -56,11 +54,8 @@ def make_trove_file_geojson_array(input_trove_file, town_name, town_coordinates,
       end
       i += 1
    end
-   
    return(geojson_array)
-
 end
-
 
 def write_geojson_for_all_csv_files(town_path_name, output_path_name)
    # ADD METHOD NOTES HERE
@@ -71,8 +66,8 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
 
       puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
-      town_coordinate_dictionary = return_combined_town_coordinate_dictionary(town_path_name = town_path_name)
-      print_town_coordinate_dictionary(town_coordinate_dictionary)
+      town_dictionary = return_combined_town_dictionary(town_path_name = town_path_name)
+      print_town_dictionary(town_dictionary)
 
       full_geojson_array = []
 
@@ -82,7 +77,7 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
          #town_name = town_name[/#{"trove_result_"}(.*?)#{"_tragedy.csv"}/m, 1].gsub("_", " ")
          town_name = return_trove_file_town_info(input_trove_file = file_name)
          puts(town_name)
-         town_coordinates = town_coordinate_dictionary[town_name]
+         town_coordinates = town_dictionary[town_name]
          puts("\nProcessing geojson for output file #{i}\n#{file_name}.\nTown name: #{town_name}, Coordinates: #{town_coordinates}")
          current_geojson_array = make_trove_file_geojson_array(input_trove_file = file_name, town_name = town_name, town_coordinates = town_coordinates)
          full_geojson_array.push(*current_geojson_array)

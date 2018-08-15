@@ -66,7 +66,7 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
 
       puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
-      town_dictionary = return_town_dictionary_from_multiple_sources(town_path_name = town_path_name)
+      town_dictionary = return_town_dictionary_from_both_sources(town_path_name = town_path_name)
       print_town_dictionary(town_dictionary)
 
       full_geojson_array = []

@@ -71,6 +71,13 @@ def write_trove_search_results(trove_api_results, output_file_name, search_word,
    return(result_count)
 end
 
+def count_trove_search_results_from_csv(input_trove_file)
+   input_trove = CSV.read(input_trove_file).map { |row|
+     [row[4], row[6], row[8], row[9]]
+   }.uniq
+   return(input_trove.size - 1)
+end
+
 # NOTE: here make a simple "count trove search results in csv"
 # NOTE: here make a function "count trove search results total"
 # AND: function to count trove total results

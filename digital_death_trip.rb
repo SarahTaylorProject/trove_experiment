@@ -23,17 +23,23 @@ continue = true
 
 # START TESTING AREA
 # 1 test existing file list
-# existing_file_list = return_matching_file_names(input_path = default_output_path_name, file_extension = "csv", file_pattern = "trove")
-# puts("existing files:")
-# puts(existing_file_list)
-# existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
+existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
 
 # 2 test geojson files
 # current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
 #    output_path_name = default_output_path_name)
 
-search_town = select_random_town_with_user_input(default_speed, town_path_name = default_town_path_name)
-puts(search_town)
+# 3 test random town selection
+# search_town = select_random_town_with_user_input(default_speed, town_path_name = default_town_path_name)
+# puts(search_town)
+
+puts("Files already available: #{existing_trove_result_file_list.size}")
+existing_trove_result_file_list.each do |file_name|
+   puts("\t#{file_name}")
+   result_count = count_trove_search_results_from_csv(file_name)
+   puts("\t(#{result_count} results)")
+end
+puts("Files already available: #{existing_trove_result_file_list.size}")
 
 exit()
 ###

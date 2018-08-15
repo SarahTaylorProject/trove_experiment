@@ -46,46 +46,12 @@ user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'e
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
-   # puts("You have asked for a RANDOM town.")
-   # say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
-   # instruction_string = "\nI can search in: "
-   # standard_town_data_types.each do |data_type|
-   #   instruction_string += "\n\t'" + data_type + "'"
-   # end
-   # instruction_string += "\nWhich would you like me to use? I will default to #{standard_town_data_types[0]}"
-   # source_choice = get_user_input(prompt_text = instruction_string)
-   # if (source_choice.length == 0) then
-   #    source_choice = standard_town_data_types[0]
-   # end
-   # say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
-   
-   # town_dictionary = return_chosen_town_dictionary(source_type = source_choice, town_path_name = default_town_path_name)
-   # print_town_dictionary(town_dictionary)
-
-   # if (town_dictionary.size == 0) then   
-   #    say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
-   #    return(false)
-   # else
-   #    say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
-   #    try_again = true
-   #    while (continue == true and try_again == true) do
-   #       search_town = town_dictionary.keys.sample
-   #       say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
-   #       say_something("What do you think?", also_print = true, speed = default_speed)
-   #       user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
-   #       if (user_input.upcase == 'EXIT') then
-   #          continue = false
-   #       elsif (user_input.upcase == 'N') then
-   #          try_again = true
-   #       else
-   #          try_again = false
-   #       end
-   #    end
-   # end
-
+   search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
 else
    search_town = user_input
 end
+
+puts("Search town is #{search_town}")
 
 # TEST EXIT
 exit()
@@ -113,7 +79,7 @@ random_article_range = Array(1..20)
 output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 
 if (continue == true) then
-   result_count = preview_trove_results(output_file_name)
+   result_count = preview_trove_search_results_from_csv(output_file_name)
    say_something("\nI found some results.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter 'all' to hear all the headlines, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
@@ -130,7 +96,7 @@ end
 
 while (continue == true) do   
    clear_screen()
-   result_count = preview_trove_results(output_file_name)
+   result_count = preview_trove_search_results_from_csv(output_file_name)
    
    say_something("\nShall I pick a random tragedy from this place? Or let me know if you would like to pick from some specific articles", also_print = true, speed = default_speed)  
    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'n' or exit' to cancel.")

@@ -75,7 +75,7 @@ end
 # NOTE: here make a function "count trove search results total"
 # AND: function to count trove total results
 
-def preview_trove_results(input_trove_file)
+def preview_trove_search_results_from_csv(input_trove_file)
    # This method previews the main fields of all articles
    # Input: a csv of Trove search results, written as above in the 'write_trove_search_results' method
    # Note: Only takes in the more interesting parts of Trove results: heading (field 4), date (field 6), snippet (field 8)

@@ -5,52 +5,67 @@ require "rbconfig"
 load 'tools_for_general_use.rb'
 
 def select_random_town_with_user_input(default_speed, town_path_name)
-   # NOTE: moved here August 9th; add error handling and neaten
-   standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
-   continue = true
+   # Previously in digital_death_trip main file, moved here August 9th
+   # Assists with near-random choice of town from given inputs 
+   # (i.e. random but with room for user to choose source, and to refuse individual towns until an ok random selection is made)
+   # First offers choice of input data types for the town dictionary from which to make random selection
+   # Assigns 'town_dictionary', either from Vicmap or from PTV Stop files, depending on user choice
+   # 'town_dictionary' is a hash of unique town names and coordinates
+   # If the function handling either VicMap or PTV Stop file dictionaries fails, this function fails
+   # It then makes a random selection from the dictionary keys (i.e. town names), and assigns this to 'random_town'
+   # Enters a loop that will continue if the user says 'n' to the random selection/s
+   # Only returns when either a) user enters 'EXIT', or b) user presses a value other than 'n'
+   result = false
+   begin
+      # NOTE: moved here August 9th; add error handling and neaten
+      town_data_types = ['S for all PTV Stop files on file', 'V for VICMAP']
+      puts("You have asked for a RANDOM town.")
+      say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
+      instruction_string = "I can search in: "
+      town_data_types.each do |data_type|
+        instruction_string += "\n\t'" + data_type + "'"
+      end
+      instruction_string += "\nWhich would you like me to use? I will default to '#{town_data_types[0]}'"
+      source_choice = get_user_input(prompt_text = instruction_string)
+      if (source_choice.length == 0) then
+         source_choice = town_data_types[0]
+      end
+      say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
+      
+      town_dictionary = return_chosen_town_dictionary(source_type = source_choice, town_path_name = town_path_name)
+      print_town_dictionary(town_dictionary)
 
-   puts("You have asked for a RANDOM town.")
-   say_something("Ok I can do that. Please choose a data source for me to compile town names from.", also_print = true, speed = default_speed)
-   instruction_string = "I can search in: "
-   standard_town_data_types.each do |data_type|
-     instruction_string += "\n\t'" + data_type + "'"
-   end
-   instruction_string += "\nWhich would you like me to use? I will default to '#{standard_town_data_types[0]}'"
-   source_choice = get_user_input(prompt_text = instruction_string)
-   if (source_choice.length == 0) then
-      source_choice = standard_town_data_types[0]
-   end
-   say_something("Ok. Please wait while I process this.", also_print = true, speed = default_speed)
-   
-   town_dictionary = return_chosen_town_dictionary(source_type = source_choice, town_path_name = town_path_name)
-   print_town_dictionary(town_dictionary)
-
-   if (town_dictionary.size == 0) then   
-      say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
-      return(false)
-   else
-      say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
-      try_again = true
-      while (continue == true and try_again == true) do
-         search_town = town_dictionary.keys.sample
-         say_something("\nMy random town choice is #{search_town}", also_print = true, speed = default_speed)      
-         say_something("What do you think?", also_print = true, speed = default_speed)
-         user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
-         if (user_input.upcase == 'EXIT') then
-            continue = false
-         elsif (user_input.upcase == 'N') then
-            try_again = true
-         else
-            try_again = false
+      if (town_dictionary.size == 0) then   
+         say_something("I'm sorry, I couldn't find any towns, please check and try again.", also_print = true, speed = default_speed)
+         return(result)
+      else
+         say_something("I found #{town_dictionary.size} unique Victorian towns in this data.", also_print = true, speed = default_speed)
+         try_again = true
+         while (try_again == true) do
+            random_town = town_dictionary.keys.sample
+            say_something("\nMy random town choice is #{random_town}", also_print = true, speed = default_speed)      
+            say_something("What do you think?", also_print = true, speed = default_speed)
+            user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
+            if (user_input.upcase == 'EXIT') then
+               return(result)
+            elsif (user_input.upcase == 'N') then
+               try_again = true
+            else
+               puts("Ok. Returning #{random_town}")
+               return(random_town)
+            end
          end
       end
+   rescue
+      puts("Error encountered in 'select_random_town_with_user_input'...")
+      return(result)
    end
 end
 
 def return_chosen_town_dictionary(source_choice, town_path_name, min_stop_files = 2)
    result = Hash.new()
    begin
-      if (source_choice[0].upcase == 'S' or source_choice[0].upcase == 'P') then
+      if (source_choice[0].upcase == 'S') then
          puts("You have instructed me to use PTV STOP FILES...") 
          stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
          if (stop_file_name_list.size < min_stop_files) then
@@ -73,22 +88,22 @@ def return_chosen_town_dictionary(source_choice, town_path_name, min_stop_files 
    end
 end
 
-def return_combined_town_dictionary(town_path_name)   
+def return_town_dictionary_from_both_sources(town_path_name)   
    # NOTE this method needs explanatory header
-   combined_town_dictionary = Hash.new()
+   town_dictionary = Hash.new()
    begin
       stop_file_name_list = return_existing_stop_file_name_list(town_path_name = town_path_name)
       
       ptv_town_dictionary = return_town_dictionary_from_stop_file_name_list(stop_file_name_list = stop_file_name_list)
-      combined_town_dictionary.merge!(ptv_town_dictionary)
+      town_dictionary.merge!(ptv_town_dictionary)
       
       vicmap_town_dictionary = return_town_dictionary_from_vicmap_file(town_path_name = town_path_name)
-      combined_town_dictionary.merge!(vicmap_town_dictionary)
+      town_dictionary.merge!(vicmap_town_dictionary)
       
-      return(combined_town_dictionary)
+      return(town_dictionary)
    rescue
-      puts("Error encountered in 'return_combined_town_dictionary'...")
-      return(combined_town_dictionary)
+      puts("Error encountered in 'return_town_dictionary_from_both_sources'...")
+      return(town_dictionary)
    end
 end
 

@@ -218,7 +218,7 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
    return(true)
 end
 
-def return_existing_trove_result_file_list(output_path_name)
+def return_existing_trove_file_list(output_path_name)
    trove_result_file_list = []
    begin
       trove_result_file_list = return_matching_file_names(input_path = output_path_name, 
@@ -226,8 +226,21 @@ def return_existing_trove_result_file_list(output_path_name)
          file_pattern = "trove_result")
       return(trove_result_file_list)
    rescue
-      puts("Encountered error in 'return_existing_trove_result_file_list'...")
+      puts("Encountered error in 'return_existing_trove_file_list'...")
       return(trove_result_file_list)
+   end
+end
+
+def print_existing_trove_file_list(existing_trove_file_list)
+   begin
+      existing_trove_file_list.each do |file_name|
+         search_town = return_trove_file_search_town(file_name)
+         search_word = return_trove_file_search_word(file_name)
+         result_count = count_trove_search_results_from_csv(file_name)
+         puts("#{File.basename(file_name)} (#{search_word}, #{search_town}, #{result_count} results)")
+      end
+   rescue
+      return
    end
 end
 

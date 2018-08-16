@@ -23,7 +23,7 @@ continue = true
 
 # START TESTING AREA
 # 1 test existing file list
-existing_trove_result_file_list = return_existing_trove_result_file_list(output_path_name = default_output_path_name)
+existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 
 # 2 test geojson files
 # current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, 
@@ -33,14 +33,15 @@ existing_trove_result_file_list = return_existing_trove_result_file_list(output_
 # search_town = select_random_town_with_user_input(default_speed, town_path_name = default_town_path_name)
 # puts(search_town)
 
-puts("Files already available: #{existing_trove_result_file_list.size}")
-existing_trove_result_file_list.each do |file_name|
-   search_town = return_trove_file_search_town(file_name)
-   search_word = return_trove_file_search_word(file_name)
-   result_count = count_trove_search_results_from_csv(file_name)
-   puts("#{File.basename(file_name)} (#{search_word}, #{search_town}, #{result_count} results)")
-end
-puts("Trove result files already available: #{existing_trove_result_file_list.size}")
+puts("Files already available: #{existing_trove_file_list.size}")
+print_existing_trove_file_list(existing_trove_file_list)
+# existing_trove_file_list.each do |file_name|
+#    search_town = return_trove_file_search_town(file_name)
+#    search_word = return_trove_file_search_word(file_name)
+#    result_count = count_trove_search_results_from_csv(file_name)
+#    puts("#{File.basename(file_name)} (#{search_word}, #{search_town}, #{result_count} results)")
+# end
+puts("Trove result files already available: #{existing_trove_file_list.size}")
 
 exit()
 ###

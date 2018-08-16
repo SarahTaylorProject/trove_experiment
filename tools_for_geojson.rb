@@ -62,7 +62,7 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
    result = false
    begin
       output_file_name = File.join(output_path_name, "map_collection_" + Time.now.strftime("%d_%m_%Y") + ".json")
-      csv_file_list = return_existing_trove_result_file_list(output_path_name = output_path_name)
+      csv_file_list = return_existing_trove_file_list(output_path_name = output_path_name)
 
       puts("\nFound #{csv_file_list.size} output files, will try to create geojson file #{output_file_name}...")
 
@@ -75,7 +75,7 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
       csv_file_list.each do |file_name|
          town_name = File.basename(file_name)
          #town_name = town_name[/#{"trove_result_"}(.*?)#{"_tragedy.csv"}/m, 1].gsub("_", " ")
-         town_name = return_trove_file_town_info(input_trove_file = file_name)
+         town_name = return_trove_file_search_town(input_trove_file = file_name)
          puts(town_name)
          town_coordinates = town_dictionary[town_name]
          puts("\nProcessing geojson for output file #{i}\n#{file_name}.\nTown name: #{town_name}, Coordinates: #{town_coordinates}")

@@ -231,16 +231,20 @@ def return_existing_trove_result_file_list(output_path_name)
    end
 end
 
-def return_trove_file_town_info(input_trove_file)
-   #NOTE more needed here
-   puts("Town name from #{input_trove_file}")
-   input_trove = CSV.read(input_trove_file).map { |row|
-     [row[0], row[1]]
-   }.uniq
-   town_name = input_trove[1][1]
-   puts(town_name)
-   return(town_name)
+def return_trove_file_search_town(input_trove_file, search_town_field=1)
+   # Returns the town name for a Trove CSV file, by using the first row 
+   # (they should all be identical)
+   # This is marginally easier than inferring the search town from the file name
+   # If errors encountered, returns blank string
+   # If successful, returns the search town name from the Trove search result CSV file (defaults to field 1)
+   search_town = ''
+   begin
+      search_town = CSV.read(input_trove_file)[1][search_town_field]
+      return(search_town)
+   rescue
+      puts("Error encountered in 'return_trove_file_search_town', returning #{search_town}...")
+      return(search_town)
+   end
 end
-
 
 # example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext

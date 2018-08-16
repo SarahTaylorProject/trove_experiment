@@ -293,3 +293,18 @@ def return_matching_file_names(input_path_name = Dir.pwd, file_extension = "", f
    end
    return(matching_file_names)
 end
+
+
+def return_record_from_csv_file(input_file, row_number, column_number)
+   # Returns individual record from CSV file
+   # If errors encountered, returns blank string
+   # If successful, returns the matching record from the CSV file
+   record = ''
+   begin
+      record = CSV.read(input_trove_file)[row_number][column_number]
+      return(record)
+   rescue
+      puts("Error encountered in 'return_record_from_csv_file', returning #{record}...")
+      return(record)
+   end
+end

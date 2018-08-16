@@ -233,7 +233,6 @@ end
 
 def return_trove_file_search_town(input_trove_file, search_town_field=1)
    # Returns the town name for a Trove CSV file, by using the first row 
-   # (they should all be identical)
    # This is marginally easier than inferring the search town from the file name
    # If errors encountered, returns blank string
    # If successful, returns the search town name from the Trove search result CSV file (defaults to field 1)
@@ -247,4 +246,17 @@ def return_trove_file_search_town(input_trove_file, search_town_field=1)
    end
 end
 
-# example of full text search http://api.trove.nla.gov.au/newspaper/203354793?&key={}&reclevel=full&include=articletext
+def return_trove_file_search_word(input_trove_file, search_word_field=0)
+   # Returns the search word for a Trove CSV file, by using the first row 
+   # This is marginally easier than inferring the search word from the file name
+   # If errors encountered, returns blank string
+   # If successful, returns the search word from the Trove search result CSV file (defaults to field 0)
+   search_word = ''
+   begin
+      search_word = CSV.read(input_trove_file)[1][search_word_field]
+      return(search_word)
+   rescue
+      puts("Error encountered in 'return_trove_file_search_word', returning #{search_word}...")
+      return(search_word)
+   end
+end

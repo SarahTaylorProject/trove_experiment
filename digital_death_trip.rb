@@ -35,12 +35,12 @@ existing_trove_result_file_list = return_existing_trove_result_file_list(output_
 
 puts("Files already available: #{existing_trove_result_file_list.size}")
 existing_trove_result_file_list.each do |file_name|
-   puts("\t#{File.basename(file_name)}")
    search_town = return_trove_file_search_town(file_name)
+   search_word = return_trove_file_search_word(file_name)
    result_count = count_trove_search_results_from_csv(file_name)
-   puts("\t(#{search_town}, #{result_count} results)")
+   puts("#{File.basename(file_name)} (#{search_word}, #{search_town}, #{result_count} results)")
 end
-puts("Files already available: #{existing_trove_result_file_list.size}")
+puts("Trove result files already available: #{existing_trove_result_file_list.size}")
 
 exit()
 ###

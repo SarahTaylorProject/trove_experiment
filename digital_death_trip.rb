@@ -17,9 +17,9 @@ unless File.directory?(default_output_path_name)
 end
 default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
-#standard_town_data_types = ['S or P for PTV Stop Files', 'V for VICMAP']
-#standard_town_data_types = ['S or P for all existing PTV Stop files', 'G to unzip PTV GTFS zip file', 'V for VICMAP']
+
 continue = true
+output_file_name = ''
 
 # START TESTING AREA
 # 1 test existing file list
@@ -35,26 +35,30 @@ existing_trove_file_list = return_existing_trove_file_list(output_path_name = de
 
 puts("Files already available: #{existing_trove_file_list.size}")
 print_existing_trove_file_list(existing_trove_file_list)
-# existing_trove_file_list.each do |file_name|
-#    search_town = return_trove_file_search_town(file_name)
-#    search_word = return_trove_file_search_word(file_name)
-#    result_count = count_trove_search_results_from_csv(file_name)
-#    puts("#{File.basename(file_name)} (#{search_word}, #{search_town}, #{result_count} results)")
-# end
 puts("Trove result files already available: #{existing_trove_file_list.size}")
 
-exit()
 ###
-say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
-say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
+#say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
+#say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
-say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
-user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'exit' to cancel")
+#say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
+user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")
 
 if (user_input.upcase == 'EXIT') then
    continue = false
 elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
+elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
+   puts("\nSelecting random existing Trove file...")
+   existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
+   if (existing_trove_file_list.size == 0) then
+      puts("sorry, no existing Trove files found")
+      continue = false
+   else
+      output_file_name = existing_trove_file_list.sample
+      puts("Selected file: #{File.basename(output_file_name)}")
+      search_town = return_trove_file_search_town(output_file_name)
+   end
 else
    search_town = user_input
 end
@@ -62,11 +66,11 @@ end
 puts("Search town is #{search_town}")
 
 # TEST EXIT
-exit()
+#exit()
 # nb. need function here to gather coordinates for town choices not made through town_dictionary
 # START PASTE
 
- if (continue == true) then
+ if (continue == true and output_file_name == '') then
     say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
     output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
     trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
@@ -83,12 +87,10 @@ exit()
 
 default_article_numbers = Array(1..5)
 random_article_range = Array(1..20)
-# search_town = 'Elmore'
-output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 
 if (continue == true) then
-   result_count = preview_trove_search_results_from_csv(output_file_name)
-   say_something("\nI found some results.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
+   result_count = count_trove_search_results_from_csv(output_file_name)
+   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter 'all' to hear all the headlines, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false
@@ -102,10 +104,7 @@ if (continue == true) then
    end
 end
 
-while (continue == true) do   
-   clear_screen()
-   result_count = preview_trove_search_results_from_csv(output_file_name)
-   
+while (continue == true) do    
    say_something("\nShall I pick a random tragedy from this place? Or let me know if you would like to pick from some specific articles", also_print = true, speed = default_speed)  
    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'n' or exit' to cancel.")
    if (user_input.upcase == 'N' or user_input.upcase == 'EXIT') then
@@ -143,7 +142,7 @@ end
 say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
 
 puts("\nWill update map files before exiting...")
-current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, default_output_path_name = default_output_path_name, write_individual_files = true)
+current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, output_path_name = default_output_path_name)
 if (current_result != false) then
    puts("\nHave written #{current_result} map objects to your output directory.")
    puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")

@@ -88,7 +88,6 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
       File.open(output_file_name, "w") do |f|
          f.write(JSON.pretty_generate(geojson_collection))
       end
-      puts("HERE...")
       puts("\nMap collection geojson file for ALL Trove outputs in directory:\n#{output_file_name}\n")
       puts("Total of #{full_geojson_array.size} map objects, from #{i} files.")
       return(full_geojson_array.size)

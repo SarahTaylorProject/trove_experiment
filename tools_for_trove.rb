@@ -72,13 +72,10 @@ def write_trove_search_results(trove_api_results, output_file_name, search_word,
 end
 
 def count_trove_search_results_from_csv(input_trove_file)
-   input_trove = CSV.read(input_trove_file).map { |row|
-     [row[4], row[6], row[8], row[9]]
-   }.uniq
+   input_trove = CSV.read(input_trove_file)
    return(input_trove.size - 1)
 end
 
-# NOTE: here make a simple "count trove search results in csv"
 # NOTE: here make a function "count trove search results total"
 # AND: function to count trove total results
 
@@ -167,8 +164,8 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(
    i = 1
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
       begin#error handling
-         if (article_numbers.include? i) then
-            puts("\nArticle: #{i}")            
+         if (article_numbers.include? i) then     
+            say_something("\nArticle: #{i}", also_print = true, speed = speed)    
             read_trove_article(str_heading = str_heading = str_heading, str_date = str_date, str_snippet = '', speed = speed, year_only = true, also_print = true)
          end
       rescue Exception
@@ -182,7 +179,7 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(
 end
 
 def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180, year_only = false, also_print = false)
-   begin                           
+   begin                         
       if (str_date != '') then
          new_date = convert_date(str_date)
          if (year_only == true) then

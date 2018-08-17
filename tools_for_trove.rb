@@ -215,16 +215,19 @@ def read_trove_article(str_heading='', str_date='', str_snippet='', speed = 180,
    return(true)
 end
 
-def return_existing_trove_file_list(output_path_name)
-   trove_result_file_list = []
+def return_existing_trove_file_list(output_path_name, also_print = false)
+   existing_trove_file_list = []
    begin
-      trove_result_file_list = return_matching_file_names(input_path = output_path_name, 
+      existing_trove_file_list = return_matching_file_names(input_path = output_path_name, 
          file_extension = "csv", 
          file_pattern = "trove_result")
-      return(trove_result_file_list)
+      if (also_print == true) then
+         print_existing_trove_file_list(existing_trove_file_list)
+      end
+      return(existing_trove_file_list)
    rescue
       puts("Encountered error in 'return_existing_trove_file_list'...")
-      return(trove_result_file_list)
+      return(existing_trove_file_list)
    end
 end
 

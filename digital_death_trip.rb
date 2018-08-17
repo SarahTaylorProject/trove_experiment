@@ -24,7 +24,7 @@ output_file_name = ''
 # Test for existing file list
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("Files already available: #{existing_trove_file_list.size}")
-print_existing_trove_file_list(existing_trove_file_list)
+#print_existing_trove_file_list(existing_trove_file_list)
 puts("Trove result files already available: #{existing_trove_file_list.size}")
 
 ###
@@ -40,7 +40,7 @@ elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
 elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
    puts("\nSelecting random existing Trove file...")
-   existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
+   existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name, also_print = true)
    if (existing_trove_file_list.size == 0) then
       puts("sorry, no existing Trove files found")
       continue = false
@@ -53,8 +53,7 @@ else
    search_town = user_input
 end
 
-puts("Search town is #{search_town}")
-
+puts("Search town: #{search_town}")
 
 # nb. need function here to gather coordinates for town choices not made through town_dictionary
 

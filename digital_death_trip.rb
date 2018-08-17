@@ -19,13 +19,11 @@ default_town_path_name = File.join(Dir.pwd, 'town_lists')
 max_articles_to_read = 3
 
 continue = true
-output_file_name = ''
+trove_result_file_name = ''
 
 # Test for existing file list
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
-puts("Files already available: #{existing_trove_file_list.size}")
-#print_existing_trove_file_list(existing_trove_file_list)
-puts("Trove result files already available: #{existing_trove_file_list.size}")
+puts("\nTrove result files already available: #{existing_trove_file_list.size}")
 
 ###
 #say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
@@ -45,9 +43,9 @@ elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
       puts("sorry, no existing Trove files found")
       continue = false
    else
-      output_file_name = existing_trove_file_list.sample
-      puts("Selected file: #{File.basename(output_file_name)}")
-      search_town = return_trove_file_search_town(output_file_name)
+      trove_result_file_name = existing_trove_file_list.sample
+      puts("Selected file: #{File.basename(trove_result_file_name)}")
+      search_town = return_trove_file_search_town(trove_result_file_name)
    end
 else
    search_town = user_input
@@ -57,12 +55,12 @@ puts("Search town: #{search_town}")
 
 # nb. need function here to gather coordinates for town choices not made through town_dictionary
 
-if (continue == true and output_file_name == '') then
+if (continue == true and trove_result_file_name == '') then
    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
-   output_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
+   trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
    puts("\nWriting results to file now...")
-   result_count = write_trove_search_results(trove_api_results, output_file_name, search_word, search_town)
+   result_count = write_trove_search_results(trove_api_results, trove_result_file_name, search_word, search_town)
    puts(result_count)
 
    if (result_count == 0) then
@@ -75,18 +73,18 @@ default_article_numbers = Array(1..5)
 random_article_range = Array(1..20)
 
 if (continue == true) then
-   result_count = count_trove_search_results_from_csv(output_file_name)
+   result_count = count_trove_search_results_from_csv(trove_result_file_name)
    say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter 'all' to hear all the headlines, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false
    elsif (user_input.upcase == 'ALL') then
       # just reads the default first 5
-      read_trove_headlines(input_trove_file = output_file_name, speed = default_speed, article_numbers = default_article_numbers)
+      read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = default_article_numbers)
    elsif (user_input.upcase != 'N') then
       # reads random sample of 5
       random_article_numbers = Array.new(5) { rand(1..20) }
-      read_trove_headlines(input_trove_file = output_file_name, speed = default_speed, article_numbers = random_article_numbers)
+      read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
 end
 
@@ -117,14 +115,14 @@ while (continue == true) do
       if (continue == true) then
          say_something("\nOk, let's see.", also_print = true, speed = default_speed) 
          puts("Articles: #{article_numbers}")
-         read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = article_numbers, speed = default_speed)
+         read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = article_numbers, speed = default_speed)
       end
    else
       random_article_number = random_article_range.sample
       say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
       puts(random_article_number)
       # skipping read for now
-      #read_trove_results_by_array(input_trove_file = output_file_name, article_numbers = [random_article_number], speed = default_speed)
+      #read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [random_article_number], speed = default_speed)
    end
 
    if (continue == true) then    
@@ -136,11 +134,9 @@ while (continue == true) do
          # Provision here for full article search
          # note: need to account for multiple article numbers here
          # RECORD LOOKUP NOT WORKING
-         trove_article_id = return_record_from_csv_file(input_file = output_file_name, row_number = random_article_number + 1, column_number = 10)
+         trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = random_article_number + 1, column_number = 9)
          puts(trove_article_id)
-         trove_article_id = return_record_from_csv_file(input_file = output_file_name, row_number = random_article_number + 1, column_number = 3)
-         puts(trove_article_id)
-         # fetch_trove_newspaper_article(trove_article_id, trove_key)
+         trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
          continue = false
       elsif (user_input.upcase == 'EXIT') then      
          continue = false

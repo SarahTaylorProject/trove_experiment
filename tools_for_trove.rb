@@ -273,3 +273,23 @@ def return_trove_file_search_word(input_trove_file, search_word_field=0)
       return(search_word)
    end
 end
+
+def fetch_trove_newspaper_article(trove_article_id, trove_key)
+   # Added August 18th: fetches individual article
+   # Note: add more functions to handle this kind of return value
+   puts("\nFetching individual article: #{trove_article_id}...")
+   trove_api_request = "http://api.trove.nla.gov.au/newspaper/#{trove_article_id}?key=#{trove_key}&reclevel=full&include=articletext"
+   puts(trove_api_request)
+   begin
+      uri = URI(trove_api_request)
+      response = Net::HTTP.get(uri)
+      trove_api_results = Nokogiri::XML.parse(response)
+      puts(trove_api_results)
+   rescue
+      puts "Error getting API results"
+      return(0)
+   end
+
+   return(trove_api_results)
+
+end

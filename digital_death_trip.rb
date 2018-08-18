@@ -25,7 +25,6 @@ trove_result_file_name = ''
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}")
 
-###
 #say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 #say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
@@ -121,22 +120,20 @@ while (continue == true) do
       random_article_number = random_article_range.sample
       say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
       puts(random_article_number)
-      # skipping read for now
-      #read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [random_article_number], speed = default_speed)
+      read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [random_article_number], speed = default_speed)
    end
 
    if (continue == true) then    
       say_something("\n...That was my random tragedy from #{search_town}. Are you ready to investigate this Trove Town Tragedy?", also_print = true, speed = default_speed)             
       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different tragedy\nEnter 'exit' to cancel\nEnter 'y' to find out more")
       if (user_input.upcase == 'Y') then
-         say_something("Good luck!", also_print = true, speed = default_speed)
-         puts("HERE")
-         # Provision here for full article search
          # note: need to account for multiple article numbers here
-         # RECORD LOOKUP NOT WORKING
          trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = random_article_number + 1, column_number = 9)
          puts(trove_article_id)
-         trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
+         trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
+         puts("\nContent written to file: #{trove_article_file}")
+         # note: add option for READING article (though will need to remove weird text)
+         say_something("Good luck!", also_print = true, speed = default_speed)
          continue = false
       elsif (user_input.upcase == 'EXIT') then      
          continue = false

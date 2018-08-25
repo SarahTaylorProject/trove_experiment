@@ -115,17 +115,23 @@ def preview_trove_search_results_from_csv(input_trove_file)
    return(article_count)
 end
 
-def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5), speed = 180)
+def read_trove_results_by_array(input_trove_file, article_numbers = [], speed = 180)
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
    clear_screen()
-   puts("\nREADING ARTICLES #{article_numbers}******")
+   puts("\nREADING ARTICLES ******")
    
    # take only the fields of interest for reading aloud, into an array of trove results
    input_trove = CSV.read(input_trove_file).map { |row|
      [row[4], row[6], row[8], row[9]]
    }.uniq
+
+   if (article_numbers == []) then
+      article_numbers = Array(1..input_trove.size)
+   end
+
+   puts(article_numbers)
 
    i = 1
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
@@ -149,7 +155,7 @@ def read_trove_results_by_array(input_trove_file, article_numbers = Array(1..5),
    return(true)
 end
 
-def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(1..DEFAULT_ARTICLE_COUNT))
+def read_trove_headlines(input_trove_file, speed = 180, article_numbers = [])
    # This method reads the Trove results aloud, given an array of articles to read
    # Input: Trove file, array of article numbers to read out
 
@@ -160,6 +166,12 @@ def read_trove_headlines(input_trove_file, speed = 180, article_numbers = Array(
    input_trove = CSV.read(input_trove_file).map { |row|
      [row[4], row[6], row[8], row[9]]
    }.uniq
+
+   if (article_numbers == []) then
+      article_numbers = Array(1..input_trove.size)
+   end
+
+   puts(article_numbers)
 
    i = 1
    input_trove[1..-1].each do |str_heading, str_date, str_snippet, str_trove_id|
@@ -300,9 +312,10 @@ def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id
    output_file_name = File.join(output_path_name, "trove_article_" + trove_article_id + ".txt")
 
    open(output_file_name, 'w') do |f|
+      write_text = trove_article_result.text.gsub("span&gt;", "").gsub(/<span>|<\/span>/,"")
+      write_text = write_text.gsub("</p>", "\n")
+      write_text = write_text.gsub("<p>", "").lstrip
       f.puts(trove_article_result)
-      #note: need to decide whether to process the text or just leave it as is
-      #maybe just process the text for TALKING, use this process here
       # trove_article_result.xpath('//articleText').each do |article_xml|
       #    article_text = article_xml.text.gsub("span&gt;", "").gsub(/<span>|<\/span>/,"")
       #    article_text = article_text.gsub("</p>", "\n")

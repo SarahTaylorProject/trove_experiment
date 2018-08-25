@@ -5,13 +5,7 @@ load 'tools_for_trove.rb'
 load 'tools_for_towns.rb'
 load 'tools_for_geojson.rb'
 
-# Alternate way of loading in other scripts
 script_directory = File.dirname(__FILE__)
-# puts(script_directory)
-# load File.join(script_directory, 'tools_for_general_use.rb')
-# load File.join(script_directory, 'tools_for_trove.rb')
-# load File.join(script_directory, 'tools_for_towns.rb')
-# load File.join(script_directory, 'tools_for_geojson.rb')
 
 clear_screen()
 my_trove_key = read_trove_key()
@@ -85,16 +79,18 @@ if (continue == true) then
       continue = false
    elsif (user_input.upcase == 'ALL') then
       # just reads the default first 5
-      read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = default_article_numbers)
+      read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
    elsif (user_input.upcase != 'N') then
       # reads random sample of 5
       random_article_numbers = Array.new(5) { rand(1..20) }
+      random_article_numbers = random_article_numbers.uniq
       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
 end
 
 if (continue == true) then 
-   say_something("\nShall I pick a random tragedy from this place? Or let me know if you would like to pick from some specific articles", also_print = true, speed = default_speed)  
+   say_something("\nShall I pick a random tragedy from this place?", also_print = true, speed = default_speed)
+   say_something("Or let me know if you would like to pick from some specific articles.", also_print = true, speed = default_speed)  
 end
 
 while (continue == true) do      

@@ -288,12 +288,11 @@ def fetch_trove_newspaper_article(trove_article_id, trove_key)
    # Note: add more functions to handle this kind of return value
    puts("\nFetching individual article: #{trove_article_id}...")
    trove_api_request = "http://api.trove.nla.gov.au/newspaper/#{trove_article_id}?key=#{trove_key}&reclevel=full&include=articletext"
-   puts(trove_api_request)
    begin
       uri = URI(trove_api_request)
       response = Net::HTTP.get(uri)
       trove_api_results = Nokogiri::XML.parse(response)
-      puts(trove_api_results)
+      #puts(trove_api_results)
    rescue
       puts "Error getting API results"
       return(0)
@@ -313,15 +312,29 @@ def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id
 
       trove_article_result.xpath('//pdf').each do |article_pdf|
          article_pdf_address = article_pdf.text
-         system %{cmd /c "start #{article_pdf_address}"}
+         if (operating_system() == "windows") then
+            system %{cmd /c "start #{article_pdf_address}"}
+         else
+            system %{open "#{article_pdf_address}"}
+         end
       end
 
       open(output_file_name, 'w') do |output_file|
+         trove_article_result.xpath('//heading').each do |article_heading|
+            output_file.puts(article_heading.text)
+         end
+         trove_article_result.xpath('//date').each do |article_date|
+            output_file.puts(article_date.text)
+         end
          trove_article_result.xpath('//articleText').each do |article_text| 
             output_file.puts(article_text.text)
          end        
       end
-      system %{cmd /c "start #{output_file_name}"}
+      if (operating_system() == "windows") then
+         system %{cmd /c "start #{output_file_name}"}
+      else
+         system %{open "#{output_file_name}"}
+      end
 
       return(output_file_name)
    rescue

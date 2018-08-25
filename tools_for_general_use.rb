@@ -3,6 +3,7 @@ require "net/http"
 require "date"
 require "rbconfig"
 
+
 def clear_screen()
    system("clear")
 end
@@ -192,14 +193,14 @@ def unzip_file_with_unzip_command(full_zip_file_name, full_output_path_name=nil,
       system_result = system(command_string)
       puts(system_result)
       if (system_result == true) then
-         puts("system_result == true, Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
+         puts("\nsystem_result == true, Successfully unzipped #{full_zip_file_name} to #{full_output_path_name} with this command")         
          result = true
       else
-         puts("system_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
+         puts("\nsystem_result != true, Non-zero exit code, could not successfully unzip to #{full_zip_file_name} to #{full_output_path_name} with this command")
       end
       return(result)
    rescue
-      puts("Function: unzip_file_with_unzip_command, error encountered with unzipping #{full_zip_file_name} to #{full_output_path_name}")
+      puts("Error encountered in 'unzip_file_with_unzip_command', unzipping #{full_zip_file_name} to #{full_output_path_name}")
       return(result)
    end
 end
@@ -277,3 +278,35 @@ def proper_case(input_string)
       return(input_string)
    end
 end
+
+
+def return_matching_file_names(input_path_name = Dir.pwd, file_extension = "", file_pattern="")
+   # this function returns file list for any files matching the pattern and/or extension
+   # useful for matching within subdirectories
+   matching_file_names = []
+   Find.find(input_path_name) do |path|
+      if path =~ /.*\.#{file_extension}/ then
+         if path =~ /.*#{file_pattern}./ then
+            matching_file_names << path
+         end
+      end
+   end
+   return(matching_file_names)
+end
+
+
+def return_record_from_csv_file(input_file, row_number, column_number)
+   # Returns individual record from CSV file
+   # If errors encountered, returns blank string
+   # If successful, returns the matching record from the CSV file
+   record = ''
+   begin
+      record = CSV.read(input_file)[row_number][column_number]
+      return(record)
+   rescue
+      puts("Error encountered in 'return_record_from_csv_file', returning #{record}...")
+      return(record)
+   end
+end
+
+# Note: should add function to read CSV headers to gather correct column, and/or read as data frame

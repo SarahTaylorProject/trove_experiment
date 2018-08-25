@@ -297,17 +297,18 @@ end
 def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id, output_path_name)
    # This method writes the Trove XML results of an individual article, to a text file
    # Input: XML results, Trove article ID, output path name 
-   output_file_name = File.join(output_path_name, "trove_article_" + trove_article_id)
+   output_file_name = File.join(output_path_name, "trove_article_" + trove_article_id + ".txt")
 
    open(output_file_name, 'w') do |f|
       f.puts(trove_article_result)
-      # note: need to decide whether to process the text or just leave it as is
-      # maybe just process the text for TALKING, use this process here
+      #note: need to decide whether to process the text or just leave it as is
+      #maybe just process the text for TALKING, use this process here
       # trove_article_result.xpath('//articleText').each do |article_xml|
       #    article_text = article_xml.text.gsub("span&gt;", "").gsub(/<span>|<\/span>/,"")
       #    article_text = article_text.gsub("</p>", "\n")
       #    article_text = article_text.gsub("<p>", "").lstrip
-       # end#of article
+      # end#of article
    end#of writing text file
+   system %{cmd /c "start #{output_file_name}"}
    return(output_file_name)
 end

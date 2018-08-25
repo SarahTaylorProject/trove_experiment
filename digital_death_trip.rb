@@ -1,21 +1,27 @@
+require 'fileutils'
+require 'find'
 load 'tools_for_general_use.rb'
 load 'tools_for_trove.rb'
 load 'tools_for_towns.rb'
 load 'tools_for_geojson.rb'
-require 'fileutils'
-require 'find'
 
-DEFAULT_ARTICLE_COUNT = 20
+# Alternate way of loading in other scripts
+script_directory = File.dirname(__FILE__)
+# puts(script_directory)
+# load File.join(script_directory, 'tools_for_general_use.rb')
+# load File.join(script_directory, 'tools_for_trove.rb')
+# load File.join(script_directory, 'tools_for_towns.rb')
+# load File.join(script_directory, 'tools_for_geojson.rb')
 
 clear_screen()
 my_trove_key = read_trove_key()
 search_word = 'tragedy'
 default_speed = 180
-default_output_path_name = File.join(Dir.pwd, 'output_files')
+default_output_path_name = File.join(script_directory, 'output_files')
 unless File.directory?(default_output_path_name)
    FileUtils.mkdir_p(default_output_path_name)
 end
-default_town_path_name = File.join(Dir.pwd, 'town_lists')
+default_town_path_name = File.join(script_directory, 'town_lists')
 max_articles_to_read = 3
 
 continue = true
@@ -25,10 +31,10 @@ trove_result_file_name = ''
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}")
 
-#say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
-#say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
+say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
+say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
-#say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
+say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
 user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")
 
 if (user_input.upcase == 'EXIT') then
@@ -124,12 +130,13 @@ while (continue == true) do
    end
 
    if (continue == true) then    
-      say_something("\n...That was my random tragedy from #{search_town}. Are you ready to investigate this Trove Town Tragedy?", also_print = true, speed = default_speed)             
+      say_something("\n...That was my random tragedy from #{search_town}. Would you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different tragedy\nEnter 'exit' to cancel\nEnter 'y' to find out more")
       if (user_input.upcase == 'Y') then
          # note: need to account for multiple article numbers here
          trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = random_article_number + 1, column_number = 9)
          puts(trove_article_id)
+         trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
          puts("\nContent written to file: #{trove_article_file}")
          # note: add option for READING article (though will need to remove weird text)
@@ -141,18 +148,7 @@ while (continue == true) do
    end
 end
 
-# Liz notes
-# I think I would like to have some gravitas having read the selected random article.
-# Perhaps just say, after the article selection is read, something like:
-#“[Pause]. That was my random tragedy from [town name], in [year]. Are you ready to investigate this Trove Town Tragedy?”
-#[If enter YES say “Good luck”, and exit.]
-#Otherwise “Would you like to try a different tragedy from this place?”
-#Then go back to the “shall I pick a random” etc.
-#More complex idea is if they are read to investigate  the selection, to then fetch the full article! That's another thing though. 
-
-
 say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
-exit()
 
 puts("\nWill update map files before exiting...")
 current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, output_path_name = default_output_path_name)

@@ -21,9 +21,9 @@ max_articles_to_read = 3
 continue = true
 trove_result_file_name = ''
 
-# Test for existing file list
+
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
-puts("\nTrove result files already available: #{existing_trove_file_list.size}")
+puts("\nTrove result files already available: #{existing_trove_file_list.size}\n")
 
 say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
@@ -68,21 +68,18 @@ if (continue == true and trove_result_file_name == '') then
    end
 end
 
-default_article_numbers = Array(1..5)
-random_article_range = Array(1..20)
-
 if (continue == true) then
    result_count = count_trove_search_results_from_csv(trove_result_file_name)
+   random_article_range = Array(1..result_count)
    say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
-   user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter 'all' to hear all the headlines, \nEnter any other key to hear a few sample headlines...")
+   user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false
    elsif (user_input.upcase == 'ALL') then
-      # just reads the default first 5
       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
    elsif (user_input.upcase != 'N') then
       # reads random sample of 5
-      random_article_numbers = Array.new(5) { rand(1..20) }
+      random_article_numbers = Array.new(5) { rand(1..result_count) }
       random_article_numbers = random_article_numbers.uniq
       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
@@ -90,7 +87,7 @@ end
 
 if (continue == true) then 
    say_something("\nShall I pick a random tragedy from this place?", also_print = true, speed = default_speed)
-   say_something("Or let me know if you would like to pick from some specific articles.", also_print = true, speed = default_speed)  
+   say_something("Or let me know if you would like to pick a specific article.", also_print = true, speed = default_speed)  
 end
 
 while (continue == true) do      
@@ -98,44 +95,36 @@ while (continue == true) do
    if (user_input.upcase == 'EXIT') then
       continue = false
    elsif (user_input.upcase == 'PICK') then 
-      say_something("\nWhich articles are you interested in?", also_print = true, speed = default_speed)  
-      user_input = get_user_input(prompt_text = "\Please enter article numbers separated by space or comma. \nEnter 'exit' to cancel.\nI will default to #{default_article_numbers}")   
+      say_something("\nWhich article are you interested in?", also_print = true, speed = default_speed)  
+      user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
       if (user_input.upcase == 'EXIT') then
          continue = false
       else
-         article_numbers = return_int_array_from_string(user_input, divider = ",")
-         if (article_numbers == false) then
-            article_numbers = return_int_array_from_string(user_input, divider = " ")
-         end           
+         article_numbers = return_int_array_from_string(user_input, divider = ",")   
          if (article_numbers == false) then
             continue = false
-         elsif (article_numbers.size == 0) then
-            article_numbers = default_article_numbers
+         else
+            say_something("Ok. Let's see.", also_print = true, speed = default_speed)
+            article_number = article_numbers[0]
          end
       end
-      if (continue == true) then
-         say_something("\nOk, let's see.", also_print = true, speed = default_speed) 
-         puts("Articles: #{article_numbers}")
-         read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = article_numbers, speed = default_speed)
-      end
    else
-      random_article_number = random_article_range.sample
+      article_number = random_article_range.sample
       say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
-      puts(random_article_number)
-      read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [random_article_number], speed = default_speed)
+      puts(article_number)
    end
-
-   if (continue == true) then    
-      say_something("\n...That was my random tragedy from #{search_town}. Would you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
+   if (continue == true) then  
+      read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
+      say_something("\n...So, that was a tragedy from #{search_town}", also_print = true, speed = default_speed)   
+      say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different tragedy\nEnter 'exit' to cancel\nEnter 'y' to find out more")
       if (user_input.upcase == 'Y') then
-         # note: need to account for multiple article numbers here
-         trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = random_article_number + 1, column_number = 9)
-         puts(trove_article_id)
+         trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = article_number + 1, column_number = 9)
          trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
-         puts("\nContent written to file: #{trove_article_file}")
-         # note: add option for READING article (though will need to remove weird text)
+         if (trove_article_file != false) then
+            puts("\nContent written to file: #{trove_article_file}")
+         end
          say_something("Good luck!", also_print = true, speed = default_speed)
          continue = false
       elsif (user_input.upcase == 'EXIT') then      

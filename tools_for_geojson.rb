@@ -70,8 +70,8 @@ def write_geojson_for_all_csv_files(town_path_name, output_path_name)
          town_name = File.basename(file_name)
          town_name = return_trove_file_search_town(input_trove_file = file_name)
          town_coordinates = town_dictionary[town_name]
-         puts("\nProcessing geojson for output file #{i}\n#{file_name}")
-         puts("\nTown name: #{town_name}, Coordinates: #{town_coordinates}")
+         #puts("\nProcessing geojson for output file #{i}\n#{file_name}")
+         #puts("\nTown name: #{town_name}, Coordinates: #{town_coordinates}")
          current_geojson_array = make_trove_file_geojson_array(input_trove_file = file_name, town_name = town_name, town_coordinates = town_coordinates)
          full_geojson_array.push(*current_geojson_array)
          i += 1

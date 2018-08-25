@@ -76,9 +76,6 @@ def count_trove_search_results_from_csv(input_trove_file)
    return(input_trove.size - 1)
 end
 
-# NOTE: here make a function "count trove search results total"
-# AND: function to count trove total results
-
 def preview_trove_search_results_from_csv(input_trove_file)
    # This method previews the main fields of all articles
    # Input: a csv of Trove search results, written as above in the 'write_trove_search_results' method
@@ -312,16 +309,13 @@ def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id
    output_file_name = File.join(output_path_name, "trove_article_" + trove_article_id + ".txt")
 
    open(output_file_name, 'w') do |f|
-      write_text = trove_article_result.text.gsub("span&gt;", "").gsub(/<span>|<\/span>/,"")
-      write_text = write_text.gsub("</p>", "\n")
-      write_text = write_text.gsub("<p>", "").lstrip
       f.puts(trove_article_result)
-      # trove_article_result.xpath('//articleText').each do |article_xml|
-      #    article_text = article_xml.text.gsub("span&gt;", "").gsub(/<span>|<\/span>/,"")
-      #    article_text = article_text.gsub("</p>", "\n")
-      #    article_text = article_text.gsub("<p>", "").lstrip
-      # end#of article
+      trove_article_result.xpath('//pdf').each do |article_pdf|
+         article_pdf_address = article_pdf.text
+         system %{cmd /c "start #{article_pdf_address}"}
+      end#of article
    end#of writing text file
    system %{cmd /c "start #{output_file_name}"}
+
    return(output_file_name)
 end

@@ -25,7 +25,7 @@ def select_random_town_with_user_input(default_speed, town_path_name)
       town_data_types.each do |data_type|
         instruction_string += "\n\t'" + data_type + "'"
       end
-      instruction_string += "\nWhich would you like me to use? I will default to '#{town_data_types[0]}'"
+      instruction_string += "\nWhich would you like me to use?\nI will default to '#{town_data_types[0]}'"
       source_choice = get_user_input(prompt_text = instruction_string)
       if (source_choice.length == 0) then
          source_choice = town_data_types[0]

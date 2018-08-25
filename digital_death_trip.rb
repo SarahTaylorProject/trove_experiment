@@ -24,7 +24,7 @@ trove_result_file_name = ''
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}\n")
 
-say_something("Hello, this is Digital Death Trip.", also_print = true, speed = default_speed)
+say_something("\nHello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
 say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
@@ -76,7 +76,7 @@ if (continue == true) then
       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
    elsif (user_input.upcase != 'N') then
       # reads random sample of 5
-      random_article_numbers = Array.new(5) { rand(1..result_count) }
+      random_article_numbers = Array.new(4) { rand(1..result_count) }
       random_article_numbers = random_article_numbers.uniq
       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = random_article_numbers)
    end
@@ -111,12 +111,15 @@ while (continue == true) do
       puts(article_number)
    end
    if (continue == true) then  
+      puts(article_number)
       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
-      say_something("\n...So, that was a tragedy from #{search_town}", also_print = true, speed = default_speed)   
+      say_something("\n.....")
+      say_something("So, that was one tragedy from #{search_town}", also_print = true, speed = default_speed)   
       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different tragedy\nEnter 'exit' to cancel\nEnter 'y' to find out more")
       if (user_input.upcase == 'Y') then
-         trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = article_number + 1, column_number = 9)
+         trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
+         puts(trove_article_id)
          trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
          if (trove_article_file != false) then

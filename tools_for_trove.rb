@@ -20,7 +20,7 @@ def read_trove_key(my_trove_file = "my_trove.txt", my_directory = "keys")
    return(my_trove_key)
 end
 
-def fetch_trove_search_results(current_search_town, current_search_word, trove_key)
+def fetch_trove_search_results(current_search_town, current_search_word, trove_key, phrase_divider='%22')
    # This method constructs a single search request for Trove (of a very specific format!) 
    # Input: two search parameters (town name, and search term) and the API key 
    # Return: XML of results (if successful) or 0 if error encountered
@@ -28,13 +28,20 @@ def fetch_trove_search_results(current_search_town, current_search_word, trove_k
    # The search town and search term are currently both just passed as strings, eventually the town search will be expanded
    # December 2017 this was altered to use net::HTTP rather than curl, as this is more reliable on Windows
 
-   current_search_word = convert_phrase_string_for_url(current_search_word)
-   # note: April 2018 search word may suit treatment as multiple words, not string literal
-   # note: should build search phrase here, loop through: upper and proper case, and different order for split words
-   current_search_town = convert_phrase_string_for_url(current_search_town)
+   search_word = replace_spaces_for_url(current_search_word)
+   search_string = current_search_word + "+AND+"
 
+   town_string = replace_spaces_for_url(current_search_town)
+   search_string += phrase_divider + town_string + phrase_divider
+   
+   reverse_town_string = replace_spaces_for_url(reverse_sentence(current_search_town))
+   if (reverse_town_string != town_string) then      
+      search_string += "+OR+" + phrase_divider + reverse_town_string + phrase_divider
+   end
+
+   puts(search_string)
    trove_api_request = "http://api.trove.nla.gov.au/result?key="
-   trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{current_search_word}+AND+#{current_search_town}"
+   trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{search_string}"  
 
    begin
       uri = URI(trove_api_request)
@@ -46,6 +53,33 @@ def fetch_trove_search_results(current_search_town, current_search_word, trove_k
    end
    return(trove_api_results)
 end
+
+# def fetch_trove_search_results(current_search_town, current_search_word, trove_key)
+#    # This method constructs a single search request for Trove (of a very specific format!) 
+#    # Input: two search parameters (town name, and search term) and the API key 
+#    # Return: XML of results (if successful) or 0 if error encountered
+#    # Note: will not necessarily fail if no results returned
+#    # The search town and search term are currently both just passed as strings, eventually the town search will be expanded
+#    # December 2017 this was altered to use net::HTTP rather than curl, as this is more reliable on Windows
+
+#    current_search_word = replace_spaces_for_url(current_search_word)
+#    # note: April 2018 search word may suit treatment as multiple words, not string literal
+#    # note: should build search phrase here, loop through: upper and proper case, and different order for split words
+#    current_search_town = replace_spaces_for_url(current_search_town)
+
+#    trove_api_request = "http://api.trove.nla.gov.au/result?key="
+#    trove_api_request = trove_api_request + "#{trove_key}&zone=newspaper&q=#{current_search_word}+AND+#{current_search_town}"
+#    puts(trove_api_request)
+#    begin
+#       uri = URI(trove_api_request)
+#       response = Net::HTTP.get(uri)
+#       trove_api_results = Nokogiri::XML.parse(response)
+#    rescue
+#       puts "Error getting API results"
+#       return(0)
+#    end
+#    return(trove_api_results)
+# end
 
 def write_trove_search_results(trove_api_results, output_file_name, search_word, search_town)
    # This method writes the Trove XML results to a csv file, one article at a time

@@ -242,31 +242,34 @@ def unzip_file_with_7z_command(full_zip_file_name, full_output_path_name=nil, ov
 end
 
 
-def convert_phrase_string_for_url(input_string, input_divider = ' ', output_quotemark='%22', output_divider='%20')
+def replace_spaces_for_url(input_string, input_divider = ' ', output_divider='%20')
    # changes a phrase string with spaces, to string suitable for use in a URL
    # treats as a single phrase, not as separate words
-   # (i.e. puts a URL-friendly quote symbol at the start and end, and URL-friendly dividers in the middle)
    # https://www.w3schools.com/tags/ref_urlencode.asp
    begin
-
-      input_words = input_string.split(input_divider)
-      if (input_words.size == 1) then
-         return(input_string)
-      end
-      
-      output_string = output_quotemark
-      for word in input_words.each do
-         output_string += (word + output_divider)
-      end
-
-      output_string = output_string[0..output_divider.size] + output_quotemark
-
+      output_string = input_string.rstrip.gsub(input_divider, output_divider)
       return(output_string)
    rescue
       return(input_string)
    end
 end
 
+
+def reverse_sentence(input_sentence, input_divider = ' ')
+   result = input_sentence
+   begin
+      output_sentence = ""
+      input_sentence.split(input_divider).reverse.each do |word|
+         output_sentence += (word + input_divider)
+      end
+      output_sentence = output_sentence[0..-input_divider.size]
+      return(output_sentence)
+   rescue
+      puts("Encountered error in 'reverse_sentence', will return original")
+      return(result)
+   end
+
+end
 
 def proper_case(input_string)
    begin

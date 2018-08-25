@@ -21,6 +21,11 @@ max_articles_to_read = 3
 continue = true
 trove_result_file_name = ''
 
+trove_article_id = '35276208'
+trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
+trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
+puts("HERE!")
+exit()
 
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}\n")
@@ -39,7 +44,7 @@ elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
    puts("\nSelecting random existing Trove file...")
    existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name, also_print = true)
    if (existing_trove_file_list.size == 0) then
-      puts("sorry, no existing Trove files found")
+      puts("Sorry, no existing Trove files found")
       continue = false
    else
       trove_result_file_name = existing_trove_file_list.sample
@@ -51,8 +56,6 @@ else
 end
 
 puts("Search town: #{search_town}")
-
-# nb. need function here to gather coordinates for town choices not made through town_dictionary
 
 if (continue == true and trove_result_file_name == '') then
    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")

@@ -21,12 +21,6 @@ max_articles_to_read = 3
 continue = true
 trove_result_file_name = ''
 
-trove_article_id = '35276208'
-trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
-trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
-puts("HERE!")
-exit()
-
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}\n")
 

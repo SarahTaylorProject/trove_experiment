@@ -303,37 +303,29 @@ def fetch_trove_newspaper_article(trove_article_id, trove_key)
 
 end
 
-def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id, output_path_name, padding_text=["span&gt", "&gt", "&lt", "&nbsp;"])
-   # This method writes the Trove XML results of an individual article, to a text file
+def write_trove_newspaper_article_to_file(trove_article_result, trove_article_id, output_path_name)
+   # This method writes the content of an individual article, to a html file
+   # It also opens the PDF address in a browser
    # Input: XML results, Trove article ID, output path name 
+   result = false
+   begin
+      output_file_name = File.join(output_path_name, "trove_article_" + trove_article_id + ".html")
 
-   output_file_name = File.join(output_path_name, "trove_full_article_" + trove_article_id + ".txt")
-
-   open(output_file_name, 'w') do |output_file|
-      
-      output_file.puts("\nPDF ADDRESS:")
       trove_article_result.xpath('//pdf').each do |article_pdf|
          article_pdf_address = article_pdf.text
-         output_file.puts(article_pdf_address)
          system %{cmd /c "start #{article_pdf_address}"}
       end
 
-      output_file.puts("\nMAIN TEXT:\n")
-      trove_article_result.xpath('//articleText').each do |article_text|         
-         trove_article_bits = article_text.text.split("/")             
-         trove_article_bits.each do |bit|
-            bit_to_print = bit            
-            padding_text.each do |item|
-               bit_to_print = bit_to_print.gsub(item, " ")
-            end
-            output_file.puts(bit_to_print)         
-         end 
+      open(output_file_name, 'w') do |output_file|
+         trove_article_result.xpath('//articleText').each do |article_text| 
+            output_file.puts(article_text.text)
+         end        
       end
+      system %{cmd /c "start #{output_file_name}"}
 
-      output_file.puts("\nARTICLE XML:")
-      output_file.puts(trove_article_result)
+      return(output_file_name)
+   rescue
+      puts("Encountered error in 'write_trove_newspaper_article_to_file'")
+      return(result)
    end
-   system %{cmd /c "start #{output_file_name}"}
-
-   return(output_file_name)
 end

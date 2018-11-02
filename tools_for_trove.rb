@@ -283,6 +283,31 @@ def return_trove_file_search_word(input_trove_file, search_word_field=0)
    end
 end
 
+def search_for_matching_trove_file(existing_trove_file_list, search_town, search_word='', search_word_field=0, search_town_field=1)
+   # Returns any existing Trove files from list, that match the search_town
+   # Can save an unnecessary internet search if file already exists
+   # Will only match the search_word if it's non-blank (thus making it possible to search for any files for the search_town)
+   matching_trove_file_list = []
+   begin
+      existing_trove_file_list.each do |current_file_name|
+         current_town = return_trove_file_search_word(input_trove_file = current_file_name, search_town_field = search_town_field)
+         if (current_town == search_town) then
+            if (search_town != '') then
+               current_word = return_trove_file_search_word(input_trove_file = current_file_name, search_word_field = search_world_field)
+            else
+               current_word = search_word
+            end
+            matching_trove_file_list << current_file_name
+         end
+      end   
+      return(matching_trove_file_list)
+   rescue
+      puts("Error encountered in 'return_matching_trove_file_list', returning empty list...")
+      return(matching_trove_file_list)
+   end
+end
+
+
 def fetch_trove_newspaper_article(trove_article_id, trove_key)
    # Added August 18th: fetches individual article
    # Note: add more functions to handle this kind of return value

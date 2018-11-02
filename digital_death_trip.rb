@@ -68,7 +68,7 @@ end
 if (continue == true) then
    result_count = count_trove_search_results_from_csv(trove_result_file_name)
    random_article_range = Array(1..result_count)
-   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
+   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false

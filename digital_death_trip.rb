@@ -57,12 +57,12 @@ if (continue == true) then
    if (allow_existing_files == true) then
       trove_result_file_name = search_for_matching_trove_file(existing_trove_file_list = existing_trove_file_list, search_town = search_town)
       if (trove_result_file_name != '') then
-         puts("Matching file found already on list, will use this one and be frugal: #{trove_result_file_name}")
+         puts("Matching file found already on list, will use this one and be frugal:")
+         puts("#{File.basename(trove_result_file_name)}")
       end
    end
 end
-# testing!
-continue = false
+
 if (continue == true and trove_result_file_name == '') then
    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
    trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))

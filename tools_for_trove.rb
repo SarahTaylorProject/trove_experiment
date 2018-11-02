@@ -284,26 +284,30 @@ def return_trove_file_search_word(input_trove_file, search_word_field=0)
 end
 
 def search_for_matching_trove_file(existing_trove_file_list, search_town, search_word='', search_word_field=0, search_town_field=1)
-   # Returns any existing Trove files from list, that match the search_town
+   # Looks for a matching Trove file from list: the first (if any) that matches the search_town and search_word
    # Can save an unnecessary internet search if file already exists
    # Will only match the search_word if it's non-blank (thus making it possible to search for any files for the search_town)
-   matching_trove_file_list = []
+   matching_trove_file = ''
    begin
+      puts("\nSearching for existing Trove files for #{search_town}")
       existing_trove_file_list.each do |current_file_name|
          current_town = return_trove_file_search_word(input_trove_file = current_file_name, search_town_field = search_town_field)
          if (current_town == search_town) then
-            if (search_town != '') then
+            if (search_word != '') then
                current_word = return_trove_file_search_word(input_trove_file = current_file_name, search_word_field = search_world_field)
             else
                current_word = search_word
             end
-            matching_trove_file_list << current_file_name
+            if ((current_word.upcase == search_word.upcase) and (current_town.upcase == search_town.upcase)) then
+               puts("Matching file found: #{current_file_name}")
+               return(current_file_name)
+            end
          end
       end   
-      return(matching_trove_file_list)
+      return(matching_trove_file)
    rescue
-      puts("Error encountered in 'return_matching_trove_file_list', returning empty list...")
-      return(matching_trove_file_list)
+      puts("Error encountered in 'return_matching_trove_file', returning empty list...")
+      return(matching_trove_file)
    end
 end
 

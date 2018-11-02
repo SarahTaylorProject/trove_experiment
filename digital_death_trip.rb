@@ -11,6 +11,7 @@ clear_screen()
 my_trove_key = read_trove_key()
 search_word = 'tragedy'
 default_speed = 180
+allow_existing_files = true
 default_output_path_name = File.join(script_directory, 'output_files')
 unless File.directory?(default_output_path_name)
    FileUtils.mkdir_p(default_output_path_name)
@@ -22,6 +23,7 @@ continue = true
 trove_result_file_name = ''
 
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
+print_existing_trove_file_list(existing_trove_file_list)
 puts("\nTrove result files already available: #{existing_trove_file_list.size}\n")
 
 say_something("\nHello, this is Digital Death Trip.", also_print = true, speed = default_speed)
@@ -51,6 +53,16 @@ end
 
 puts("Search town: #{search_town}")
 
+if (continue == true) then
+   if (allow_existing_files == true) then
+      trove_result_file_name = search_for_matching_trove_file(existing_trove_file_list = existing_trove_file_list, search_town = search_town)
+      if (trove_result_file_name != '') then
+         puts("Matching file found already on list, will use this one and be frugal:")
+         puts("#{File.basename(trove_result_file_name)}")
+      end
+   end
+end
+
 if (continue == true and trove_result_file_name == '') then
    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
    trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
@@ -68,7 +80,7 @@ end
 if (continue == true) then
    result_count = count_trove_search_results_from_csv(trove_result_file_name)
    random_article_range = Array(1..result_count)
-   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the tragedies in #{search_town}?", also_print = true, speed = default_speed)
+   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false

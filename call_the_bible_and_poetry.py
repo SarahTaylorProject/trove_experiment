@@ -2,6 +2,7 @@ import tools_for_talking
 import random
 import os
 import codecs
+import sys
 
 default_speed = 180
 meta_source_list = ["the bible", "the online poetry database"]
@@ -9,7 +10,7 @@ default_directory = os.path.dirname(os.path.abspath(__file__))
 line_count = 0
 output_file = codecs.open("random_poem_output.txt", "w", encoding='utf-8')
 
-text_file_name = default_directory + os.path.normpath("/") + "taylor_project_lyrics_sample.txt"
+text_file_name = default_directory + os.path.normpath("/") + "funny_lyrics_sample.txt"
 text_file_quotes = tools_for_talking.read_text_file_to_array(text_file_name)
 if text_file_quotes != False:
   text_file_quotes = tools_for_talking.remove_item_from_list(text_file_quotes, '')

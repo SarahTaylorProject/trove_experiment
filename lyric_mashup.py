@@ -6,8 +6,10 @@ import sys
 
 default_speed = 180
 use_say_something = False
+unique_lines = True
 meta_source_list = ["the bible", "the online poetry database"]
-meta_source_list = ["the online poetry database"]
+meta_source_list = ["the bible"]
+book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
 #meta_source_list = []
 meta_source_list = []
 
@@ -20,7 +22,8 @@ text_file_name_list = ["flowers_by_the_roadside.txt", "old_town_road.txt", "nobo
 text_file_name_list = ["taylor_project_lyrics_sample.txt", "early_warning_signs.txt", "focus_areas.txt"]
 text_file_name_list = ["horses.txt", "papa_was_a_rodeo.txt"]
 text_file_name_list = ["in_the_end.txt", "focus_areas.txt", "bharath.txt"]
-text_file_name_list = ["in_the_end.txt", "bharath.txt", "focus_areas.txt", "taylor_project_lyrics_sample.txt"]
+text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "lovely_day.txt"]
+text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "sidewinder.txt"]
 #text_file_name_list = ["early_warning_signs.txt"]
 
 for text_file_name in text_file_name_list:
@@ -66,16 +69,19 @@ if (line_count > 0):
     meta_source_choice = random.choice(meta_source_list)
     print("choice: " + meta_source_choice)
     if (meta_source_choice == "the bible"):
-      current_quote = tools_for_talking.return_random_bible(max_chapters=20, max_tries=20)
+      current_quote = tools_for_talking.return_random_bible(book_list=book_list, max_chapters=20, max_tries=20)
     elif (meta_source_choice == "the online poetry database"):
       current_quote = tools_for_talking.return_random_poetry(full_metadata=False)
     else:
       current_line = random.choice(text_file_quote_dictionary[meta_source_choice])
-      print(current_line)
       current_metadata = meta_source_choice
       current_quote = [current_line, current_metadata]
 
     if (current_quote != False):
+      current_quote[0] = current_quote[0].replace(":", "\n")
+      current_quote[0] = current_quote[0].replace(".", "\n")
+      current_quote[0] = current_quote[0].replace(",", "\n")
+      current_quote[0] = current_quote[0].replace(";", "\n")
       random_poetry_quotes.append(current_quote)
 
   print("\n")

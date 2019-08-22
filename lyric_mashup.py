@@ -6,12 +6,13 @@ import sys
 
 default_speed = 180
 use_say_something = False
-unique_lines = True
+unique_input_lines = True
+unique_output_lines = True
 meta_source_list = ["the bible", "the online poetry database"]
 meta_source_list = ["the bible"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
-meta_source_list = []
 #meta_source_list = []
+meta_source_list = []
 
 default_directory = os.path.dirname(os.path.abspath(__file__))
 line_count = 0
@@ -26,15 +27,13 @@ text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obliga
 text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt"]
 text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt", "lovely_day.txt", "sidewinder.txt"]
 text_file_name_list = ["building_11_cleaning.txt", "fitter_happier.txt"]
-text_file_name_list = ["rmit_values.txt", "raspberry_beret.txt", "purple_rain.txt"]
-text_file_name_list = ["game_description.txt", "in_the_end.txt"]
+text_file_name_list = ["game_description.txt", "taylor_project_lyrics_sample.txt"]
 #text_file_name_list = ["lyric_mashup.py", "tools_for_talking.py"]
-#text_file_name_list = ["early_warning_signs.txt"]
 
 for text_file_name in text_file_name_list:
   full_text_file_name = default_directory + os.path.normpath("/") + text_file_name
   text_file_quotes = tools_for_talking.read_text_file_to_array(full_text_file_name)
-  if (unique_lines == True):
+  if (unique_input_lines == True):
     text_file_quote_set = set(text_file_quotes)
     text_file_quotes = list(text_file_quote_set)
   if text_file_quotes != False:
@@ -71,7 +70,11 @@ if (line_count > 0):
   print(greeting_string)
   if (use_say_something == True):
     tools_for_talking.say_something(text=greeting_string, speed=default_speed)
-  for i in range(1, line_count+1):
+  i = 0
+  j = 0
+  max_tries = line_count * 3
+  while ((i < line_count) and (j < max_tries)):
+    j += 1  
     print("\nCollecting quote {}".format(i))
     print("Choosing from: {}".format(meta_source_list))
     meta_source_choice = random.choice(meta_source_list)
@@ -90,7 +93,11 @@ if (line_count > 0):
       current_quote[0] = current_quote[0].replace(".", "\n")
       current_quote[0] = current_quote[0].replace(",", "\n")
       current_quote[0] = current_quote[0].replace(";", "\n")
-      random_poetry_quotes.append(current_quote)
+      if ((unique_output_lines == False) or (current_quote not in random_poetry_quotes)):
+        random_poetry_quotes.append(current_quote)
+        i = i + 1
+      else:
+        print("skipping, repeat line: {0}".format(current_quote))
 
   print("\n")
   greeting_string = "Finished collecting {} random quotes.".format(line_count)

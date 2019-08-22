@@ -386,6 +386,7 @@ def modify_string_for_email_header(input_string):
     input_string = input_string.replace(u"\u2014", "")
     input_string = input_string.replace(u"\u2018", "")
     input_string = input_string.replace(u"\u2019", "")
+    input_string = input_string.replace('  ', ' ')
     return(input_string)
   except:
     traceback.print_exc()

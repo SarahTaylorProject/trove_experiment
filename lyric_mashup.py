@@ -12,7 +12,7 @@ meta_source_list = ["the bible", "the online poetry database"]
 meta_source_list = ["the bible"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
 #meta_source_list = []
-meta_source_list = []
+#meta_source_list = []
 
 default_directory = os.path.dirname(os.path.abspath(__file__))
 line_count = 0
@@ -23,11 +23,11 @@ text_file_name_list = ["flowers_by_the_roadside.txt", "old_town_road.txt", "nobo
 text_file_name_list = ["taylor_project_lyrics_sample.txt", "early_warning_signs.txt", "focus_areas.txt"]
 text_file_name_list = ["horses.txt", "papa_was_a_rodeo.txt"]
 text_file_name_list = ["in_the_end.txt", "focus_areas.txt", "bharath.txt"]
-text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "lovely_day.txt"]
 text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt"]
-text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt", "lovely_day.txt", "sidewinder.txt"]
-text_file_name_list = ["building_11_cleaning.txt", "fitter_happier.txt"]
-text_file_name_list = ["game_description.txt", "taylor_project_lyrics_sample.txt"]
+# text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt"]
+# text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt", "lovely_day.txt", "sidewinder.txt"]
+# text_file_name_list = ["building_11_cleaning.txt", "fitter_happier.txt"]
+# text_file_name_list = ["game_description.txt", "taylor_project_lyrics_sample.txt"]
 #text_file_name_list = ["lyric_mashup.py", "tools_for_talking.py"]
 
 for text_file_name in text_file_name_list:

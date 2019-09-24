@@ -73,7 +73,7 @@ if (continue == true and trove_result_file_name == '') then
 
    if (result_count == 0) then
       continue = false
-      say_something("\nSorry, no tragedy results found for #{search_town}")
+      say_something("\nSorry, no #{search_word} results found for #{search_town}")
    end
 end
 
@@ -95,7 +95,7 @@ if (continue == true) then
 end
 
 if (continue == true) then 
-   say_something("\nShall I pick a random tragedy from this place?", also_print = true, speed = default_speed)
+   say_something("\nShall I pick a random #{search_word} from this place?", also_print = true, speed = default_speed)
    say_something("Or let me know if you would like to pick a specific article.", also_print = true, speed = default_speed)  
 end
 
@@ -119,16 +119,16 @@ while (continue == true) do
       end
    else
       article_number = random_article_range.sample
-      say_something("Ok. Here is my random tragedy from #{search_town}.", also_print = true, speed = default_speed)
+      say_something("Ok. Let's see. Here is my random #{search_word} from #{search_town}.", also_print = true, speed = default_speed)
       puts(article_number)
    end
    if (continue == true) then  
       puts(article_number)
       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
       say_something("\n.....")
-      say_something("So, that was one tragedy from #{search_town}", also_print = true, speed = default_speed)   
+      say_something("So, that was one #{search_word} from #{search_town}", also_print = true, speed = default_speed)   
       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
-      user_input = get_user_input(prompt_text = "\nEnter 'n' for a different tragedy\nEnter 'exit' to cancel\nEnter 'y' to find out more")
+      user_input = get_user_input(prompt_text = "\nEnter 'n' for a different #{search_word}\nEnter 'exit' to cancel\nEnter 'y' to find out more")
       if (user_input.upcase == 'Y') then
          trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
          puts(trove_article_id)

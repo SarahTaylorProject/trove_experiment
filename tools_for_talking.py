@@ -18,7 +18,7 @@ def return_operating_system():
   return(result)
 
 
-def say_something(text, also_print = True, speed = 120):
+def say_something(text, also_print=True, speed=120):
   """
   # Adapted from original Ruby script, August 2017
   # This function says text aloud through the command line for some operating systems
@@ -47,7 +47,8 @@ def say_something(text, also_print = True, speed = 120):
   if (can_say == True):
     subprocess.call(command_text, shell=True)
   else:
-    print("\t(say_something does not yet support this operating system)")
+    return()
+    ##print("\t(say_something does not yet support this operating system)")
 
 
 def get_user_input(prompt_text = "\nPlease enter value"):
@@ -385,6 +386,7 @@ def modify_string_for_email_header(input_string):
     input_string = input_string.replace(u"\u2014", "")
     input_string = input_string.replace(u"\u2018", "")
     input_string = input_string.replace(u"\u2019", "")
+    input_string = input_string.replace('  ', ' ')
     return(input_string)
   except:
     traceback.print_exc()

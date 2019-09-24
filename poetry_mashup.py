@@ -3,52 +3,60 @@ import random
 import os
 import codecs
 import sys
+import time
 
 default_speed = 180
 use_say_something = False
 unique_input_lines = True
 unique_output_lines = True
+
+# 1. start up the meta source list with the external sources, if any
+# could potentially make this interactive again
 meta_source_list = ["the bible", "the online poetry database"]
-meta_source_list = ["the bible"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
 #meta_source_list = []
-#meta_source_list = []
+print("Meta source list: {}".format(meta_source_list))
 
-default_directory = os.path.dirname(os.path.abspath(__file__))
-line_count = 0
-output_file = codecs.open("random_poem_output.txt", "w", encoding='utf-8')
-text_file_quote_dictionary = {}
+# 2. look for local directory, create if needed
+local_input_directory_name = os.path.dirname(os.path.abspath(__file__)) + os.path.normpath("/") + "poetry_input_files_current" + os.path.normpath("/")
+print("Searching for local input files in: {}".format(local_input_directory_name))
+if not os.path.isdir(local_input_directory_name):
+  print("No local input directory found, I will create one. \nPlease put your poetry input material here in future: {}".format(local_input_directory_name))
+  os.makedirs(local_input_directory_name)
 
-text_file_name_list = ["flowers_by_the_roadside.txt", "old_town_road.txt", "nobody_knows_what_the_neighbours_know.txt", "taylor_project_lyrics_sample.txt"]
-text_file_name_list = ["taylor_project_lyrics_sample.txt", "early_warning_signs.txt", "focus_areas.txt"]
-text_file_name_list = ["horses.txt", "papa_was_a_rodeo.txt"]
-text_file_name_list = ["in_the_end.txt", "focus_areas.txt", "bharath.txt"]
-text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt"]
-# text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt"]
-# text_file_name_list = ["centrelink_demerits.txt", "centrelink_not_meeting_obligations.txt", "fitter_happier.txt", "lovely_day.txt", "sidewinder.txt"]
-# text_file_name_list = ["building_11_cleaning.txt", "fitter_happier.txt"]
-# text_file_name_list = ["game_description.txt", "taylor_project_lyrics_sample.txt"]
-#text_file_name_list = ["lyric_mashup.py", "tools_for_talking.py"]
+# 3. build a local input dictionary from all the files in the input directory
+local_input_file_name_list = os.listdir(local_input_directory_name)
+local_input_quote_dictionary = {}
+local_input_quote_total = 0
+if (len(local_input_file_name_list) > 0):
+  print("Now preparing {} local input files into dictionary...".format(len(local_input_file_name_list)))
+  for input_file_name in local_input_file_name_list:
+    full_input_file_name = local_input_directory_name + os.path.normpath("/") + input_file_name
+    input_file_quote_list = tools_for_talking.read_text_file_to_array(full_input_file_name)
+    if (unique_input_lines == True):
+      input_file_quote_set = set(input_file_quote_list)
+      input_file_quote_list = list(input_file_quote_set)
+    if input_file_quote_list != False:
+      input_file_quote_list = tools_for_talking.remove_item_from_list(input_file_quote_list, '')
+      if len(input_file_quote_list) > 0:
+        meta_source_list.append(os.path.basename(input_file_name))
+        local_input_quote_dictionary[input_file_name] = input_file_quote_list
+      local_input_quote_total += len(input_file_quote_list)
+  print("Finished. Size of local input quote dictionary: {}".format(local_input_quote_total))
 
-for text_file_name in text_file_name_list:
-  full_text_file_name = default_directory + os.path.normpath("/") + text_file_name
-  text_file_quotes = tools_for_talking.read_text_file_to_array(full_text_file_name)
-  if (unique_input_lines == True):
-    text_file_quote_set = set(text_file_quotes)
-    text_file_quotes = list(text_file_quote_set)
-  if text_file_quotes != False:
-    text_file_quotes = tools_for_talking.remove_item_from_list(text_file_quotes, '')
-    if len(text_file_quotes) > 0:
-      meta_source_list.append(os.path.basename(text_file_name))
-      text_file_quote_dictionary[text_file_name] = text_file_quotes
+# 4. create output directory, if needed, then output file with date stamp
+output_directory_name = os.path.dirname(os.path.realpath(__file__)) + os.path.normpath("/") + "poetry_output_files" + os.path.normpath("/")
+if not os.path.isdir(output_directory_name):
+  os.makedirs(output_directory_name)
+output_file_name = output_directory_name + "random_poem_output_" + time.strftime("%Y%m%d").replace("/", "") + ".txt"
+output_file = codecs.open(output_file_name, "w", encoding='utf-8')
 
-print(meta_source_list)
-#for text_file_name in text_file_name_list:
-#  print(text_file_quote_dictionary[text_file_name])
-
+# 5. start talking to user
 greeting_string = "Hello. I will assemble a poem, using a random mix of quotes."
 output_file.write(greeting_string)
 
+# 6. get line count from user input
+line_count = 0
 if (len(meta_source_list) > 0):
   print("I will search in: {}".format(meta_source_list))
   greeting_string = "Ok. How many quotes would you like me to collect?"
@@ -63,8 +71,8 @@ else:
   if (use_say_something == True):
     tools_for_talking.say_something(greeting_string)
 
+# 7. assemble random poem: random source choice, then random line choice
 random_poetry_quotes = []
-
 if (line_count > 0):
   greeting_string = "Thank you. Please wait while I collect {} random quotes for the poem.\n".format(line_count)
   print(greeting_string)
@@ -84,7 +92,7 @@ if (line_count > 0):
     elif (meta_source_choice == "the online poetry database"):
       current_quote = tools_for_talking.return_random_poetry(full_metadata=False)
     else:
-      current_line = random.choice(text_file_quote_dictionary[meta_source_choice])
+      current_line = random.choice(local_input_quote_dictionary[meta_source_choice])
       current_metadata = meta_source_choice
       current_quote = [current_line, current_metadata]
 

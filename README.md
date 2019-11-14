@@ -1,6 +1,10 @@
 # Trove API Experiment
 
+
 # Digital Death Trip
+
+As featured in the Digital Death Trip podcast instalments :)
+
 
 ### Usage for 'digital_death_trip'
 ```
@@ -42,6 +46,9 @@ Note that this component (the geojson/geographic part of giving extra informatio
 "digital death trip" requires Ruby
 
 It also requires that a valid Trove API key is in a subfolder named 'keys'
+It needs a town list in the 'town_lists' subfolder. An example is included (vic_and_border_locality_list.csv). 
+The fancier Victorian town list built from PTV stops is also possible, if a gtfs.zip file is included in this subfolder.
+The latter is a much bigger file so is not included by default. 
 
 Speaking is big part.
 On Linux and Mac the "speak" function is in-built and the "say_something" functions take this into account.
@@ -71,7 +78,7 @@ When the program runs poorly it is just distracting and annoying!
 - More inclusion of interesting mashups: e.g. interacting with Twitter to send search terms.
 
 
-# Poetry mashup (in progress)
+# Also includes: Poetry mashup (in progress)
 
 The 'poetry_mashup.py' program is in progress, it is a Python script that compiles random poetry from chosen inputs. 
 

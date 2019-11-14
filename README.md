@@ -4,6 +4,8 @@
 # Digital Death Trip
 
 As featured in the Digital Death Trip podcast instalments :)
+example: https://soundcloud.com/david-nichols-738987609/the-pyramid-hill-tragedy-1906-the-lie-of-the-land-digital-death-trip-investigatesep-1-of-3
+and: https://soundcloud.com/david-nichols-738987609/the-tatura-tragedy-1905-death-of-a-hired-man-digital-death-trip-investigates
 
 
 ### Usage for 'digital_death_trip'
@@ -138,10 +140,10 @@ python poetry_mashup.py
 (place any text files of interest in subfolder named 'poetry_input_files_current')
 ```
 
-# Requirements
+## Requirements (poetry_mashup)
 "poetry_mashup" requires Python 3 (no fancy packages though - just 'requests' and 'json')
 
-# Notes
+## Notes (poetry_mashup)
 This is a work in progress! But it is funny when it works. 
 There are some sample text file inputs provided but you should add more for interest value. 
 You will need to manually change the 'meta_source_list' in poetry_mashup.py if you wish it NOT to call the Bible and the Poetry database. 

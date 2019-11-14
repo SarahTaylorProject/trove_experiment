@@ -12,9 +12,7 @@ unique_output_lines = True
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
-meta_source_list = ["the online poetry database"]
-meta_source_list = ["the bible"]
-meta_source_list = []
+meta_source_list = ["the bible", "the online poetry database"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
 #meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))

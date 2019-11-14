@@ -1,4 +1,4 @@
-import tools_for_talking
+import tools_for_poetry_mashup
 import random
 import os
 import codecs
@@ -12,9 +12,7 @@ unique_output_lines = True
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
-meta_source_list = ["the online poetry database"]
-meta_source_list = ["the bible"]
-meta_source_list = []
+meta_source_list = ["the bible", "the online poetry database"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
 #meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))
@@ -34,12 +32,12 @@ if (len(local_input_file_name_list) > 0):
   print("Now preparing {} local input files into dictionary...".format(len(local_input_file_name_list)))
   for input_file_name in local_input_file_name_list:
     full_input_file_name = local_input_directory_name + os.path.normpath("/") + input_file_name
-    input_file_quote_list = tools_for_talking.read_text_file_to_array(full_input_file_name)
+    input_file_quote_list = tools_for_poetry_mashup.read_text_file_to_array(full_input_file_name)
     if (unique_input_lines == True):
       input_file_quote_set = set(input_file_quote_list)
       input_file_quote_list = list(input_file_quote_set)
     if input_file_quote_list != False:
-      input_file_quote_list = tools_for_talking.remove_item_from_list(input_file_quote_list, '')
+      input_file_quote_list = tools_for_poetry_mashup.remove_item_from_list(input_file_quote_list, '')
       if len(input_file_quote_list) > 0:
         meta_source_list.append(os.path.basename(input_file_name))
         local_input_quote_dictionary[input_file_name] = input_file_quote_list
@@ -65,13 +63,13 @@ if (len(meta_source_list) > 0):
   print(greeting_string)
   output_file.write(greeting_string)
   if (use_say_something == True):
-    tools_for_talking.say_something(text=greeting_string, speed=default_speed, also_print=False)
-  line_count = int((tools_for_talking.get_user_input(prompt_text = " [default 6] ") or 6))
+    tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed, also_print=False)
+  line_count = int((tools_for_poetry_mashup.get_user_input(prompt_text = " [default 6] ") or 6))
 else:
   greeting_string = "No sources selected, cannot continue."
   print(greeting_string)
   if (use_say_something == True):
-    tools_for_talking.say_something(greeting_string)
+    tools_for_poetry_mashup.say_something(greeting_string)
 
 # 7. assemble random poem: random source choice, then random line choice
 random_poetry_quotes = []
@@ -79,7 +77,7 @@ if (line_count > 0):
   greeting_string = "Thank you. Please wait while I collect {} random quotes for the poem.\n".format(line_count)
   print(greeting_string)
   if (use_say_something == True):
-    tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+    tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed)
   i = 0
   j = 0
   max_tries = line_count * 3
@@ -90,9 +88,9 @@ if (line_count > 0):
     meta_source_choice = random.choice(meta_source_list)
     print("choice: " + meta_source_choice)
     if (meta_source_choice == "the bible"):
-      current_quote = tools_for_talking.return_random_bible(book_list=book_list, max_chapters=20, max_tries=20)
+      current_quote = tools_for_poetry_mashup.return_random_bible(book_list=book_list, max_chapters=20, max_tries=20)
     elif (meta_source_choice == "the online poetry database"):
-      current_quote = tools_for_talking.return_random_poetry(full_metadata=False)
+      current_quote = tools_for_poetry_mashup.return_random_poetry(full_metadata=False)
     else:
       current_line = random.choice(local_input_quote_dictionary[meta_source_choice])
       current_metadata = meta_source_choice
@@ -113,7 +111,7 @@ if (line_count > 0):
   greeting_string = "Finished collecting {} random quotes.".format(line_count)
   print(greeting_string)
   if (use_say_something == True):
-    tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+    tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed)
 
   greeting_string = "I used the following sources:"
   print(greeting_string)
@@ -131,17 +129,17 @@ if (line_count > 0):
   print(greeting_string)
   output_file.write("\n\n" + greeting_string)
   if (use_say_something == True):
-    tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+    tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed)
   for quote in random_poetry_quotes:
-    final_quote = tools_for_talking.modify_string_for_email_header(quote[0]).strip()
+    final_quote = tools_for_poetry_mashup.modify_string_for_email_header(quote[0]).strip()
     if (final_quote != False):
       print(final_quote)
       output_file.write("\n" + final_quote)
       if (use_say_something == True):
-        tools_for_talking.say_something(text=final_quote, speed=default_speed, also_print=False)
+        tools_for_poetry_mashup.say_something(text=final_quote, speed=default_speed, also_print=False)
 
 
   print("\n")
   greeting_string = "End of poem. Thanks for listening."
-  tools_for_talking.say_something(text=greeting_string, speed=default_speed)
+  tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed)
   output_file.write("\n\n" + greeting_string)

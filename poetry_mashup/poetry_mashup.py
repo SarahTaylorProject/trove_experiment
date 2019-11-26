@@ -9,12 +9,13 @@ default_speed = 180
 use_say_something = False
 unique_input_lines = True
 unique_output_lines = True
+max_words_per_line = 20
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
 meta_source_list = ["the bible", "the online poetry database"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
-#meta_source_list = []
+meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))
 
 # 2. look for local directory, create if needed
@@ -101,8 +102,19 @@ if (line_count > 0):
       current_quote[0] = current_quote[0].replace(".", "\n")
       current_quote[0] = current_quote[0].replace(",", "\n")
       current_quote[0] = current_quote[0].replace(";", "\n")
+
+      if (max_words_per_line != None):
+        print(current_quote)
+        current_quote_split = current_quote[0].split(" ")
+        print(current_quote_split)
+        current_quote[0] = ' '.join(current_quote_split[:max_words_per_line])
+        print("HERE:")
+        print(current_quote)
+
       if ((unique_output_lines == False) or (current_quote not in random_poetry_quotes)):
         random_poetry_quotes.append(current_quote)
+        print("HERE2:")
+        print(random_poetry_quotes)
         i = i + 1
       else:
         print("skipping, repeat line: {0}".format(current_quote))

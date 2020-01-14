@@ -9,11 +9,16 @@ default_speed = 180
 use_say_something = False
 unique_input_lines = True
 unique_output_lines = True
+max_words_per_line = 6
+max_words_per_line_always_from_start = False
+also_split_by_character_list = [".", ";", "\n"]
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
 meta_source_list = ["the bible", "the online poetry database"]
-book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
+book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "daniel", "revelation"]
+book_list = ["matthew", "mark", "luke", "john", "revelation", "genesis"]
+meta_source_list = ["the bible"]
 #meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))
 
@@ -83,7 +88,7 @@ if (line_count > 0):
   max_tries = line_count * 3
   while ((i < line_count) and (j < max_tries)):
     j += 1  
-    print("\nCollecting quote {}".format(i))
+    print("\nCollecting quote {}".format(i+1))
     print("Choosing from: {}".format(meta_source_list))
     meta_source_choice = random.choice(meta_source_list)
     print("choice: " + meta_source_choice)
@@ -96,13 +101,34 @@ if (line_count > 0):
       current_metadata = meta_source_choice
       current_quote = [current_line, current_metadata]
 
-    if (current_quote != False):
-      current_quote[0] = current_quote[0].replace(":", "\n")
-      current_quote[0] = current_quote[0].replace(".", "\n")
-      current_quote[0] = current_quote[0].replace(",", "\n")
-      current_quote[0] = current_quote[0].replace(";", "\n")
+    print("HERE1a:")
+    print(current_quote)
+
+    if (current_quote != False):      
+      current_quote_split = current_quote[0].split(" ")
+      print("HERE1b:")
+      print(current_quote_split)
+      for also_split_by_character in also_split_by_character_list:
+        current_quote_split = tools_for_poetry_mashup.return_array_of_strings_also_split_by_character(input_array=current_quote_split, split_character=also_split_by_character)
+
+      start_word_number = 0
+      end_word_number = len(current_quote_split)
+
+      if (max_words_per_line != None):
+        if (len(current_quote_split) > max_words_per_line):
+          if (max_words_per_line_always_from_start == False):
+            start_word_number = random.randint(0, len(current_quote_split)-1)    
+        end_word_number = start_word_number + max_words_per_line
+        print("start_word_num: {}".format(start_word_number))
+        print("start_word: '{}'".format(current_quote_split[start_word_number]))
+        print("end_word_num: {}".format(end_word_number))
+      
+      current_quote[0] = ' '.join(current_quote_split[start_word_number:end_word_number])  
+
       if ((unique_output_lines == False) or (current_quote not in random_poetry_quotes)):
         random_poetry_quotes.append(current_quote)
+        print("HERE1c:")
+        print(current_quote)
         i = i + 1
       else:
         print("skipping, repeat line: {0}".format(current_quote))

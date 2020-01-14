@@ -9,13 +9,17 @@ default_speed = 180
 use_say_something = False
 unique_input_lines = True
 unique_output_lines = True
-max_words_per_line = 20
+max_words_per_line = None
+max_words_per_line_always_from_start = False
+also_split_by_character_list = [".", ";", "\n"]
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
 meta_source_list = ["the bible", "the online poetry database"]
-book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "revelation"]
-meta_source_list = []
+book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "daniel", "revelation"]
+book_list = ["matthew", "mark", "luke", "john", "revelation", "genesis"]
+meta_source_list = ["the bible"]
+#meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))
 
 # 2. look for local directory, create if needed
@@ -97,23 +101,31 @@ if (line_count > 0):
       current_metadata = meta_source_choice
       current_quote = [current_line, current_metadata]
 
-    if (current_quote != False):
-      current_quote[0] = current_quote[0].replace(":", "\n")
-      current_quote[0] = current_quote[0].replace(".", "\n")
-      current_quote[0] = current_quote[0].replace(",", "\n")
-      current_quote[0] = current_quote[0].replace(";", "\n")
+    if (current_quote != False):      
+      current_quote_split = current_quote[0].split(" ")
+      for also_split_by_character in also_split_by_character_list:
+        current_quote_split = tools_for_poetry_mashup.return_array_of_strings_also_split_by_character(input_array=current_quote_split, split_character=also_split_by_character)
+
+      start_word_number = 0
+      end_word_number = len(current_quote_split)
 
       if (max_words_per_line != None):
-        print(current_quote)
-        current_quote_split = current_quote[0].split(" ")
-        print(current_quote_split)
-        current_quote[0] = ' '.join(current_quote_split[:max_words_per_line])
-        print("HERE:")
-        print(current_quote)
+        if (len(current_quote_split) > max_words_per_line):
+          if (max_words_per_line_always_from_start == False):
+            start_word_number = random.randint(0, len(current_quote_split))    
+        end_word_number = start_word_number + max_words_per_line
+      
+      current_quote[0] = ' '.join(current_quote_split[start_word_number:end_word_number])  
+
+      print("HERE1:")
+      print(current_quote[0])
+      
+      print("HERE2:")
+      print(current_quote[0])
 
       if ((unique_output_lines == False) or (current_quote not in random_poetry_quotes)):
         random_poetry_quotes.append(current_quote)
-        print("HERE2:")
+        print("HERE3:")
         print(random_poetry_quotes)
         i = i + 1
       else:

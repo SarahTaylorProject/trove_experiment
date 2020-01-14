@@ -362,6 +362,24 @@ def read_text_file_to_array(input_file_name, max_lines = None):
     traceback.print_exc()
     return(result)
 
+def return_array_of_strings_also_split_by_character(input_array, split_character="."):
+  result = input_array
+  try:
+    if (split_character == None):
+      return(input_array)
+    output_array = []
+    for input_line in input_array:
+      if (split_character in input_line):
+        input_line_split = input_line.split(split_character)
+        output_array.extend(input_line_split)
+      else:
+        output_array.append(input_line)
+    return(output_array)
+  except:
+    traceback.print_exc()
+    return(result)
+
+
 
 def remove_item_from_list(input_list, remove_item=""):
   try:

@@ -369,7 +369,7 @@ def return_array_of_strings_also_split_by_character(input_array, split_character
       return(input_array)
     output_array = []
     for input_line in input_array:
-      if (split_character in input_line):
+      if ((split_character in input_line) and (input_line.endswith(split_character) == False)):
         input_line_split = input_line.split(split_character)
         output_array.extend(input_line_split)
       else:

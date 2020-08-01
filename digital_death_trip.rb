@@ -9,7 +9,14 @@ script_directory = File.dirname(__FILE__)
 
 clear_screen()
 my_trove_key = read_trove_key()
+
 search_word = 'tragedy'
+
+if ARGV.length > 0 then
+   search_word = ARGV[0]
+   puts "command line search word detected: #{search_word}"
+end
+
 default_speed = 180
 allow_existing_files = true
 default_output_path_name = File.join(script_directory, 'output_files')
@@ -29,6 +36,18 @@ puts("\nTrove result files already available: #{existing_trove_file_list.size}\n
 say_something("\nHello, this is Digital Death Trip.", also_print = true, speed = default_speed)
 say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
+say_something("\nI have been set to search for records of #{search_word}, is this ok?")
+user_input = get_user_input(prompt_text = "Enter 'n' for a new search term\nEnter 'exit' to cancel\nAny other key to continue")
+
+if (user_input.upcase == 'EXIT') then
+   continue = false
+elsif (user_input.upcase == 'N') then
+   say_something("\nWhich search word would you like?")
+   user_input = get_user_input(prompt_text = "Enter new search word")
+   search_word = user_input
+   say_something("\nOk, I have now been set to search for records of #{search_word}")
+end
+
 say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
 user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")
 
@@ -36,6 +55,9 @@ if (user_input.upcase == 'EXIT') then
    continue = false
 elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
+   if search_town == false then
+      continue = false
+   end
 elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
    puts("\nSelecting random existing Trove file...")
    existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name, also_print = true)
@@ -64,7 +86,7 @@ if (continue == true) then
 end
 
 if (continue == true and trove_result_file_name == '') then
-   say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
+   say_something("Ok. I will now see if I can find any newspaper references to #{search_word} in #{search_town}")
    trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
    puts("\nWriting results to file now...")
@@ -73,14 +95,14 @@ if (continue == true and trove_result_file_name == '') then
 
    if (result_count == 0) then
       continue = false
-      say_something("\nSorry, no #{search_word} results found for #{search_town}")
+      say_something("\nSorry, no results found for #{search_word} in #{search_town}")
    end
 end
 
 if (continue == true) then
    result_count = count_trove_search_results_from_csv(trove_result_file_name)
    random_article_range = Array(1..result_count)
-   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
+   say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the records of #{search_word} in #{search_town}?", also_print = true, speed = default_speed)
    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
    if (user_input.upcase == 'EXIT') then
       continue = false
@@ -147,11 +169,11 @@ end
 
 say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
 
-puts("\nWill update map files before exiting...")
-current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, output_path_name = default_output_path_name)
-if (current_result != false) then
-   puts("\nHave written #{current_result} map objects to your output directory.")
-   puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")
-else
-   puts("\nSorry, encountered error with updating map files.")
-end
+# puts("\nWill update map files before exiting...")
+# current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, output_path_name = default_output_path_name)
+# if (current_result != false) then
+#    puts("\nHave written #{current_result} map objects to your output directory.")
+#    puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")
+# else
+#    puts("\nSorry, encountered error with updating map files.")
+# end

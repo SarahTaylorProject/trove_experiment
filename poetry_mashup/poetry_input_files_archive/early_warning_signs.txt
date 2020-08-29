@@ -1,0 +1,34 @@
+Early Warning Signs Model
+supporting our students to succeed
+Learn more about the new model developed 
+to help identify the early warning signs of students who might be at risk and in need of support
+Using predictive analytics, the Early Warning Signs (EWS) model pulls timely, in-depth data 
+from over 70 sources, allowing the University to identify students who may be at risk 
+Deputy Vice-Chancellor Education Professor Belinda Tynan said the Early Warning Signs model will 
+continue to complement RMIT's existing student retention activities
+that occur at a school, college and university-wide level. ​
+The model provides in-depth data to further inform decision-making about our retention activities
+both in the classroom and around the student experienceshe said. 
+It also allows us to reach out to students that might be struggling 
+and connect them to the amazing support services we offer
+The Early Warning Signs model was first piloted last year (Semester 2)
+and contributed to RMIT Connect and SLAMS Connect teams calling 1800 students offering support
+Out of the 500 students who responded, 86 percent found the calls helpful 
+and 37 percent put their hand up saying they needed help.
+Data scientists Julie Dang and Theo Dufort
+who both completed RMIT's Master of Analytics program
+joined RMIT's Analytics and Insights Team in 2018 to develop the model.
+As part of the pilot, 19 program teams were provided Early Warning Signs insights 
+to complement their existing student retention activities
+David McLay, Senior Data Manager, Learning Analytics Team 
+said the model continues to be refined and tested with program teams.
+In Semester 1 this year we met with 36 program teams and their support staff 
+to review the data and workshop potential support strategies and actions  
+We are scaling up the model this coming Semester 2 
+with more programs, more data and more ideas about how we can improve the whole process
+David says the future goal is to have a prescriptive model 
+that not only identifies students at risk
+but guides student retention activities.
+In conjunction with the colleges, we’ve begun planning a 2020 rollout to all higher education programs
+
+ 

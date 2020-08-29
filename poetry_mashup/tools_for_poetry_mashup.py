@@ -335,7 +335,7 @@ def return_bible_book_list():
     return (result)
 
 
-def read_text_file_to_array(input_file_name, max_lines = None):
+def read_text_file_to_array(input_file_name, max_lines = None, ignore_lines_containing=[]):
   """
   This function is handy for reading in password files.
   It reads a file line by line and returns the lines as an array.
@@ -354,7 +354,12 @@ def read_text_file_to_array(input_file_name, max_lines = None):
         if (line_count > max_lines):
           break
       else:
-        file_content.append(line.strip())
+        add_line = True
+        for item in ignore_lines_containing:
+          if (item in line):
+            add_line = False
+        if (add_line == True):
+          file_content.append(line.strip())
 
     input_file.close()
     return(file_content)

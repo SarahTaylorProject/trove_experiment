@@ -9,18 +9,21 @@ default_speed = 180
 use_say_something = False
 unique_input_lines = True
 unique_output_lines = True
-max_words_per_line = 6
+max_words_per_line = 12
 max_words_per_line_always_from_start = False
 also_split_by_character_list = [".", ";", "\n"]
+alternate_meta_source_each_line = True
+ignore_lines_containing = [":"]
 
 # 1. start up the meta source list with the external sources, if any
 # could potentially make this interactive again
 meta_source_list = ["the bible", "the online poetry database"]
 book_list = ["genesis", "deuteronomy", "1corinthians", "2corinthians", "matthew", "mark", "luke", "john", "daniel", "revelation"]
 book_list = ["matthew", "mark", "luke", "john", "revelation", "genesis"]
-meta_source_list = ["the bible"]
-#meta_source_list = []
+#meta_source_list = ["the bible"]
+meta_source_list = []
 print("Meta source list: {}".format(meta_source_list))
+print("Alternate meta source each line: {}".format(alternate_meta_source_each_line))
 
 # 2. look for local directory, create if needed
 local_input_directory_name = os.path.dirname(os.path.abspath(__file__)) + os.path.normpath("/") + "poetry_input_files_current" + os.path.normpath("/")
@@ -37,7 +40,7 @@ if (len(local_input_file_name_list) > 0):
   print("Now preparing {} local input files into dictionary...".format(len(local_input_file_name_list)))
   for input_file_name in local_input_file_name_list:
     full_input_file_name = local_input_directory_name + os.path.normpath("/") + input_file_name
-    input_file_quote_list = tools_for_poetry_mashup.read_text_file_to_array(full_input_file_name)
+    input_file_quote_list = tools_for_poetry_mashup.read_text_file_to_array(full_input_file_name, ignore_lines_containing=ignore_lines_containing)
     if (unique_input_lines == True):
       input_file_quote_set = set(input_file_quote_list)
       input_file_quote_list = list(input_file_quote_set)
@@ -90,7 +93,11 @@ if (line_count > 0):
     j += 1  
     print("\nCollecting quote {}".format(i+1))
     print("Choosing from: {}".format(meta_source_list))
-    meta_source_choice = random.choice(meta_source_list)
+    if (alternate_meta_source_each_line == True):
+      meta_source_choice_index = i%len(meta_source_list)
+      meta_source_choice = meta_source_list[meta_source_choice_index]
+    else:
+      meta_source_choice = random.choice(meta_source_list)
     print("choice: " + meta_source_choice)
     if (meta_source_choice == "the bible"):
       current_quote = tools_for_poetry_mashup.return_random_bible(book_list=book_list, max_chapters=20, max_tries=20)
@@ -101,12 +108,10 @@ if (line_count > 0):
       current_metadata = meta_source_choice
       current_quote = [current_line, current_metadata]
 
-    print("HERE1a:")
     print(current_quote)
 
     if (current_quote != False):      
       current_quote_split = current_quote[0].split(" ")
-      print("HERE1b:")
       print(current_quote_split)
       for also_split_by_character in also_split_by_character_list:
         current_quote_split = tools_for_poetry_mashup.return_array_of_strings_also_split_by_character(input_array=current_quote_split, split_character=also_split_by_character)
@@ -127,7 +132,6 @@ if (line_count > 0):
 
       if ((unique_output_lines == False) or (current_quote not in random_poetry_quotes)):
         random_poetry_quotes.append(current_quote)
-        print("HERE1c:")
         print(current_quote)
         i = i + 1
       else:

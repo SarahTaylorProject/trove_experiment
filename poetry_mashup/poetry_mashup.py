@@ -157,7 +157,7 @@ if (line_count > 0):
   if (use_say_something == True):
     tools_for_poetry_mashup.say_something(text=greeting_string, speed=default_speed)
   for quote in random_poetry_quotes:
-    final_quote = tools_for_poetry_mashup.modify_string_for_email_header(quote[0]).strip()
+    final_quote = tools_for_poetry_mashup.remove_nuisance_characters_from_string(quote[0]).strip()
     if (final_quote != False):
       print(final_quote)
       output_file.write("\n" + final_quote)

@@ -18,7 +18,7 @@ def return_operating_system():
   return(result)
 
 
-def say_something(text, also_print=True, speed=120):
+def say_something(text, also_print=True, speed=120, espeak_executable_path=None):
   """
   # Adapted from original Ruby script, August 2017
   # This function says text aloud through the command line for some operating systems
@@ -28,11 +28,17 @@ def say_something(text, also_print=True, speed=120):
   # If also_print is true, then the text is sent to puts as well
   """
 
+  can_say = False
+  os_result = None
   if (also_print == True):
       print(text)
-
-  os_result = return_operating_system()
-  can_say = False
+  
+  if (espeak_executable_path != None):
+    command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
+    command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
+    can_say = True
+  else:
+    os_result = return_operating_system()
 
   if os_result == "mac":
     command_text = 'say -r ' + str(speed) + ' "' + text + '"'
@@ -262,14 +268,14 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
       else:
         chapter_choice = random.randrange(1, max_chapters)
       request_string = request_string_part2 + "+" + str(chapter_choice) + "?translation=" + translation
-      print("Trying for random Bible chapter: ", request_string)
+      #print("Trying for random Bible chapter: ", request_string)
       result = requests.get(request_string)
       if (result.status_code == 200):
         result_json = json.loads(result.content)
-        print("Chapter found!")
+        #print("Chapter found!")
         success = True
       else:
-        print("No such chapter, trying again...")
+        #print("No such chapter, trying again...")
         try_count += 1
     
     if success == False:
@@ -279,7 +285,7 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
     if (isinstance(result_json, dict)):
       if ("reference" in result_json.keys()):
         metadata = result_json["reference"]
-        metadata = modify_string_for_email_header(metadata)
+        metadata = remove_nuisance_characters_from_string(metadata)
       if ("verses" in result_json.keys()):        
         verse_array = result_json["verses"]
     else:
@@ -293,10 +299,10 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
         metadata += ":" + str(verse_choice["verse"])      
       if ("text" in verse_choice.keys()):  
         random_bible = verse_choice["text"]
-        random_bible = modify_string_for_email_header(random_bible)
+        random_bible = remove_nuisance_characters_from_string(random_bible)
        
-      print(random_bible)
-      print(metadata)
+      #print(random_bible)
+      #print(metadata)
 
     else:
       print("Unexpected format...")
@@ -392,7 +398,7 @@ def remove_item_from_list(input_list, remove_item=""):
     return(None)
 
 
-def modify_string_for_email_header(input_string):
+def remove_nuisance_characters_from_string(input_string):
   """
   This function is a workaround for the bug that Python 3 decoding doesn't work.
   It removes some typical UTC characters that may be returned from API calls and problematise use of a string in an email header.

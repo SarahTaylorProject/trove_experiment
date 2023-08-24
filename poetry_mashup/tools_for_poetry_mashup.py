@@ -2,6 +2,27 @@ import subprocess
 import os
 import traceback
 import sys
+import requests
+import json
+import random
+
+import string
+from nltk.corpus import stopwords
+from nltk.corpus import words
+
+from nltk.tokenize import word_tokenize
+import nltk
+
+# comment these out if using repeatedly
+# nltk.download('stopwords')
+# nltk.download('punkt')
+# nltk.download('brown')
+
+stop_words = set(stopwords.words('english'))
+corpus_words = set(w.lower() for w in nltk.corpus.brown.words())
+
+from random import sample
+
 
 def return_operating_system():
   """
@@ -18,7 +39,7 @@ def return_operating_system():
   return(result)
 
 
-def say_something(text, also_print=True, speed=120):
+def say_something(text, also_print=True, speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
   """
   # Adapted from original Ruby script, August 2017
   # This function says text aloud through the command line for some operating systems
@@ -28,23 +49,28 @@ def say_something(text, also_print=True, speed=120):
   # If also_print is true, then the text is sent to puts as well
   """
 
+  try_say = False
+  os_result = None
   if (also_print == True):
       print(text)
 
   os_result = return_operating_system()
-  can_say = False
 
   if os_result == "mac":
     command_text = 'say -r ' + str(speed) + ' "' + text + '"'
-    can_say = True
+    try_say = True
+  elif (espeak_executable_path != None and os.path.isfile(espeak_executable_path)):
+    command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
+    command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
+    try_say = True
   elif os_result == "win32":
     command_text = 'espeak -s' + str(speed) + ' "' + text + '"'
-    can_say = True
+    try_say = True
   elif os_result == "linux":
     command_text = "echo '" + text + "'|espeak -s " + str(speed)
-    can_say = True
+    try_say = True
 
-  if (can_say == True):
+  if (try_say == True):
     subprocess.call(command_text, shell=True)
   else:
     return()
@@ -106,9 +132,6 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
   """
   result = False
   try:
-    import random
-    import requests
-    import json
 
     random_poetry = ""
     metadata = ""
@@ -120,13 +143,11 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
       if (author_list == False):
         print("Errors with retrieving author list, exiting.")
         return(result)
-      else:
-        print("Author list: ", author_list)
 
     author_choice = random.choice(author_list)
-    print("Sending poetry API request for author: %s" %author_choice)
+    print("author: %s" %author_choice)
     request_string = request_string_part1 + author_choice
-    print(request_string)
+    #print(request_string)
     result = requests.get(request_string)
     if (result.status_code == 200):
       if (decode_result == True):
@@ -164,7 +185,6 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
           try_count = 0
           while (len(random_poetry) < min_length and try_count < max_tries):
             poem_line_choice = random.randrange(0, poem_linecount-1)
-            print(poem_line_choice)
             random_poetry = poem_choice["lines"][poem_line_choice]
             if (poem_line_choice == poem_linecount):
               random_poetry = poem_choice["lines"][poem_line_choice-1] + " " + random_poetry
@@ -176,9 +196,9 @@ def return_random_poetry(author_list=["Browning", "Byron", "Dickinson", "Po", "S
           return(result)
 
         random_poetry = random_poetry.strip()
-        print(random_poetry)
+        #print(random_poetry)
         metadata = metadata.strip()
-        print("METADATA: ", metadata)
+        #print("METADATA: ", metadata)
 
     else:
       print("Unexpected format...")
@@ -200,9 +220,9 @@ def return_list_of_poets():
   '''
   result = False
   try:
+
     request_string_authors = "http://poetrydb.org/author"
 
-    print("Extracting list of all authors in the poetrydb database...")
     result = requests.get(request_string_authors)
     if (result.status_code == 200):
       result_json = json.loads(result.content)
@@ -233,10 +253,7 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
   """
   result = False
   try:  
-    import random
-    import requests
-    import json
-    
+
     random_bible = ""
     metadata = ""
 
@@ -252,6 +269,7 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
     request_string_part1 = "https://bible-api.com/"
     
     book_choice = random.choice(book_list)
+    print("book: {}".format(book_choice))
     request_string_part2 = request_string_part1 + book_choice    
     success = False
 
@@ -262,14 +280,14 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
       else:
         chapter_choice = random.randrange(1, max_chapters)
       request_string = request_string_part2 + "+" + str(chapter_choice) + "?translation=" + translation
-      print("Trying for random Bible chapter: ", request_string)
+      #print("Trying for random Bible chapter: ", request_string)
       result = requests.get(request_string)
       if (result.status_code == 200):
         result_json = json.loads(result.content)
-        print("Chapter found!")
+        #print("Chapter found!")
         success = True
       else:
-        print("No such chapter, trying again...")
+        #print("No such chapter, trying again...")
         try_count += 1
     
     if success == False:
@@ -279,7 +297,7 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
     if (isinstance(result_json, dict)):
       if ("reference" in result_json.keys()):
         metadata = result_json["reference"]
-        metadata = modify_string_for_email_header(metadata)
+        metadata = remove_nuisance_characters_from_string(metadata)
       if ("verses" in result_json.keys()):        
         verse_array = result_json["verses"]
     else:
@@ -293,10 +311,10 @@ def return_random_bible(book_list=None, max_chapters=80, max_tries=80, translati
         metadata += ":" + str(verse_choice["verse"])      
       if ("text" in verse_choice.keys()):  
         random_bible = verse_choice["text"]
-        random_bible = modify_string_for_email_header(random_bible)
+        random_bible = remove_nuisance_characters_from_string(random_bible)
        
-      print(random_bible)
-      print(metadata)
+      #print(random_bible)
+      #print(metadata)
 
     else:
       print("Unexpected format...")
@@ -362,37 +380,37 @@ def read_text_file_to_array(input_file_name, max_lines = None):
     traceback.print_exc()
     return(result)
 
-def return_array_of_strings_also_split_by_character(input_array, split_character="."):
-  result = input_array
-  try:
-    if (split_character == None):
-      return(input_array)
-    output_array = []
-    for input_line in input_array:
-      if ((split_character in input_line) and (input_line.endswith(split_character) == False)):
-        input_line_split = input_line.split(split_character)
-        output_array.extend(input_line_split)
-      else:
-        output_array.append(input_line)
-    return(output_array)
-  except:
-    traceback.print_exc()
-    return(result)
+# def return_array_of_strings_also_split_by_character(input_array, split_character="."):
+#   result = input_array
+#   try:
+#     if (split_character == None):
+#       return(input_array)
+#     output_array = []
+#     for input_line in input_array:
+#       if ((split_character in input_line) and (input_line.endswith(split_character) == False)):
+#         input_line_split = input_line.split(split_character)
+#         output_array.extend(input_line_split)
+#       else:
+#         output_array.append(input_line)
+#     return(output_array)
+#   except:
+#     traceback.print_exc()
+#     return(result)
 
 
 
-def remove_item_from_list(input_list, remove_item=""):
-  try:
-    for item in input_list:
-      if item == remove_item:
-        input_list.remove(item)
-    return(input_list)
-  except:
-    traceback.print_exc()
-    return(None)
+# def remove_item_from_list(input_list, remove_item=""):
+#   try:
+#     for item in input_list:
+#       if item == remove_item:
+#         input_list.remove(item)
+#     return(input_list)
+#   except:
+#     traceback.print_exc()
+#     return(None)
 
 
-def modify_string_for_email_header(input_string):
+def remove_nuisance_characters_from_string(input_string):
   """
   This function is a workaround for the bug that Python 3 decoding doesn't work.
   It removes some typical UTC characters that may be returned from API calls and problematise use of a string in an email header.
@@ -409,3 +427,65 @@ def modify_string_for_email_header(input_string):
   except:
     traceback.print_exc()
     return(input_string)
+
+
+### NLTK FUNCTIONS
+
+def return_string_of_random_words(word_count=2):
+  try:
+    string_of_random_words = ' '.join(sample(corpus_words, word_count))
+    string_of_random_words = string_of_random_words.capitalize()
+    return(string_of_random_words)
+  except:
+    traceback.print_exc()
+    return(None)
+
+
+def return_string_of_random_words_and_stop_words(word_count=2):
+  try:
+    random_word_list = []
+    while (len(random_word_list) <= word_count):
+      
+      random_word = sample(stop_words, 1)
+      random_word_list.append(random_word[0])
+
+      random_word = sample(corpus_words, 1)
+      random_word_list.append(random_word[0])
+    
+    string_of_random_words = ' '.join(random_word_list)
+    tring_of_random_words = string_of_random_words.capitalize()
+    return(string_of_random_words)
+  except:
+    traceback.print_exc()
+    return(None)
+
+
+def remove_stop_words_from_end_of_string(input_string, remove_punctuation_first=False):
+  try:
+    if (remove_punctuation_first == True):
+      input_string_stripped = input_string.translate(str.maketrans('', '', string.punctuation))
+      word_token_list = word_tokenize(input_string_stripped)
+    else:
+      word_token_list = word_tokenize(input_string)
+    new_word_token_list = remove_stop_words_from_end_of_token_list(word_token_list)
+    new_string = " ".join(new_word_token_list)
+    return(new_string)
+  except:
+    traceback.print_exc()
+    return(input_string)
+
+
+def remove_stop_words_from_end_of_token_list(input_token_list):
+  try:
+    if (input_token_list[-1].lower() in stop_words):
+      new_token_list = [w for w in input_token_list[:-1]]
+      return(remove_stop_words_from_end_of_token_list(new_token_list))
+    else:
+      new_token_list = [w for w in input_token_list]
+      return(new_token_list)
+  except:
+    traceback.print_exc()
+    return(input_token_list)
+
+
+

@@ -22,7 +22,6 @@ j = 0
 max_tries = default_line_count * 3
 while ((i < default_line_count) and (j < max_tries)):
   j += 1
-  print(j)
   current_quote = return_random_bible(book_list=book_list, max_chapters=20, max_tries= max_tries)
   if (current_quote != False):   
     i += 1
@@ -31,6 +30,7 @@ while ((i < default_line_count) and (j < max_tries)):
 
 # 4. say all quotes, but only print metadata
 for quote in random_bible_quotes:
+  print("\n")
   say_something(text=quote[0], speed=default_speed)
   print(quote[1])
 

@@ -13,7 +13,7 @@ meta_source_list = ["the bible"]
 book_list = return_bible_book_list()
 
 # 2. start talking to user
-greeting_string = "\nHello. I will choose a Bible verse for you.\nPlease wait while I ask the internet...\n"
+greeting_string = "\nHello. I will select a Bible verse for you.\nPlease wait while I ask the internet...\n"
 say_something(text=greeting_string, speed=default_speed, espeak_executable_path=espeak_executable_path)
 
 # 3. choose random bible verse, with maximum allowable tries

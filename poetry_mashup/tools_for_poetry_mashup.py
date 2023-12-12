@@ -433,7 +433,7 @@ def remove_nuisance_characters_from_string(input_string):
 
 def return_string_of_random_words(word_count=2):
   try:
-    string_of_random_words = ' '.join(sample(corpus_words, word_count))
+    string_of_random_words = ' '.join(sample(sorted(corpus_words), word_count))
     string_of_random_words = string_of_random_words.capitalize()
     return(string_of_random_words)
   except:

@@ -38,18 +38,26 @@ input_lines = read_text_file_to_array(full_input_file_name)
 
 print("\n")
 
-for current_line in input_lines:
-  print(current_line)
+for current_wham_line in input_lines:
+  add_random_word = random.choice([True, True])
+  if (add_random_word == True):
+    word_token_list = word_tokenize(current_wham_line)
+    random_word = return_string_of_random_words(word_count=1)
+    word_token_list[-1] = random_word
+    print(" ".join(word_token_list))
+  else:
+    print(current_wham_line)
+  #print(word_count)
+  # current_random_string = return_string_of_random_words(word_count=word_count)
+  # print(current_random_string)
 
 print("\n")
 
-# TO DO: mashup with random words?
-# ERROR IN THIS DAMN - FIXED BUT INEFFICIENT?
 # TRY DOING THE SORTED EARLIER
-default_random_word_count = 5
-# idea: get from song
-word_count = random.randint(1, default_random_word_count)
-current_quote_string = return_string_of_random_words(word_count=word_count)
-print(current_quote_string)
+# default_random_word_count = 5
+# # idea: get from song
+# word_count = random.randint(1, default_random_word_count)
+# current_quote_string = return_string_of_random_words(word_count=word_count)
+# print(current_quote_string)
 
 # TO DO MIX IN

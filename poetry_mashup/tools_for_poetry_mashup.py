@@ -20,6 +20,7 @@ import nltk
 
 stop_words = set(stopwords.words('english'))
 corpus_words = set(w.lower() for w in nltk.corpus.brown.words())
+corpus_words_sorted = sorted(corpus_words)
 
 from random import sample
 
@@ -433,7 +434,7 @@ def remove_nuisance_characters_from_string(input_string):
 
 def return_string_of_random_words(word_count=2):
   try:
-    string_of_random_words = ' '.join(sample(sorted(corpus_words), word_count))
+    string_of_random_words = ' '.join(sample(corpus_words_sorted, word_count))
     string_of_random_words = string_of_random_words.capitalize()
     return(string_of_random_words)
   except:

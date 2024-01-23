@@ -40,38 +40,68 @@ def return_operating_system():
   return(result)
 
 
-def say_something(text, also_print=True, speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
+def test_say_something(text="test", speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
+  """
+  # Test say_something options
+  Returns True if no error
+  Returns False if error
+  """
+  result = False
+  try:
+    os_result = return_operating_system()
+    command_text = None
+    if os_result == "mac":
+      command_text = 'say -r ' + ' "' + text + '"'
+    elif (os.path.isfile(espeak_executable_path)):
+      command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
+      command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
+    elif os_result == "win32":
+      command_text = 'espeak -s' + str(speed) + ' "' + text + '"'
+    elif os_result == "linux":
+      command_text = "echo '" + text + "'|espeak -s " + str(speed)
+
+    if (command_text != None):
+      subprocess.check_output(command_text)
+      result = True
+
+    return(result)
+  
+  except:
+    return(result)
+
+
+
+def say_something(text, also_print=True, try_say=True, speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
   """
   # Adapted from original Ruby script, August 2017
   # This function says text aloud through the command line for some operating systems
   # It checks for operating system and uses appropriate say-aloud command line
   # Works for linux and mac, and for Windows if the 'espeak' package is installed.
-  # Will print text either way
-  # If also_print is true, then the text is sent to puts as well
+  # If try_say is passed in as False, it will not bother with trying to say stuff
+  # If also_print is True, then the text is sent to puts as well
   """
 
-  try_say = False
-  os_result = None
   if (also_print == True):
-      print(text)
+    print(text)
+  if (try_say == False):
+    return()
 
+  os_result = None
   os_result = return_operating_system()
+  command_text = None
 
   if os_result == "mac":
     command_text = 'say -r ' + str(speed) + ' "' + text + '"'
-    try_say = True
   elif (espeak_executable_path != None and os.path.isfile(espeak_executable_path)):
+    print("here")
     command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
     command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
-    try_say = True
   elif os_result == "win32":
     command_text = 'espeak -s' + str(speed) + ' "' + text + '"'
-    try_say = True
   elif os_result == "linux":
     command_text = "echo '" + text + "'|espeak -s " + str(speed)
-    try_say = True
 
-  if (try_say == True):
+  if (command_text != None):
     subprocess.call(command_text, shell=True)
   else:
     return()

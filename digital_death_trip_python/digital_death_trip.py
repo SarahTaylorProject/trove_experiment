@@ -6,23 +6,18 @@ from tools_for_trove import *
 # from tools_for_towns import *
 # from tools_for_geojson import *
 
-script_directory = return_script_directory()
-
 clear_screen()
-print(script_directory)
 
+script_directory = return_script_directory()
 parent_directory = return_parent_directory(script_directory)
-print(parent_directory)
 
 trove_key = return_trove_key()
 
-sys.exit()
-
-# my_trove_key = read_trove_key()
-# search_word = 'tragedy'
-# default_speed = 180
-# allow_existing_files = true
-# default_output_path_name = File.join(script_directory, 'output_files')
+search_word = 'tragedy'
+default_speed = 180
+allow_existing_files = True
+default_output_path_name = os.path.join(script_directory, 'output_files')
+print("Hello")
 # unless File.directory?(default_output_path_name)
 #    FileUtils.mkdir_p(default_output_path_name)
 # end

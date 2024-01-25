@@ -1,4 +1,6 @@
+import csv
 import os
+import pathlib
 import sys
 import traceback
 from pathlib import Path
@@ -55,10 +57,9 @@ def test_say_something(text="test", speed=120, espeak_executable_path='C:\Elevat
       result = True
 
     return(result)
-  
+ 
   except:
     return(result)
-
 
 
 def say_something(text, also_print=True, try_say=True, speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
@@ -133,3 +134,29 @@ def remove_nuisance_characters_from_string(input_string):
   except:
     traceback.print_exc()
     return(input_string)
+  
+
+def return_matching_file_names(input_path_name='', file_extension='', file_pattern=''):
+    """"
+    Returns file list for any files matching the pattern and/or extension
+    Useful for matching within subdirectories
+    """
+    matching_file_names = []
+    input_path = pathlib.Path(input_path_name).absolute()
+    for file in input_path.glob(file_pattern):
+        if (file_extension in file.suffix):
+            matching_file_names.append(str(file))
+
+    return(matching_file_names)
+
+
+def return_first_line_of_csv_file(input_csv_file, delimiter=","):
+    result = None
+    try:
+        with open(input_csv_file, "r") as f:
+            csv_reader = csv.reader(f, delimiter=delimiter)
+            csv_headings = next(csv_reader)
+            first_line = next(csv_reader)
+        return(first_line)
+    except:
+        return(result)

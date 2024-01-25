@@ -1,21 +1,26 @@
 import os
 import sys
 from pathlib import Path
+
+sys.path.insert(0, '..')
+
 from tools_for_general_use import *
 from tools_for_trove import *
 # from tools_for_towns import *
 # from tools_for_geojson import *
 
-clear_screen()
+#clear_screen()
 
-script_directory = return_script_directory()
-parent_directory = return_parent_directory(script_directory)
-
-trove_key = return_trove_key()
-
+# options
 search_word = 'tragedy'
 default_speed = 180
 allow_existing_files = True
+
+script_directory = return_script_directory()
+parent_directory = return_parent_directory(script_directory)
+trove_key = return_trove_key()
+
+
 default_output_path_name = os.path.join(script_directory, 'output_files')
 print("Hello")
 # unless File.directory?(default_output_path_name)

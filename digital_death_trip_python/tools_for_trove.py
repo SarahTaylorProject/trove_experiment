@@ -104,3 +104,33 @@ def return_trove_file_search_word(input_trove_file, search_word_field=0, delimit
 def count_trove_search_results_from_csv(input_trove_file):
     result = return_line_count_of_csv_file(input_trove_file)
     return(result)
+
+
+def search_for_matching_trove_file(existing_trove_file_list, search_town, search_word='', search_word_field=0, search_town_field=1):
+    """
+    Looks for a matching Trove file from list: the first (if any) that matches the search_town and search_word
+    Can save an unnecessary internet search if file already exists
+    Will only match the search_word if it's non-blank (thus making it possible to search for any files for the search_town)
+    """
+    matching_trove_file = ''
+    try:
+        print(f"\nSearching existing Trove files for {search_town}")
+        for current_file_name in existing_trove_file_list:
+            current_town = return_trove_file_search_town(input_trove_file=current_file_name, search_town_field=search_town_field)
+            if (current_town == search_town):
+                print(f"Matching town in: #{current_file_name}")
+                if (search_word != ''):
+                    print(f"Will also check for search word {search_word}")
+                    current_word = return_trove_file_search_word(input_trove_file=current_file_name, search_word_field=search_word_field)
+                else:
+                    current_word = search_word
+            
+            if (current_town.upper() == search_town.upper()):
+                if (current_word.upper() == search_word.upper()):                
+                    print(f"Matching file: #{current_file_name}")
+                return(current_file_name)
+  
+        return(matching_trove_file)
+    except:
+        print(f"Error encountered in 'search_for_matching_trove_file', returning empty list...")
+        return(matching_trove_file)

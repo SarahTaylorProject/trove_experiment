@@ -21,6 +21,7 @@ try_say = test_say_something()
 # directory setup
 script_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = return_parent_directory(script_directory)
+operating_system = return_operating_system()
 trove_key = return_trove_key()
 
 default_output_path_name = os.path.join(script_directory, 'output_files')
@@ -38,7 +39,7 @@ print(f"\nTrove result files already available: {len(existing_trove_file_list)}"
 print_existing_trove_file_list(existing_trove_file_list)
 
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
-# say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
+say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
 
 # say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
 # user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")

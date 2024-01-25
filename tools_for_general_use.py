@@ -146,17 +146,26 @@ def return_matching_file_names(input_path_name='', file_extension='', file_patte
     for file in input_path.glob(file_pattern):
         if (file_extension in file.suffix):
             matching_file_names.append(str(file))
-
     return(matching_file_names)
 
 
-def return_first_line_of_csv_file(input_csv_file, delimiter=","):
+def return_first_line_of_csv_file(input_csv_file):
     result = None
     try:
         with open(input_csv_file, "r") as f:
-            csv_reader = csv.reader(f, delimiter=delimiter)
-            csv_headings = next(csv_reader)
-            first_line = next(csv_reader)
+            data = list(csv.reader(f))
+            first_line = data[1]
         return(first_line)
+    except:
+        return(result)
+    
+
+def return_line_count_of_csv_file(input_csv_file):
+    result = None
+    try:
+        with open(input_csv_file, "r") as f:
+            data = list(csv.reader(f))
+            line_count = len(data) - 1
+        return(line_count)
     except:
         return(result)

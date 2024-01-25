@@ -7,7 +7,7 @@ sys.path.insert(0, '..')
 
 from tools_for_general_use import *
 from tools_for_trove import *
-# from tools_for_towns import *
+from tools_for_towns import *
 # from tools_for_geojson import *
 
 clear_screen()
@@ -53,12 +53,15 @@ prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
 user_input = get_user_input(prompt_text)
 print(f"Your choice: {user_input}\n")
 print(len(user_input))
+
 if (user_input.upper() == 'EXIT'):
     continue_script = False
 elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
     print("RANDOM TOWN")
-    print("TO DO")
-    search_town = "random"
+    search_town = "to do!"
+    stop_file_name_list = return_existing_stop_file_name_list(town_path_name=default_town_path_name)
+    town_list = return_town_dictionary_from_stop_file_name_list(stop_file_name_list=stop_file_name_list)
+    print(town_list)
 #    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
 elif (user_input.upper() == 'RF'):
     print("\nSelecting random existing Trove file...")

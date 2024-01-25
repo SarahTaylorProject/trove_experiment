@@ -16,6 +16,7 @@ search_word = 'tragedy'
 default_speed = 180
 allow_existing_files = True
 max_articles_to_read = 3
+try_say = test_say_something()
 
 # directory setup
 script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -32,11 +33,11 @@ print("Hello")
 continue_script = True
 trove_result_file_name = ''
 
-existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
-print_existing_trove_file_list(existing_trove_file_list)
+existing_trove_file_list = return_existing_trove_file_list(output_path_name=default_output_path_name)
 print(f"\nTrove result files already available: {len(existing_trove_file_list)}")
+print_existing_trove_file_list(existing_trove_file_list)
 
-# say_something("\nHello, this is Digital Death Trip.", also_print = true, speed = default_speed)
+say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 # say_something("Today I am talking to you from a #{operating_system()} operating system.", also_print = true, speed = default_speed)
 
 # say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)

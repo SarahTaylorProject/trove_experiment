@@ -54,16 +54,13 @@ def return_existing_trove_file_list(output_path_name, also_print=False, file_pat
         return(existing_trove_file_list)
 
 
-
 def print_existing_trove_file_list(existing_trove_file_list):
     try:
         for file_name in existing_trove_file_list:
             search_town = return_trove_file_search_town(file_name)
-            print(search_town)
             search_word = return_trove_file_search_word(file_name)
-            print(search_word)
-            # result_count = count_trove_search_results_from_csv(file_name)
-            # print(f"{os.path.basename(file_name)}, {search_word}, {search_town}, {result_count} results)")
+            result_count = count_trove_search_results_from_csv(file_name)
+            print(f"{os.path.basename(file_name)}: {search_town} {search_word} ({result_count} records)")
     except:
         return()
 
@@ -85,6 +82,7 @@ def return_trove_file_search_town(input_trove_file, search_town_field=1, delimit
         print(f"Error encountered in 'return_trove_file_search_town', returning {search_town}...")
         return(search_town)
 
+
 def return_trove_file_search_word(input_trove_file, search_word_field=0, delimiter=","):
     """
     Returns the search word for a Trove CSV file, by using the first row 
@@ -102,3 +100,7 @@ def return_trove_file_search_word(input_trove_file, search_word_field=0, delimit
         print(f"Error encountered in 'return_trove_file_search_word', returning {search_word}...")
         return(search_word)
 
+
+def count_trove_search_results_from_csv(input_trove_file):
+    result = return_line_count_of_csv_file(input_trove_file)
+    return(result)

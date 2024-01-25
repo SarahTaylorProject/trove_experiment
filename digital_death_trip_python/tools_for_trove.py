@@ -40,3 +40,16 @@ def try_read_trove_key_file(trove_key_file_path="my_trove.txt"):
         return(None)
     
 
+def return_existing_trove_file_list(output_path_name, also_print=False, file_pattern="trove_result*"):
+    existing_trove_file_list = []
+    try:
+        existing_trove_file_list = return_matching_file_names(input_path_name=output_path_name, 
+            file_extension = "csv", 
+            file_pattern = file_pattern)
+    # if (also_print == True):
+    #     print_existing_trove_file_list(existing_trove_file_list)
+    #   end
+        return(existing_trove_file_list)
+    except:
+        print("Encountered error in 'return_existing_trove_file_list'...")
+        return(existing_trove_file_list)

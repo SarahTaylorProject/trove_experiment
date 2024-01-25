@@ -3,6 +3,9 @@ import os
 import codecs
 import sys
 
+try_say = test_say_something()
+print(try_say)
+
 default_speed = 170
 maximum_line_count = None
 read_text_file = False
@@ -56,7 +59,7 @@ if (read_text_file == True):
 
   for current_line in read_lines:
 
-    say_something(text=current_line, speed=default_speed)
+    say_something(text=current_line, try_say=try_say, speed=default_speed)
 
 
 print("\n")

@@ -92,9 +92,15 @@ if (line_count > 0):
     say_something(text=greeting_string, try_say=try_say, speed=default_speed)
     sys.exit()
 
+  print("\n\nI USED THE FOLLOWING SOURCES:")
+  count = 0
+  for quote in random_poetry_quotes:
+    count += 1
+    metadata_string = "{}-{}".format(count, quote[1])
+    print(metadata_string)
 
   print("\n***")
-  greeting_string = "\nHERE IS MY POEM"
+  greeting_string = "\n\nHERE IS MY POEM"
   say_something(text=greeting_string, try_say=try_say, speed=default_speed)
   for quote in random_poetry_quotes:
     output_quote = remove_nuisance_characters_from_string(quote[0]).strip()
@@ -103,13 +109,5 @@ if (line_count > 0):
     if (output_quote != False):
       print(output_quote)
       say_something(text=output_quote, try_say=try_say, speed=default_speed, also_print=False)
-
-
-  print("\n\nI USED THE FOLLOWING SOURCES:")
-  count = 0
-  for quote in random_poetry_quotes:
-    count += 1
-    metadata_string = "{}-{}".format(count, quote[1])
-    print(metadata_string)
 
   print("\n")

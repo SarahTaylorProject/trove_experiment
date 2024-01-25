@@ -15,22 +15,22 @@ from tools_for_trove import *
 search_word = 'tragedy'
 default_speed = 180
 allow_existing_files = True
+max_articles_to_read = 3
 
-script_directory = return_script_directory()
+# directory setup
+script_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = return_parent_directory(script_directory)
 trove_key = return_trove_key()
 
-
 default_output_path_name = os.path.join(script_directory, 'output_files')
-print("Hello")
-# unless File.directory?(default_output_path_name)
-#    FileUtils.mkdir_p(default_output_path_name)
-# end
-# default_town_path_name = File.join(script_directory, 'town_lists')
-# max_articles_to_read = 3
+os.makedirs(default_output_path_name, exist_ok=True)
 
-# continue = true
-# trove_result_file_name = ''
+default_town_path_name = os.path.join(script_directory, 'town_lists')
+
+print("Hello")
+
+continue_script = True
+trove_result_file_name = ''
 
 # existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
 # print_existing_trove_file_list(existing_trove_file_list)
@@ -43,7 +43,7 @@ print("Hello")
 # user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")
 
 # if (user_input.upcase == 'EXIT') then
-#    continue = false
+#    continue_script = false
 # elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
 #    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
 # elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
@@ -51,7 +51,7 @@ print("Hello")
 #    existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name, also_print = true)
 #    if (existing_trove_file_list.size == 0) then
 #       puts("Sorry, no existing Trove files found")
-#       continue = false
+#       continue_script = false
 #    else
 #       trove_result_file_name = existing_trove_file_list.sample
 #       puts("Selected file: #{File.basename(trove_result_file_name)}")
@@ -63,7 +63,7 @@ print("Hello")
 
 # puts("Search town: #{search_town}")
 
-# if (continue == true) then
+# if (continue_script == true) then
 #    if (allow_existing_files == true) then
 #       trove_result_file_name = search_for_matching_trove_file(existing_trove_file_list = existing_trove_file_list, search_town = search_town)
 #       if (trove_result_file_name != '') then
@@ -73,7 +73,7 @@ print("Hello")
 #    end
 # end
 
-# if (continue == true and trove_result_file_name == '') then
+# if (continue_script == true and trove_result_file_name == '') then
 #    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
 #    trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
 #    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
@@ -82,18 +82,18 @@ print("Hello")
 #    puts(result_count)
 
 #    if (result_count == 0) then
-#       continue = false
+#       continue_script = false
 #       say_something("\nSorry, no #{search_word} results found for #{search_town}")
 #    end
 # end
 
-# if (continue == true) then
+# if (continue_script == true) then
 #    result_count = count_trove_search_results_from_csv(trove_result_file_name)
 #    random_article_range = Array(1..result_count)
 #    say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
 #    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
 #    if (user_input.upcase == 'EXIT') then
-#       continue = false
+#       continue_script = false
 #    elsif (user_input.upcase == 'ALL') then
 #       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
 #    elsif (user_input.upcase != 'N') then
@@ -104,24 +104,24 @@ print("Hello")
 #    end
 # end
 
-# if (continue == true) then 
+# if (continue_script == true) then 
 #    say_something("\nShall I pick a random #{search_word} from this place?", also_print = true, speed = default_speed)
 #    say_something("Or let me know if you would like to pick a specific article.", also_print = true, speed = default_speed)  
 # end
 
-# while (continue == true) do      
+# while (continue_script == true) do      
 #    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.")
 #    if (user_input.upcase == 'EXIT') then
-#       continue = false
+#       continue_script = false
 #    elsif (user_input.upcase == 'PICK') then 
 #       say_something("\nWhich article are you interested in?", also_print = true, speed = default_speed)  
 #       user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
 #       if (user_input.upcase == 'EXIT') then
-#          continue = false
+#          continue_script = false
 #       else
 #          article_numbers = return_int_array_from_string(user_input, divider = ",")   
 #          if (article_numbers == false) then
-#             continue = false
+#             continue_script = false
 #          else
 #             say_something("Ok. Let's see.", also_print = true, speed = default_speed)
 #             article_number = article_numbers[0]
@@ -132,7 +132,7 @@ print("Hello")
 #       say_something("Ok. Let's see. Here is my random #{search_word} from #{search_town}.", also_print = true, speed = default_speed)
 #       puts(article_number)
 #    end
-#    if (continue == true) then  
+#    if (continue_script == true) then  
 #       puts(article_number)
 #       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
 #       say_something("\n.....")
@@ -148,9 +148,9 @@ print("Hello")
 #             puts("\nContent written to file: #{trove_article_file}")
 #          end
 #          say_something("Good luck!", also_print = true, speed = default_speed)
-#          continue = false
+#          continue_script = false
 #       elsif (user_input.upcase == 'EXIT') then      
-#          continue = false
+#          continue_script = false
 #       end
 #    end
 # end

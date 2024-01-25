@@ -28,16 +28,16 @@ trove_key = return_trove_key()
 default_output_path_name = os.path.join(script_directory, 'output_files')
 os.makedirs(default_output_path_name, exist_ok=True)
 
-default_town_path_name = os.path.join(script_directory, 'town_lists')
+default_town_data_directory = os.path.join(script_directory, 'town_lists')
 
 print("Hello")
 
 continue_script = True
 trove_result_file_name = ''
 
-existing_trove_file_list = return_existing_trove_file_list(output_path_name=default_output_path_name)
-print(f"\nTrove result files already available: {len(existing_trove_file_list)}")
-print_existing_trove_file_list(existing_trove_file_list)
+existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
+print(f"\nTrove result files already available: {len(existing_trove_result_files)}")
+print_existing_trove_result_files(existing_trove_result_files)
 
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
@@ -58,31 +58,42 @@ if (user_input.upper() == 'EXIT'):
     continue_script = False
 elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
     print("RANDOM TOWN")
-    search_town = "to do!"
-    stop_file_name_list = return_existing_stop_file_name_list(town_path_name=default_town_path_name)
-    town_list = return_town_dictionary_from_stop_file_name_list(stop_file_name_list=stop_file_name_list)
-    print(town_list)
-#    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
+    # need to make this an interactive function with user choice
+    town_dictionary = return_town_dictionary_from_single_file(file_name='australian_cities_list.csv',
+        directory_name=default_town_data_directory,
+        town_file_type='other',
+        town_field_num=0, lat_field_num=1, long_field_num=2,
+        filter_field_num=5, filter_field_value='Victoria')
+    town_list = list(town_dictionary.keys())
+    print(f"{len(town_list)} towns found in file")
+    search_town = random.choice(town_list)
+    print(f"\nRandom choice: {search_town}")
+    # stop_files = return_ptv_stop_files(town_data_directory=default_town_data_directory)
+    # print(stop_files)
+    # town_list = return_town_dictionary_from_ptv_stop_files(stop_files=stop_files)
+    #print(town_list)
+#    search_town = select_random_town_with_user_input(default_speed = default_speed, town_data_directory = default_town_data_directory)
 elif (user_input.upper() == 'RF'):
     print("\nSelecting random existing Trove file...")
-    existing_trove_file_list = return_existing_trove_file_list(output_path_name=default_output_path_name)
-    if (len(existing_trove_file_list) == 0):
+    existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
+    if (len(existing_trove_result_files) == 0):
         print("Sorry, no existing Trove files found")
         continue_script = False
     else:
-        trove_result_file_name = random.choice(existing_trove_file_list)
+        trove_result_file_name = random.choice(existing_trove_result_files)
         print(f"Selected file: {os.path.basename(trove_result_file_name)}")
         search_town = return_trove_file_search_town(trove_result_file_name)
         search_word = return_trove_file_search_word(trove_result_file_name)
 else:
-    search_town = user_input
+    search_town = user_input.strip().title()
 
-print(f"Search town: {search_town}")
-print(f"Search word: {search_word}")
 
 if (continue_script == True):
+    print("continuing...")
+    print(f"Search town: {search_town}")
+    print(f"Search word: {search_word}")
     if (allow_existing_files == True):
-        trove_result_file_name = search_for_matching_trove_file(existing_trove_file_list = existing_trove_file_list, search_town = search_town)
+        trove_result_file_name = search_for_matching_trove_file(existing_trove_result_files = existing_trove_result_files, search_town = search_town)
         if (trove_result_file_name != ''):
             print("Matching file found already on list, will use this one and be frugal:")
             print(f"{os.path.basename(trove_result_file_name)}")
@@ -172,7 +183,7 @@ if (continue_script == True):
 # say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
 
 # puts("\nWill update map files before exiting...")
-# current_result = write_geojson_for_all_csv_files(town_path_name = default_town_path_name, output_path_name = default_output_path_name)
+# current_result = write_geojson_for_all_csv_files(town_data_directory = default_town_data_directory, output_path_name = default_output_path_name)
 # if (current_result != false) then
 #    puts("\nHave written #{current_result} map objects to your output directory.")
 #    puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")

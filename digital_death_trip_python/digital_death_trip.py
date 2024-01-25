@@ -1,14 +1,21 @@
 import os
 import sys
+from pathlib import Path
 from tools_for_general_use import *
-# from tools_for_trove import *
+from tools_for_trove import *
 # from tools_for_towns import *
 # from tools_for_geojson import *
 
-script_directory = os.path.dirname(os.path.abspath(__file__)) 
+script_directory = return_script_directory()
 
 clear_screen()
 print(script_directory)
+
+parent_directory = return_parent_directory(script_directory)
+print(parent_directory)
+
+trove_key = return_trove_key()
+
 sys.exit()
 
 # my_trove_key = read_trove_key()

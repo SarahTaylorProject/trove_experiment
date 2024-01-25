@@ -32,11 +32,8 @@ print("Hello")
 continue_script = True
 trove_result_file_name = ''
 
-# test = return_matching_file_names(input_path_name='output_files', 
-#                                   file_extension='csv', 
-#                                   file_pattern='trove_result*')
-# print(test)
 existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name)
+print_existing_trove_file_list(existing_trove_file_list)
 print(f"\nTrove result files already available: {len(existing_trove_file_list)}")
 
 # say_something("\nHello, this is Digital Death Trip.", also_print = true, speed = default_speed)

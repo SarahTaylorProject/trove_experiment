@@ -26,6 +26,7 @@ def return_town_dictionary_from_single_file(file_name,
                 if (town_file_type == 'ptv_stops'):
                     current_town_name = extract_town_string_from_ptv_stop_string(row[town_field_num])
                 elif (town_file_type == 'vicmap'):
+                    print("HERE")
                     current_town_name = extract_town_string_from_vicmap_string(row[town_field_num])
                 else:
                     current_town_name = row[town_field_num]
@@ -35,13 +36,12 @@ def return_town_dictionary_from_single_file(file_name,
                         include_current_town = False
 
                 if (include_current_town != False):
-                    current_town_data['lat'] = float(row[lat_field_num])
-                    current_town_data['long'] = float(row[long_field_num])
+                    current_town_data['lat'] = row[lat_field_num]
+                    current_town_data['long'] = row[long_field_num]
                     if (include_row_summary == True):
                         current_town_data['source_row'] = str(row)
                     town_dictionary[current_town_name] = current_town_data
 
-        print_town_dictionary(town_dictionary)
         return(town_dictionary)
 
     except:
@@ -49,17 +49,17 @@ def return_town_dictionary_from_single_file(file_name,
         return(town_dictionary)
 
 
-def return_town_dictionary_from_vicmap_file(town_data_directory=None, vicmap_file_name='vic_and_border_locality_list.csv'):
+def return_town_dictionary_from_vicmap_file(town_data_directory='', vicmap_file_name='vic_and_border_locality_list.csv'):
     vicmap_town_dictionary = {}
     try:
-        vicmap_file_path = os.path.join(town_data_directory, vicmap_file_name)
-        vicmap_town_dictionary = return_town_dictionary_from_single_file(file_name = vicmap_file_path, 
-            file_type = 'vicmap', 
-            town_field_num = 3, 
-            lat_field_num = 11, 
-            long_field_num = 12, 
-            filter_field_num = 6, 
-            filter_field_value = 'VIC',
+        vicmap_town_dictionary = return_town_dictionary_from_single_file(file_name=vicmap_file_name,
+            directory_name=town_data_directory,
+            town_file_type='vicmap',
+            town_field_num=3,
+            lat_field_num = 11,
+            long_field_num = 12,
+            # filter_field_num = 6,
+            # filter_field_value = 'VIC',
             include_row_summary = True)
         return(vicmap_town_dictionary)
     except:
@@ -92,19 +92,17 @@ def return_town_dictionary_from_ptv_stop_files(stop_files):
     town_dictionary = {}
     try:
         for stop_file_name in stop_files:
-            print(f"Current gfts_stops stop file: {stop_file_name}")
+            print(f"Current stop file: {stop_file_name}")
             current_town_dictionary = return_town_dictionary_from_single_file(file_name = stop_file_name, 
                 town_file_type = 'ptv_stops', 
                 town_field_num = 1, 
                 lat_field_num = 2, 
                 long_field_num = 3)
-            print(current_town_dictionary)
-            if (current_town_dictionary != False): 
+            print(len(current_town_dictionary))
+            if (len(current_town_dictionary) > 0): 
                 town_dictionary.update(current_town_dictionary)
-    
-        print(f"Finished. Town count: {len(town_dictionary)}")
-        town_dictionary_sorted = sorted(town_dictionary)
-        return(town_dictionary_sorted)
+            print(len(town_dictionary))
+        return(town_dictionary)
     except:
         print("Error encountered in 'return_town_dictionary_from_ptv_stop_files'...")
         return(town_dictionary)

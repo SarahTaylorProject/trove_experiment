@@ -44,7 +44,7 @@ say_something(f"Today I am talking to you from a {operating_system} operating sy
 
 say_something("\nWould you like to choose a town, or would you like me to make a random selection?", try_say=try_say, speed=default_speed)
 prompt_options = ['']
-prompt_options.append("Type 'r' for a random town choice (DEFAULT); OR")
+prompt_options.append("Type 'r' or Enter for a random town choice (DEFAULT); OR")
 prompt_options.append("Type town name directly; OR")
 prompt_options.append("Type 'rf' for a random choice from existing output files; OR")
 prompt_options.append("Type 'exit' to cancel")
@@ -58,20 +58,27 @@ if (user_input.upper() == 'EXIT'):
     continue_script = False
 elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
     print("RANDOM TOWN")
-    # need to make this an interactive function with user choice
-    town_dictionary = return_town_dictionary_from_single_file(file_name='australian_cities_list.csv',
-        directory_name=default_town_data_directory,
-        town_file_type='other',
-        town_field_num=0, lat_field_num=1, long_field_num=2,
-        filter_field_num=5, filter_field_value='Victoria')
+    # here testing different town data; need to make this an interactive function with user choice
+    
+    # 1
+    # town_dictionary = return_town_dictionary_from_single_file(file_name='australian_cities_list.csv',
+    #     directory_name=default_town_data_directory,
+    #     town_file_type='other',
+    #     town_field_num=0, lat_field_num=1, long_field_num=2,
+    #     filter_field_num=5, filter_field_value='Victoria')
+
+    # 2
+    stop_files = return_ptv_stop_files(town_data_directory=default_town_data_directory)
+    town_dictionary = return_town_dictionary_from_ptv_stop_files(stop_files=stop_files)
+
+    # 3
+    # town_dictionary = return_town_dictionary_from_vicmap_file(town_data_directory=default_town_data_directory)
+    
     town_list = list(town_dictionary.keys())
+
     print(f"{len(town_list)} towns found in file")
     search_town = random.choice(town_list)
     print(f"\nRandom choice: {search_town}")
-    # stop_files = return_ptv_stop_files(town_data_directory=default_town_data_directory)
-    # print(stop_files)
-    # town_list = return_town_dictionary_from_ptv_stop_files(stop_files=stop_files)
-    #print(town_list)
 #    search_town = select_random_town_with_user_input(default_speed = default_speed, town_data_directory = default_town_data_directory)
 elif (user_input.upper() == 'RF'):
     print("\nSelecting random existing Trove file...")

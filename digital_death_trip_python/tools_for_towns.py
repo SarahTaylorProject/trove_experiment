@@ -19,11 +19,12 @@ def return_town_dictionary_from_stop_file_name_list(stop_file_name_list):
     try:
         for stop_file_name in stop_file_name_list:
             print(f"Current PTV stop file: {stop_file_name}")
-            current_town_dictionary = return_town_dictionary_from_single_file(stop_file_name = stop_file_name, 
+            current_town_dictionary = return_town_dictionary_from_single_file(file_name = stop_file_name, 
                 town_file_type = 'ptv', 
                 town_field_num = 1, 
                 lat_field_num = 2, 
                 long_field_num = 3)
+            print(current_town_dictionary)
             if (current_town_dictionary != False): 
                 town_dictionary.update(current_town_dictionary)
     
@@ -44,20 +45,26 @@ def return_town_dictionary_from_single_file(file_name,
         print(f"Attempting to make town dictionary from file {file_name}")
         with open(file_name, "r") as f:
             csv_data = list(csv.reader(f))[1:]
+            #print(csv_data)
+            print(len(csv_data))
+            print("HERE")
             for row in csv_data:
+                print(row)
                 if (town_file_type == 'ptv'):
                     town_name = extract_town_string_from_ptv_stop_string(row[town_field_num])
+                    print(town_name)
                 elif (town_file_type == 'vicmap'):
                     town_name = extract_town_string_from_vicmap_string(row[town_field_num])
                 else:
                     town_name = row[town_field_num]
-        
-        if (select_field_num != None):
-            if (row[select_field_num] != select_field_value):
-               town_name = False
+                print(town_name)
 
-        if (town_name != False):
-            town_dictionary[town_name] = [float(row[lat_field_num]), float(row[long_field_num])]
+                if (select_field_num != None):
+                    if (row[select_field_num] != select_field_value):
+                        town_name = False
+
+                if (town_name != False):
+                    town_dictionary[town_name] = [float(row[lat_field_num]), float(row[long_field_num])]
         
         print_town_dictionary(town_dictionary)
         return(town_dictionary)

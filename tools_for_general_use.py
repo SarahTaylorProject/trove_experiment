@@ -3,6 +3,7 @@ import os
 import pathlib
 import sys
 import traceback
+import subprocess
 from pathlib import Path
 
 def clear_screen():
@@ -110,8 +111,8 @@ def get_user_input(prompt_text = "\nPlease enter value"):
     else:
       input_text = raw_input(prompt_text)
 
+    input_text = input_text.strip()
     return(input_text)
-
   except:
     traceback.print_exc()
     return(result)

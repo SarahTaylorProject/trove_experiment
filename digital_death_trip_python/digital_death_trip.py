@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 from pathlib import Path
 
@@ -41,29 +42,40 @@ print_existing_trove_file_list(existing_trove_file_list)
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
 
-# say_something("\nWould you like to choose a town, or would you like me to make a random selection?", also_print = true, speed = default_speed)
-# user_input = get_user_input(prompt_text = "Enter town name OR 'random'\nEnter 'random file' or 'rf' for a random existing file (offline)\nEnter 'exit' to cancel")
+say_something("\nWould you like to choose a town, or would you like me to make a random selection?", try_say=try_say, speed=default_speed)
+prompt_options = ['']
+prompt_options.append("Type 'r' for a random town choice (DEFAULT); OR")
+prompt_options.append("Type town name directly; OR")
+prompt_options.append("Type 'rf' for a random choice from existing output files; OR")
+prompt_options.append("Type 'exit' to cancel")
+prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
 
-# if (user_input.upcase == 'EXIT') then
-#    continue_script = false
-# elsif ((user_input.upcase == 'RANDOM') or (user_input.upcase == 'R')) then
+user_input = get_user_input(prompt_text)
+print(f"Your choice: {user_input}\n")
+print(len(user_input))
+if (user_input.upper() == 'EXIT'):
+    continue_script = False
+elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
+    print("RANDOM TOWN")
+    print("TO DO")
+    search_town = "random"
 #    search_town = select_random_town_with_user_input(default_speed = default_speed, town_path_name = default_town_path_name)
-# elsif ((user_input.upcase == 'RANDOM FILE') or (user_input.upcase == 'RF')) then
-#    puts("\nSelecting random existing Trove file...")
-#    existing_trove_file_list = return_existing_trove_file_list(output_path_name = default_output_path_name, also_print = true)
-#    if (existing_trove_file_list.size == 0) then
-#       puts("Sorry, no existing Trove files found")
-#       continue_script = false
-#    else
-#       trove_result_file_name = existing_trove_file_list.sample
-#       puts("Selected file: #{File.basename(trove_result_file_name)}")
-#       search_town = return_trove_file_search_town(trove_result_file_name)
-#    end
-# else
-#    search_town = user_input
-# end
+elif (user_input.upper() == 'RF'):
+    print("\nSelecting random existing Trove file...")
+    existing_trove_file_list = return_existing_trove_file_list(output_path_name=default_output_path_name)
+    if (len(existing_trove_file_list) == 0):
+        print("Sorry, no existing Trove files found")
+        continue_script = False
+    else:
+        trove_result_file_name = random.choice(existing_trove_file_list)
+        print(f"Selected file: {os.path.basename(trove_result_file_name)}")
+        search_town = return_trove_file_search_town(trove_result_file_name)
+        search_word = return_trove_file_search_word(trove_result_file_name)
+else:
+    search_town = user_input
 
-# puts("Search town: #{search_town}")
+print(search_town)
+print(f"Search town: {search_town}")
 
 # if (continue_script == true) then
 #    if (allow_existing_files == true) then

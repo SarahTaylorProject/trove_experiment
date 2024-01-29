@@ -1,4 +1,5 @@
 import os
+import requests
 from tools_for_general_use import *
 
 def return_trove_key(trove_key_file="my_trove.txt", trove_key_directory="keys"):
@@ -134,3 +135,48 @@ def search_for_matching_trove_file(existing_trove_result_files, search_town, sea
     except:
         print(f"Error encountered in 'search_for_matching_trove_file', returning empty list...")
         return(matching_trove_file)
+
+def fetch_trove_search_result(trove_key='', search_town='', search_word='', 
+                              trove_search_base="https://api.trove.nla.gov.au/v3/result?",
+                              search_term_divider='%22', search_term_joiner='%20',
+                              search_category='newspaper',
+                              result_s='%2A',
+                              result_n=20,
+                              result_sortby='relevance',
+                              result_bulkharvest='false',
+                              result_reclevel='brief',
+                              result_encoding='json'):
+    #https://api.trove.nla.gov.au/v3/result?category=newspaper
+    #&q=elmore%20tragedy&s=%2A&n=20&sortby=relevance&bulkHarvest=false&reclevel=brief&encoding=xml
+
+    trove_search_result = None
+
+    search_word_list = []
+    for input_word in [search_town, search_word]:
+        current_word = remove_nuisance_characters_from_string(input_word)
+        current_word = current_word.replace(' ', search_term_joiner)
+        if (len(current_word) > 0):
+            search_word_list.append(current_word)
+
+    search_q = search_term_divider.join(search_word_list)
+    print(search_q)
+
+    request_list = []
+    request_list.append([f"key={trove_key}"])
+    request_list.append([f"q={search_q}"])
+    request_list.append([f"category={search_category}"])
+    request_list.append([f"s={result_s}"])
+    request_list.append([f"n={result_n}"])
+    request_list.append([f"sortby={result_sortby}"])
+    request_list.append([f"bulkHarvest={result_bulkharvest}"])
+    request_list.append([f"reclevel={result_reclevel}"])
+    request_list.append([f"encoding={result_encoding}"])
+
+    trove_request = trove_search_base + '&'.join(request_list)
+    print(trove_request)
+    try:
+        trove_search_result = requests.get(trove_request)
+        print(trove_search_result)
+    except:
+        print("Error getting API results")
+        return(trove_search_result)

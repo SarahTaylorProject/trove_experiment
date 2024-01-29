@@ -6,7 +6,8 @@ from tools_for_general_use import *
 def return_town_list_with_user_input(speed, try_say,
         town_directory='town_lists',
         vicmap_file_name='vic_and_border_locality_list.csv',
-        australian_cities_file_name='australian_cities_list.csv'):
+        australian_cities_file_name='australian_cities_list.csv',
+        unique_list=True):
     town_list = []
     try:
         default_source_choice='P'
@@ -28,18 +29,22 @@ def return_town_list_with_user_input(speed, try_say,
         if (source_choice == 'P'):
             town_list = return_town_list_from_ptv_stop_files(town_directory=town_directory)
         elif (source_choice == 'V'):
-            town_list = return_town_list_from_csv_file(town_file_name=vicmap_file_name,
+            town_list = return_town_list_from_single_file(town_file_name=vicmap_file_name,
                 town_directory=town_directory,
                 town_file_type='vicmap',
                 town_field_num=3)
         elif (source_choice == 'A'):
-            town_list = return_town_list_from_csv_file(town_file_name=australian_cities_file_name,
+            town_list = return_town_list_from_single_file(town_file_name=australian_cities_file_name,
                 town_directory=town_directory,
                 town_file_type='other',
                 town_field_num=0)        
+        
         if (len(town_list) == 0):
             say_something("I'm sorry, I couldn't find any towns, please check source choice and try again.", try_say=try_say, speed=speed)
-
+        elif (unique_list == True):
+            town_set = set(town_list)
+            town_list = list(town_set)
+            
         return(town_list)
     
     except:
@@ -47,20 +52,18 @@ def return_town_list_with_user_input(speed, try_say,
         return(town_list)
 
 
-def return_town_list_from_csv_file(town_file_name,
+def return_town_list_from_single_file(town_file_name,
         town_directory, town_file_type='vicmap', town_field_num=1):
-    """
-    Returns a dictionary of town names from a single file, can be of varying type
-    """
     town_list = []
     try:
         town_file_path = os.path.join(town_directory, town_file_name)
         print(f"Attempting to make town list from file {town_file_path}")
         with open(town_file_path, "r") as f:
-            csv_data = list(csv.reader(f))[1:]
-            # STILL NEED TO HANDLE TEXT FILES
-            for row in csv_data:
-                print(row)
+            if (town_file_name.endswith('.csv')):
+                input_rows = list(csv.reader(f))[1:]
+            else:
+                input_rows = [row.split(",") for row in f.readlines()]
+            for row in input_rows:
                 current_town = None
                 if (town_file_type == 'ptv_stops'):
                     current_town = extract_town_string_from_ptv_stop_string(input_string=row[town_field_num])
@@ -69,13 +72,13 @@ def return_town_list_from_csv_file(town_file_name,
                     current_town = current_town.split("(")[0].title()
                 else:
                     current_town = row[town_field_num].title()
-                print(current_town)
+
                 if (current_town != None):
                     town_list.append(current_town)
-        # TO DECIDE: sort? unique?
+
         return(town_list)
     except:
-        print(f"Encountered error in 'return_town_list_from_csv_file'")
+        print(f"Encountered error in 'return_town_list_from_single_file'")
         return(town_list)
   
 
@@ -87,7 +90,8 @@ def return_town_list_from_ptv_stop_files(town_directory='', file_pattern='*stops
             file_pattern = file_pattern)
         for stop_file_name in stop_files:
             print(f"Current stop file: {stop_file_name}")
-            current_town_list = return_town_list_from_csv_file(file_name=stop_file_name, 
+            current_town_list = return_town_list_from_single_file(town_file_name=stop_file_name,
+                town_directory=town_directory,
                 town_file_type = 'ptv_stops', 
                 town_field_num = 1)
             print(len(current_town_list))

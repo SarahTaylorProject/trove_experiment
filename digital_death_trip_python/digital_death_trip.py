@@ -144,7 +144,7 @@ if (continue_script == True):
 #       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
 #       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different #{search_word}\nEnter 'exit' to cancel\nEnter 'y' to find out more")
 #       if (user_input.upcase == 'Y') then
-#          trove_article_id = return_record_from_csv_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
+#          trove_article_id = return_record_from_single_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
 #          puts(trove_article_id)
 #          trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
 #          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        

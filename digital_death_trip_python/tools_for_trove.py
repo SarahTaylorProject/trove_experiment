@@ -1,29 +1,33 @@
+import json
 import os
 import requests
 from tools_for_general_use import *
 
 def return_trove_key(trove_key_file="my_trove.txt", trove_key_directory="keys"):
-    # Looks in various locations for trove key file
+    # Looks in various likely locations for Trove key file
     # Returns None if unsuccessful, returns key if successful
+    # TODO: move and modify for general use file
     try:
         trove_key = None
         script_directory = return_script_directory()
         parent_directory = return_parent_directory(script_directory)
 
-        trove_key_file_path = os.path.join(trove_key_directory, trove_key_file)
-        
-        trove_key = try_read_trove_key_file(trove_key_file_path)
+        try_directory = os.path.join(script_directory, trove_key_directory)
+        try_file_path = os.path.join(try_directory, trove_key_file)
+        trove_key = try_read_trove_key_file(try_file_path)
         
         if (trove_key == None):
             try_directory = os.path.join(parent_directory, trove_key_directory)
-            trove_key_file_path = os.path.join(try_directory, trove_key_file)
-            trove_key = try_read_trove_key_file(trove_key_file_path)
+            try_file_path = os.path.join(try_directory, trove_key_file)
+            trove_key = try_read_trove_key_file(try_file_path)
         if (trove_key == None):
-            trove_key_file_path = trove_key_file
-            trove_key = try_read_trove_key_file(trove_key_file_path)
+            try_directory = trove_key_directory
+            try_file_path = os.path.join(try_directory, trove_key_file)
+            trove_key = try_read_trove_key_file(try_file_path)
         if (trove_key == None):
-            trove_key_file_path = os.path.join(parent_directory, trove_key_file)
-            trove_key = try_read_trove_key_file(trove_key_file_path)
+            try_directory = ''
+            try_file_path = os.path.join(try_directory, trove_key_file)
+            trove_key = try_read_trove_key_file(try_file_path)
 
         return(trove_key)
     except:
@@ -32,13 +36,14 @@ def return_trove_key(trove_key_file="my_trove.txt", trove_key_directory="keys"):
 
 
 def try_read_trove_key_file(trove_key_file_path="my_trove.txt"):
+    trove_key = None
     try:
         with open(trove_key_file_path, 'r') as f:
             trove_key = f.readline()
             print(f"Found Trove key")
         return(trove_key)
     except:
-        return(None)
+        return(trove_key)
     
 
 def return_existing_trove_result_files(output_path_name, also_print=False, file_pattern="trove_result*"):
@@ -146,37 +151,45 @@ def fetch_trove_search_result(trove_key='', search_town='', search_word='',
                               result_bulkharvest='false',
                               result_reclevel='brief',
                               result_encoding='json'):
+    # EXAMPLE
     #https://api.trove.nla.gov.au/v3/result?category=newspaper
     #&q=elmore%20tragedy&s=%2A&n=20&sortby=relevance&bulkHarvest=false&reclevel=brief&encoding=xml
-
+    # TODO: make into separate funciton to build URL, and try URL, respectively
     trove_search_result = None
-
-    search_word_list = []
+    print(trove_key)
+    search_q_list = []
     for input_word in [search_town, search_word]:
         current_word = remove_nuisance_characters_from_string(input_word)
         current_word = current_word.replace(' ', search_term_joiner)
         if (len(current_word) > 0):
-            search_word_list.append(current_word)
+            search_q_list.append(current_word)
 
-    search_q = search_term_divider.join(search_word_list)
+    search_q = search_term_divider.join(search_q_list)
     print(search_q)
 
     request_list = []
-    request_list.append([f"key={trove_key}"])
-    request_list.append([f"q={search_q}"])
-    request_list.append([f"category={search_category}"])
-    request_list.append([f"s={result_s}"])
-    request_list.append([f"n={result_n}"])
-    request_list.append([f"sortby={result_sortby}"])
-    request_list.append([f"bulkHarvest={result_bulkharvest}"])
-    request_list.append([f"reclevel={result_reclevel}"])
-    request_list.append([f"encoding={result_encoding}"])
+    request_list.append(f"key={trove_key}")
+    request_list.append(f"q={search_q}")
+    request_list.append(f"category={search_category}")
+    request_list.append(f"s={result_s}")
+    request_list.append(f"n={result_n}")
+    request_list.append(f"sortby={result_sortby}")
+    request_list.append(f"bulkHarvest={result_bulkharvest}")
+    request_list.append(f"reclevel={result_reclevel}")
+    request_list.append(f"encoding={result_encoding}")
 
-    trove_request = trove_search_base + '&'.join(request_list)
-    print(trove_request)
+    trove_search_string = "&".join(request_list)
+    trove_search_request = trove_search_base + trove_search_string
+    print(trove_search_request)
     try:
-        trove_search_result = requests.get(trove_request)
+        trove_search_result = requests.get(trove_search_request)
         print(trove_search_result)
+        if (trove_search_result.status_code == 200):
+            trove_result_json = json.loads(trove_search_result.content)
+            print(trove_result_json)
+            #test_csv = f"trove_result_{search_town}_{search_word}.csv"
+            # TODO: better file naming, and separate; also maybe include date
+            # TODO: lots of parsing of results, put in separate functions
     except:
         print("Error getting API results")
         return(trove_search_result)

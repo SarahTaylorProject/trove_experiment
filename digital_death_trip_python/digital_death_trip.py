@@ -8,7 +8,6 @@ sys.path.insert(0, '..')
 from tools_for_general_use import *
 from tools_for_trove import *
 from tools_for_towns import *
-# from tools_for_geojson import *
 
 clear_screen()
 
@@ -23,16 +22,24 @@ script_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = return_parent_directory(script_directory)
 operating_system = return_operating_system()
 trove_key = return_trove_key()
+print(trove_key)
 
 default_output_path_name = os.path.join(script_directory, 'output_files')
 os.makedirs(default_output_path_name, exist_ok=True)
 
 default_town_directory = os.path.join(script_directory, 'town_lists')
 
-print("Hello")
-
 continue_script = True
 trove_result_file_name = ''
+
+print("Hello")
+if (trove_key == None):
+    prompt_text = "\nNo Trove key found! Press 'N' to cancel script or any other key to continue...\n"
+    user_input = get_user_input(prompt_text=prompt_text)
+    if (user_input[0].upper() == 'N'):
+        continue_script = False
+        sys.exit()
+    
 
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
@@ -82,7 +89,7 @@ if (continue_script == True and trove_result_file_name == ''):
     # TODO: incorporate more file name error catching
     trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
     print(trove_result_file_name)
-#    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
+    trove_api_results = fetch_trove_search_result(trove_key=trove_key, search_town=search_town, search_word=search_word)
 #    puts("\nWriting results to file now...")
 #    result_count = write_trove_search_results(trove_api_results, trove_result_file_name, search_word, search_town)
 #    puts(result_count)

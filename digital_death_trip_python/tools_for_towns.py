@@ -10,14 +10,15 @@ def return_town_list_with_user_input(speed, try_say,
         unique_list=True):
     town_list = []
     try:
-        default_source_choice='P'
+        default_source_choice='A'
 
         source_options = ['\n']
-        source_options.append("Type 'P' for PTV stop files in Victoria (DEFAULT); OR")
+        source_options.append("Type 'P' for PTV Stop files in Victoria; OR")
         source_options.append("Type 'V' for VicMap localities in Victoria and border New South Wales; OR")
-        source_options.append("Type 'A' for the Australian Cities database; OR")
+        source_options.append("Type 'C' for the Australian Cities database; OR")
+        source_options.append("Type 'A' for all of the above (DEFAULT); OR")
         source_options.append("Type 'EXIT' to cancel")
-        # IDEA: Include option for all
+
         prompt_text = "Which source would you like to use?\n" + "\n-\t".join(source_options) + "\n\n"
         source_choice = get_user_input(prompt_text=prompt_text)
 
@@ -25,7 +26,7 @@ def return_town_list_with_user_input(speed, try_say,
             source_choice = default_source_choice
         else:
             source_choice = source_choice.strip()[0].upper()
-        print(source_choice)
+  
         if (source_choice == 'P'):
             town_list = return_town_list_from_ptv_stop_files(town_directory=town_directory)
         elif (source_choice == 'V'):
@@ -33,11 +34,22 @@ def return_town_list_with_user_input(speed, try_say,
                 town_directory=town_directory,
                 town_file_type='vicmap',
                 town_field_num=3)
-        elif (source_choice == 'A'):
+        elif (source_choice == 'C'):
             town_list = return_town_list_from_single_file(town_file_name=australian_cities_file_name,
                 town_directory=town_directory,
                 town_file_type='other',
-                town_field_num=0)        
+                town_field_num=0)
+        elif (source_choice == 'A'):
+            town_list_1 = return_town_list_from_ptv_stop_files(town_directory=town_directory)
+            town_list_2 = return_town_list_from_single_file(town_file_name=vicmap_file_name,
+                town_directory=town_directory,
+                town_file_type='vicmap',
+                town_field_num=3)
+            town_list_3 = town_list = return_town_list_from_single_file(town_file_name=australian_cities_file_name,
+                town_directory=town_directory,
+                town_file_type='other',
+                town_field_num=0)
+            town_list = town_list_1 + town_list_2 + town_list_3
         
         if (len(town_list) == 0):
             say_something("I'm sorry, I couldn't find any towns, please check source choice and try again.", try_say=try_say, speed=speed)
@@ -57,7 +69,7 @@ def return_town_list_from_single_file(town_file_name,
     town_list = []
     try:
         town_file_path = os.path.join(town_directory, town_file_name)
-        print(f"Attempting to make town list from file {town_file_path}")
+        print(f"Reading towns from file {town_file_path}")
         with open(town_file_path, "r") as f:
             if (town_file_name.endswith('.csv')):
                 input_rows = list(csv.reader(f))[1:]
@@ -75,7 +87,7 @@ def return_town_list_from_single_file(town_file_name,
 
                 if (current_town != None):
                     town_list.append(current_town)
-
+        print(f"Count: {len(town_list)}")
         return(town_list)
     except:
         print(f"Encountered error in 'return_town_list_from_single_file'")
@@ -89,15 +101,12 @@ def return_town_list_from_ptv_stop_files(town_directory='', file_pattern='*stops
             file_extension = "txt", 
             file_pattern = file_pattern)
         for stop_file_name in stop_files:
-            print(f"Current stop file: {stop_file_name}")
             current_town_list = return_town_list_from_single_file(town_file_name=stop_file_name,
                 town_directory=town_directory,
                 town_file_type = 'ptv_stops', 
                 town_field_num = 1)
-            print(len(current_town_list))
             if (len(current_town_list) > 0): 
                 town_list.extend(current_town_list)
-            print(len(town_list))
         return(town_list)
     except:
         print("Error encountered in 'return_town_list_from_ptv_stop_files'...")
@@ -127,20 +136,21 @@ def select_random_town_with_user_input(town_list, try_say, speed):
     """
     random_town = None
     try:
-        say_something(f"I found {len(town_list)} unique towns in this data.", try_say=try_say, speed=speed)
+        say_something(f"\nI found {len(town_list)} towns.", try_say=try_say, speed=speed)
         try_again = True
         while (try_again == True):
             random_town = random.choice(town_list)
             say_something(f"\nMy random town choice is {random_town}", try_say=try_say, speed=speed)      
-            say_something("\nWhat do you think?", try_say=try_say, speed=speed)
-            user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...")
+            say_something("\nWhat do you think?\n", try_say=try_say, speed=speed)
+            # TODO: try to change this to list
+            user_input = get_user_input(prompt_text = "Enter 'n' to try again, \nEnter 'exit' to cancel and exit, \nEnter any other key to continue with this town choice...\n\n")
             if (user_input.upper() == 'EXIT'):
                 return(random_town)
             elif (user_input.upper() == 'N'):
                 try_again = True
             else:
                 try_again = False
-                print(f"Ok. Will return {random_town}")
+                print(f"Ok. Will continue with {random_town}.\n")
         return(random_town)
     except:
         print("Error encountered in 'select_random_town_with_user_input'...")

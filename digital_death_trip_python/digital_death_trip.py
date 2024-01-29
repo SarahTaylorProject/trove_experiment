@@ -15,7 +15,6 @@ clear_screen()
 # options
 search_word = 'tragedy'
 default_speed = 180
-allow_existing_files = True
 max_articles_to_read = 3
 try_say = test_say_something()
 
@@ -28,16 +27,12 @@ trove_key = return_trove_key()
 default_output_path_name = os.path.join(script_directory, 'output_files')
 os.makedirs(default_output_path_name, exist_ok=True)
 
-default_town_data_directory = os.path.join(script_directory, 'town_lists')
+default_town_directory = os.path.join(script_directory, 'town_lists')
 
 print("Hello")
 
 continue_script = True
 trove_result_file_name = ''
-
-existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
-print(f"\nTrove result files already available: {len(existing_trove_result_files)}")
-print_existing_trove_result_files(existing_trove_result_files)
 
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
@@ -51,35 +46,17 @@ prompt_options.append("Type 'exit' to cancel")
 prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
 
 user_input = get_user_input(prompt_text)
-print(f"Your choice: {user_input}\n")
-print(len(user_input))
 
 if (user_input.upper() == 'EXIT'):
     continue_script = False
 elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
-    print("RANDOM TOWN")
-    # here testing different town data; need to make this an interactive function with user choice
-    
-    # 1
-    # town_dictionary = return_town_dictionary_from_single_file(file_name='australian_cities_list.csv',
-    #     directory_name=default_town_data_directory,
-    #     town_file_type='other',
-    #     town_field_num=0, lat_field_num=1, long_field_num=2,
-    #     filter_field_num=5, filter_field_value='Victoria')
-
-    # 2
-    stop_files = return_ptv_stop_files(town_data_directory=default_town_data_directory)
-    town_dictionary = return_town_dictionary_from_ptv_stop_files(stop_files=stop_files)
-
-    # 3
-    # town_dictionary = return_town_dictionary_from_vicmap_file(town_data_directory=default_town_data_directory)
-    
-    town_list = list(town_dictionary.keys())
-
-    print(f"{len(town_list)} towns found in file")
-    search_town = random.choice(town_list)
-    print(f"\nRandom choice: {search_town}")
-#    search_town = select_random_town_with_user_input(default_speed = default_speed, town_data_directory = default_town_data_directory)
+    print("Random town")
+    town_list = return_town_list_with_user_input(speed=default_speed,
+        try_say=try_say, town_directory=default_town_directory)
+    if (len(town_list) > 0):
+        search_town = select_random_town_with_user_input(town_list=town_list, try_say=try_say, speed=default_speed)
+    else:
+        continue_script = False
 elif (user_input.upper() == 'RF'):
     print("\nSelecting random existing Trove file...")
     existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
@@ -99,11 +76,6 @@ if (continue_script == True):
     print("continuing...")
     print(f"Search town: {search_town}")
     print(f"Search word: {search_word}")
-    if (allow_existing_files == True):
-        trove_result_file_name = search_for_matching_trove_file(existing_trove_result_files = existing_trove_result_files, search_town = search_town)
-        if (trove_result_file_name != ''):
-            print("Matching file found already on list, will use this one and be frugal:")
-            print(f"{os.path.basename(trove_result_file_name)}")
 
 # if (continue_script == true and trove_result_file_name == '') then
 #    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
@@ -190,7 +162,7 @@ if (continue_script == True):
 # say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
 
 # puts("\nWill update map files before exiting...")
-# current_result = write_geojson_for_all_csv_files(town_data_directory = default_town_data_directory, output_path_name = default_output_path_name)
+# current_result = write_geojson_for_all_csv_files(town_directory = default_town_directory, output_path_name = default_output_path_name)
 # if (current_result != false) then
 #    puts("\nHave written #{current_result} map objects to your output directory.")
 #    puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")

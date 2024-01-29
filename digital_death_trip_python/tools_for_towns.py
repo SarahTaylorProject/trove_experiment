@@ -28,12 +28,12 @@ def return_town_list_with_user_input(speed, try_say,
         if (source_choice == 'P'):
             town_list = return_town_list_from_ptv_stop_files(town_directory=town_directory)
         elif (source_choice == 'V'):
-            town_list = return_town_list_from_single_file(town_file_name=vicmap_file_name,
+            town_list = return_town_list_from_csv_file(town_file_name=vicmap_file_name,
                 town_directory=town_directory,
                 town_file_type='vicmap',
                 town_field_num=3)
         elif (source_choice == 'A'):
-            town_list = return_town_list_from_single_file(town_file_name=australian_cities_file_name,
+            town_list = return_town_list_from_csv_file(town_file_name=australian_cities_file_name,
                 town_directory=town_directory,
                 town_file_type='other',
                 town_field_num=0)        
@@ -47,8 +47,8 @@ def return_town_list_with_user_input(speed, try_say,
         return(town_list)
 
 
-def return_town_list_from_single_file(town_file_name,
-        town_directory, town_file_type='ptv_stops', town_field_num=1):
+def return_town_list_from_csv_file(town_file_name,
+        town_directory, town_file_type='vicmap', town_field_num=1):
     """
     Returns a dictionary of town names from a single file, can be of varying type
     """
@@ -58,20 +58,24 @@ def return_town_list_from_single_file(town_file_name,
         print(f"Attempting to make town list from file {town_file_path}")
         with open(town_file_path, "r") as f:
             csv_data = list(csv.reader(f))[1:]
+            # STILL NEED TO HANDLE TEXT FILES
             for row in csv_data:
                 print(row)
                 current_town = None
                 if (town_file_type == 'ptv_stops'):
                     current_town = extract_town_string_from_ptv_stop_string(input_string=row[town_field_num])
+                elif (town_file_type == 'vicmap'):
+                    current_town = row[town_field_num]
+                    current_town = current_town.split("(")[0].title()
                 else:
                     current_town = row[town_field_num].title()
                 print(current_town)
                 if (current_town != None):
                     town_list.append(current_town)
-        # IDEA/CHOICE: sort? unique?
+        # TO DECIDE: sort? unique?
         return(town_list)
     except:
-        print(f"Encountered error in 'return_town_list_from_single_file'")
+        print(f"Encountered error in 'return_town_list_from_csv_file'")
         return(town_list)
   
 
@@ -83,7 +87,7 @@ def return_town_list_from_ptv_stop_files(town_directory='', file_pattern='*stops
             file_pattern = file_pattern)
         for stop_file_name in stop_files:
             print(f"Current stop file: {stop_file_name}")
-            current_town_list = return_town_list_from_single_file(file_name=stop_file_name, 
+            current_town_list = return_town_list_from_csv_file(file_name=stop_file_name, 
                 town_file_type = 'ptv_stops', 
                 town_field_num = 1)
             print(len(current_town_list))

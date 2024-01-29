@@ -77,9 +77,11 @@ if (continue_script == True):
     print(f"Search town: {search_town}")
     print(f"Search word: {search_word}")
 
-# if (continue_script == true and trove_result_file_name == '') then
-#    say_something("Ok. I will now see if I can find any newspaper references to a #{search_word} in #{search_town}")
-#    trove_result_file_name = File.join(default_output_path_name, "trove_result_#{search_town}_#{search_word}.csv".gsub(/\s/,"_"))
+if (continue_script == True and trove_result_file_name == ''):
+    say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in #{search_town}", try_say=try_say, speed=default_speed)
+    # TODO: incorporate more file name error catching
+    trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
+    print(trove_result_file_name)
 #    trove_api_results = fetch_trove_search_results(search_town, search_word, my_trove_key)
 #    puts("\nWriting results to file now...")
 #    result_count = write_trove_search_results(trove_api_results, trove_result_file_name, search_word, search_town)

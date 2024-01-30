@@ -1,5 +1,6 @@
 import json
 import os
+import pandas
 import requests
 from tools_for_general_use import *
 
@@ -124,7 +125,7 @@ def search_for_matching_trove_file(existing_trove_result_files, search_town, sea
         for current_file_name in existing_trove_result_files:
             current_town = return_trove_file_search_town(input_trove_file=current_file_name, search_town_field=search_town_field)
             if (current_town == search_town):
-                print(f"Matching town in: #{current_file_name}")
+                print(f"Matching town in: {current_file_name}")
                 if (search_word != ''):
                     print(f"Will also check for search word {search_word}")
                     current_word = return_trove_file_search_word(input_trove_file=current_file_name, search_word_field=search_word_field)
@@ -133,7 +134,7 @@ def search_for_matching_trove_file(existing_trove_result_files, search_town, sea
             
             if (current_town.upper() == search_town.upper()):
                 if (current_word.upper() == search_word.upper()):                
-                    print(f"Matching file: #{current_file_name}")
+                    print(f"Matching file: {current_file_name}")
                 return(current_file_name)
   
         return(matching_trove_file)
@@ -141,55 +142,141 @@ def search_for_matching_trove_file(existing_trove_result_files, search_town, sea
         print(f"Error encountered in 'search_for_matching_trove_file', returning empty list...")
         return(matching_trove_file)
 
+
+
 def fetch_trove_search_result(trove_key='', search_town='', search_word='', 
-                              trove_search_base="https://api.trove.nla.gov.au/v3/result?",
-                              search_term_divider='%22', search_term_joiner='%20',
-                              search_category='newspaper',
-                              result_s='%2A',
-                              result_n=20,
-                              result_sortby='relevance',
-                              result_bulkharvest='false',
-                              result_reclevel='brief',
-                              result_encoding='json'):
-    # EXAMPLE
-    #https://api.trove.nla.gov.au/v3/result?category=newspaper
-    #&q=elmore%20tragedy&s=%2A&n=20&sortby=relevance&bulkHarvest=false&reclevel=brief&encoding=xml
-    # TODO: make into separate funciton to build URL, and try URL, respectively
+                           trove_search_base="https://api.trove.nla.gov.au/v3/result?",
+                           url_quote='%22', url_space='%20',
+                           search_category='newspaper',
+                           result_start='%2A',
+                           result_n=20,
+                           result_sortby='relevance',
+                           result_bulkharvest='false',
+                           result_reclevel='brief',
+                           result_encoding='json'):
+    """
+    Build URL and try request for Trove basic search
+    """
     trove_search_result = None
-    print(trove_key)
-    search_q_list = []
-    for input_word in [search_town, search_word]:
-        current_word = remove_nuisance_characters_from_string(input_word)
-        current_word = current_word.replace(' ', search_term_joiner)
-        if (len(current_word) > 0):
-            search_q_list.append(current_word)
-
-    search_q = search_term_divider.join(search_q_list)
-    print(search_q)
-
-    request_list = []
-    request_list.append(f"key={trove_key}")
-    request_list.append(f"q={search_q}")
-    request_list.append(f"category={search_category}")
-    request_list.append(f"s={result_s}")
-    request_list.append(f"n={result_n}")
-    request_list.append(f"sortby={result_sortby}")
-    request_list.append(f"bulkHarvest={result_bulkharvest}")
-    request_list.append(f"reclevel={result_reclevel}")
-    request_list.append(f"encoding={result_encoding}")
-
-    trove_search_string = "&".join(request_list)
-    trove_search_request = trove_search_base + trove_search_string
-    print(trove_search_request)
     try:
-        trove_search_result = requests.get(trove_search_request)
-        print(trove_search_result)
-        if (trove_search_result.status_code == 200):
-            trove_result_json = json.loads(trove_search_result.content)
-            print(trove_result_json)
-            #test_csv = f"trove_result_{search_town}_{search_word}.csv"
-            # TODO: better file naming, and separate; also maybe include date
-            # TODO: lots of parsing of results, put in separate functions
-    except:
-        print("Error getting API results")
+        search_string_list = []
+        for input_word in [search_town, search_word]:
+            current_word = remove_nuisance_characters_from_string(input_word)
+            current_word = url_quote + current_word.replace(' ', url_space) + url_quote
+            if (len(current_word) > 0):
+                search_string_list.append(current_word)
+
+        search_string = url_space.join(search_string_list)
+        print(search_string)
+
+        request_list = []
+        request_list.append(f"key={trove_key}")
+        request_list.append(f"q={search_string}")
+        request_list.append(f"category={search_category}")
+        request_list.append(f"n={result_n}")
+        request_list.append(f"sortby={result_sortby}")
+        request_list.append(f"bulkHarvest={result_bulkharvest}")
+        request_list.append(f"reclevel={result_reclevel}")
+        request_list.append(f"encoding={result_encoding}")
+        request_list.append(f"s={result_start}")
+
+        trove_search_string = "&".join(request_list)
+        trove_search_url = trove_search_base + trove_search_string
+        print(trove_search_url)
+        
+        trove_search_full_result = trove_search_result = requests.get(trove_search_url)
+        if (trove_search_full_result.status_code == 200):
+            trove_search_result= json.loads(trove_search_full_result.content)
+            print(trove_search_result)
         return(trove_search_result)
+    
+    except:
+        print("Error getting API results...")
+        return(trove_search_result)
+
+
+def parse_trove_result_metadata(trove_search_result, search_word='', search_town='', category_code='newspaper'):
+    result_metadata = {}
+    try:
+        result_metadata["search_town"] = search_town
+        result_metadata["search_word"] = search_word
+        result_metadata["category_code"] = category_code
+
+        result_metadata["total"] = None
+        result_metadata["s"] = None
+        result_metadata["n"] = None
+        result_metadata["next"] = None
+        result_metadata["nextStart"] = None
+
+        category_list = trove_search_result["category"]
+        for current_category in category_list:
+            if current_category["code"] == category_code:
+                current_category_records = current_category["records"]
+                for key in result_metadata:
+                    if key in current_category_records:
+                        result_metadata[key] = current_category_records[key]
+    
+        return(result_metadata)
+    except:
+        print("Error parsing metadata...")
+        return(result_metadata)
+
+
+def parse_trove_search_result_records(trove_search_result,
+                                      category_code='newspaper',
+                                      start_count=0,  
+                                      result_headings=["result_number", "url", "heading", "title", "date", "page", "snippet", "id"]):
+    result_records = []
+    try:
+        category_list = trove_search_result["category"]
+        result_count = start_count
+        for current_category in category_list:
+            if current_category["code"] == category_code:
+                current_category_articles = current_category["records"]["article"]
+                for current_article in current_category_articles:
+                    result_count += 1
+                    print(current_article)
+                    current_result = dict.fromkeys(result_headings)
+                    current_result["result_number"] = result_count
+                    for key in result_headings:
+                        if key in current_article:
+                            current_result[key] = current_article[key]
+                    result_records.append(current_result)
+        # TODO: deal with making multiple requests when there are many records
+        # TODO: put individual article parsing in separate funciton to deal with potential duds
+
+        print(result_records)
+        return(result_records)
+    except:
+        print("error")
+        return(result_records)
+
+#     print("this will execute")
+#             metadata_total = trove_search_result["category"]["records"]
+# "s" : "*",
+#       "n" : 20,
+#       "total" : 28385,
+#       "next" : "https://api.trove.nla.gov.au/v3/result?q=Scarness%22tragedy&category=newspaper&n=20&sortby=relevance&bulkHarvest=false&reclevel=brief&encoding=json&s=AoIIQ5IZ5ikxNDk5NTczNDE%3D",
+#       "nextStart" : "AoIIQ5IZ5ikxNDk5NTczNDE="
+
+#         if "category" in trove_search_result:
+
+# search_word	search_town	result_number	trove_url	trove_article_heading	trove_article_title	trove_article_	trove_article_page	trove_article_snippet	trove_id
+
+
+# #     result_count = 0
+# #     # TODO: check if file exists, and then check if ID exists
+
+# #    CSV.open(output_file_name, 'w') do |csv|
+   
+# #       csv << ["search_word", "search_town", "result_number", "trove_url", "trove_article_heading", "trove_article_title", "trove_article_", "trove_article_page", "trove_article_snippet", "trove_id"]
+      
+# #       trove_api_results.xpath('//article').each do |trove_article|
+# #          result_count = result_count + 1      
+# #          csv << [search_word, search_town, result_count, trove_article.xpath('troveUrl').text, trove_article.xpath('heading').text, trove_article.xpath('title').text, trove_article.xpath('date').text, 
+# #             trove_article.xpath('page').text, trove_article.xpath('snippet').text.gsub(/<strong>|<\/strong>/,""), trove_article.attr('id')]
+
+# #        end#of article
+#     except:
+#         print("error")
+#         return(result)

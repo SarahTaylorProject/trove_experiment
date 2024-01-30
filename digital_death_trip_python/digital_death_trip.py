@@ -22,7 +22,6 @@ script_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = return_parent_directory(script_directory)
 operating_system = return_operating_system()
 trove_key = return_trove_key()
-print(trove_key)
 
 default_output_path_name = os.path.join(script_directory, 'output_files')
 os.makedirs(default_output_path_name, exist_ok=True)
@@ -85,23 +84,36 @@ if (continue_script == True):
     print(f"Search word: {search_word}")
 
 if (continue_script == True and trove_result_file_name == ''):
-    say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in #{search_town}", try_say=try_say, speed=default_speed)
+    say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in {search_town}", try_say=try_say, speed=default_speed)
     # TODO: incorporate more file name error catching
     trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
     print(trove_result_file_name)
-    trove_api_results = fetch_trove_search_result(trove_key=trove_key, search_town=search_town, search_word=search_word)
+    trove_search_result = fetch_trove_search_result(trove_key=trove_key, search_town=search_town, search_word=search_word)
+    if (trove_search_result == None):        
+        continue_script = False
+        say_something(f"\nSorry, no {search_word} results found for {search_town}")
+    else:
+        trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
+        print(trove_search_result_metadata)
+        result_count = trove_search_result_metadata["total"]
+        print(f"\n{result_count} result/s found for {search_town}")
+        if (result_count == 0):
+            continue_script = False
+        
+if (continue_script == True):
+    say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
+    say_something(f"\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
+    result = parse_trove_search_result_records(trove_search_result)
+    print(result)
+    
+    # IDEA: summary of key words
 #    puts("\nWriting results to file now...")
-#    result_count = write_trove_search_results(trove_api_results, trove_result_file_name, search_word, search_town)
+#    result_count = write_trove_results(trove_result, trove_result_file_name, search_word, search_town)
 #    puts(result_count)
 
-#    if (result_count == 0) then
-#       continue_script = false
-#       say_something("\nSorry, no #{search_word} results found for #{search_town}")
-#    end
-# end
 
 # if (continue_script == true) then
-#    result_count = count_trove_search_results_from_csv(trove_result_file_name)
+#    result_count = count_trove_results_from_csv(trove_result_file_name)
 #    random_article_range = Array(1..result_count)
 #    say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
 #    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")

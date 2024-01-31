@@ -222,61 +222,33 @@ def parse_trove_result_metadata(trove_search_result, search_word='', search_town
         return(result_metadata)
 
 
-def parse_trove_search_result_records(trove_search_result,
-                                      category_code='newspaper',
-                                      start_count=0,  
-                                      result_headings=["result_number", "url", "heading", "title", "date", "page", "snippet", "id"]):
+def parse_trove_result_records_to_df(trove_search_result,
+                                     result_metadata=None,
+                                     category_code='newspaper',
+                                     result_headings=["url", "heading", "title", "date", "page", "snippet", "id"]):
     result_records = []
     try:
         category_list = trove_search_result["category"]
-        result_count = start_count
         for current_category in category_list:
             if current_category["code"] == category_code:
                 current_category_articles = current_category["records"]["article"]
                 for current_article in current_category_articles:
-                    result_count += 1
                     print(current_article)
-                    current_result = dict.fromkeys(result_headings)
-                    current_result["result_number"] = result_count
+                    current_article_dict = dict.fromkeys(result_headings)
                     for key in result_headings:
                         if key in current_article:
-                            current_result[key] = current_article[key]
-                    result_records.append(current_result)
+                            current_article_dict[key] = current_article[key]
+
+                    if (result_metadata != None):
+                        current_article_dict.update(result_metadata)
+ 
+                    result_records.append(current_article_dict)
         # TODO: deal with making multiple requests when there are many records
         # TODO: put individual article parsing in separate funciton to deal with potential duds
-
+        result_df = pandas.DataFrame.from_dict(result_records)
         print(result_records)
-        return(result_records)
+        print(result_df)
+        return(result_df)
     except:
         print("error")
         return(result_records)
-
-#     print("this will execute")
-#             metadata_total = trove_search_result["category"]["records"]
-# "s" : "*",
-#       "n" : 20,
-#       "total" : 28385,
-#       "next" : "https://api.trove.nla.gov.au/v3/result?q=Scarness%22tragedy&category=newspaper&n=20&sortby=relevance&bulkHarvest=false&reclevel=brief&encoding=json&s=AoIIQ5IZ5ikxNDk5NTczNDE%3D",
-#       "nextStart" : "AoIIQ5IZ5ikxNDk5NTczNDE="
-
-#         if "category" in trove_search_result:
-
-# search_word	search_town	result_number	trove_url	trove_article_heading	trove_article_title	trove_article_	trove_article_page	trove_article_snippet	trove_id
-
-
-# #     result_count = 0
-# #     # TODO: check if file exists, and then check if ID exists
-
-# #    CSV.open(output_file_name, 'w') do |csv|
-   
-# #       csv << ["search_word", "search_town", "result_number", "trove_url", "trove_article_heading", "trove_article_title", "trove_article_", "trove_article_page", "trove_article_snippet", "trove_id"]
-      
-# #       trove_api_results.xpath('//article').each do |trove_article|
-# #          result_count = result_count + 1      
-# #          csv << [search_word, search_town, result_count, trove_article.xpath('troveUrl').text, trove_article.xpath('heading').text, trove_article.xpath('title').text, trove_article.xpath('date').text, 
-# #             trove_article.xpath('page').text, trove_article.xpath('snippet').text.gsub(/<strong>|<\/strong>/,""), trove_article.attr('id')]
-
-# #        end#of article
-#     except:
-#         print("error")
-#         return(result)

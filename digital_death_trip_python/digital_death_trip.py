@@ -103,8 +103,11 @@ if (continue_script == True and trove_result_file_name == ''):
 if (continue_script == True):
     say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
     say_something(f"\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
-    result = parse_trove_search_result_records(trove_search_result)
+    result = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
     print(result)
+    trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
+    print(trove_result_file_name)
+    result.to_csv(trove_result_file_name)
     
     # IDEA: summary of key words
 #    puts("\nWriting results to file now...")

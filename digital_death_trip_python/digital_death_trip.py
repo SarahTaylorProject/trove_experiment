@@ -74,6 +74,7 @@ elif (user_input.upper() == 'RF'):
         print(f"Selected file: {os.path.basename(trove_result_file_name)}")
         search_town = return_trove_file_search_town(trove_result_file_name)
         search_word = return_trove_file_search_word(trove_result_file_name)
+        result_count = return_trove_file_result_count(trove_result_file_name)
 else:
     search_town = user_input.strip().title()
 
@@ -103,12 +104,15 @@ if (continue_script == True and trove_result_file_name == ''):
 if (continue_script == True):
     say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
     say_something(f"\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
-    result = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
-    print(result)
-    trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
-    print(trove_result_file_name)
-    result.to_csv(trove_result_file_name)
-    
+    # option to just read csv
+    if (trove_result_file_name == ''):
+        trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
+        trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
+        print(trove_result_file_name)
+        trove_result_df.to_csv(trove_result_file_name)
+    else:
+        trove_result_df = pandas.read_csv(trove_result_file_name)
+    print(trove_result_df)
     # IDEA: summary of key words
 #    puts("\nWriting results to file now...")
 #    result_count = write_trove_results(trove_result, trove_result_file_name, search_word, search_town)

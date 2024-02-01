@@ -72,7 +72,7 @@ def print_existing_trove_result_files(existing_trove_result_files):
         return()
 
 
-def return_trove_file_search_town(input_trove_file, search_town_field=1, delimiter=","):
+def return_trove_file_search_town(input_trove_file, search_town_field="search_town"):
     """
     Returns the town name for a Trove CSV file, by using the first row 
     This is marginally easier than inferring the search town from the file name
@@ -81,36 +81,40 @@ def return_trove_file_search_town(input_trove_file, search_town_field=1, delimit
     """
     search_town = ''
     try:
-        first_line = return_first_line_of_csv_file(input_trove_file)
-        if (first_line != None):
-            search_town = first_line[search_town_field]
+        trove_df = pandas.read_csv(input_trove_file)
+        search_town = trove_df[search_town_field].iloc[0]
         return(search_town)
     except:
         print(f"Error encountered in 'return_trove_file_search_town', returning {search_town}...")
         return(search_town)
 
 
-def return_trove_file_search_word(input_trove_file, search_word_field=0, delimiter=","):
+def return_trove_file_search_word(input_trove_file, search_word_field="search_word"):
     """
-    Returns the search word for a Trove CSV file, by using the first row 
+    Returns the search word for a Trove CSV file
     This is marginally easier than inferring the search word from the file name
     If errors encountered, returns blank string
-    If successful, returns the search town name from the Trove search result CSV file (defaults to field 1)
+    If successful, returns the search town name from the Trove search result CSV file
     """
     search_word = ''
     try:
-        first_line = return_first_line_of_csv_file(input_trove_file)
-        if (first_line != None):
-            search_word = first_line[search_word_field]
+        trove_df = pandas.read_csv(input_trove_file)
+        search_word = trove_df[search_word_field].iloc[0]
         return(search_word)
     except:
         print(f"Error encountered in 'return_trove_file_search_word', returning {search_word}...")
         return(search_word)
 
 
-def count_trove_search_results_from_csv(input_trove_file):
-    result = return_line_count_of_csv_file(input_trove_file)
-    return(result)
+def return_trove_file_result_count(input_trove_file):
+    result = None
+    try:
+        trove_df = pandas.read_csv(input_trove_file)
+        result = len(trove_df)
+        return(result)
+    except:
+        print(f"Error encountered in 'return_trove_file_search_word', returning {search_word}...")
+        return(result)
 
 
 def search_for_matching_trove_file(existing_trove_result_files, search_town, search_word='', search_word_field=0, search_town_field=1):

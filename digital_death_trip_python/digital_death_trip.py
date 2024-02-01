@@ -75,6 +75,7 @@ elif (user_input.upper() == 'RF'):
         search_town = return_trove_file_search_town(trove_result_file_name)
         search_word = return_trove_file_search_word(trove_result_file_name)
         result_count = return_trove_file_result_count(trove_result_file_name)
+        trove_result_df = pandas.read_csv(trove_result_file_name)
 else:
     search_town = user_input.strip().title()
 
@@ -87,8 +88,6 @@ if (continue_script == True):
 if (continue_script == True and trove_result_file_name == ''):
     say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in {search_town}", try_say=try_say, speed=default_speed)
     # TODO: incorporate more file name error catching
-    trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
-    print(trove_result_file_name)
     trove_search_result = fetch_trove_search_result(trove_key=trove_key, search_town=search_town, search_word=search_word)
     if (trove_search_result == None):        
         continue_script = False
@@ -100,32 +99,26 @@ if (continue_script == True and trove_result_file_name == ''):
         print(f"\n{result_count} result/s found for {search_town}")
         if (result_count == 0):
             continue_script = False
+        else:
+            say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
+            trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
+            trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
+            print(trove_result_file_name)
+            trove_result_df.to_csv(trove_result_file_name)
         
+# IDEA: summary of key words
+
 if (continue_script == True):
-    say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
-    say_something(f"\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
-    # option to just read csv
-    if (trove_result_file_name == ''):
-        trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
-        trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
-        print(trove_result_file_name)
-        trove_result_df.to_csv(trove_result_file_name)
-    else:
-        trove_result_df = pandas.read_csv(trove_result_file_name)
-    print(trove_result_df)
-    # IDEA: summary of key words
-#    puts("\nWriting results to file now...")
-#    result_count = write_trove_results(trove_result, trove_result_file_name, search_word, search_town)
-#    puts(result_count)
-
-
-# if (continue_script == true) then
-#    result_count = count_trove_results_from_csv(trove_result_file_name)
-#    random_article_range = Array(1..result_count)
-#    say_something("\nI now have #{result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the #{search_word}s in #{search_town}?", also_print = true, speed = default_speed)
+    # TODO: neaten the work with result count: total results vs available result
+    available_result_count = return_trove_file_result_count(trove_result_file_name)
+    for field_name in ["trove_article_heading", "heading"]:
+        if (field_name in trove_result_df):
+            heading_field_name = field_name
+    print(trove_result_df[heading_field_name])
+    #say_something(f"\nI now have {result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
 #    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
 #    if (user_input.upcase == 'EXIT') then
-#       continue_script = false
+#       continue_script = False
 #    elsif (user_input.upcase == 'ALL') then
 #       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
 #    elsif (user_input.upcase != 'N') then

@@ -75,6 +75,7 @@ elif (user_input.upper() == 'RF'):
         search_town = return_trove_file_search_town(trove_result_file_name)
         search_word = return_trove_file_search_word(trove_result_file_name)
         result_count = return_trove_file_result_count(trove_result_file_name)
+        print(f"\n{result_count} result/s found on file for {search_town}")
         trove_result_df = pandas.read_csv(trove_result_file_name)
 else:
     search_town = user_input.strip().title()
@@ -88,7 +89,8 @@ if (continue_script == True):
 if (continue_script == True and trove_result_file_name == ''):
     say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in {search_town}", try_say=try_say, speed=default_speed)
     # TODO: incorporate more file name error catching
-    trove_search_result = fetch_trove_search_result(trove_key=trove_key, search_town=search_town, search_word=search_word)
+    trove_search_url = build_trove_search_url(trove_key=trove_key, search_town=search_town, search_word=search_word)
+    trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url)
     if (trove_search_result == None):        
         continue_script = False
         say_something(f"\nSorry, no {search_word} results found for {search_town}")
@@ -96,7 +98,7 @@ if (continue_script == True and trove_result_file_name == ''):
         trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
         print(trove_search_result_metadata)
         result_count = trove_search_result_metadata["total"]
-        print(f"\n{result_count} result/s found for {search_town}")
+        print(f"\n{result_count} total result/s found for {search_town}")
         if (result_count == 0):
             continue_script = False
         else:
@@ -104,7 +106,23 @@ if (continue_script == True and trove_result_file_name == ''):
             trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
             trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
             print(trove_result_file_name)
+            # TODO: give option to create multiple calls or not
+            print(f"Writing to {trove_result_file_name}")
             trove_result_df.to_csv(trove_result_file_name)
+            next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
+            max_calls = 10
+            call_count = 0
+            while (next_url != None and call_count < max_calls):
+                call_count += 1
+                # TODO: move key repeated steps to function
+                trove_search_url = next_url
+                trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url)
+                trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
+                trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
+                print(call_count)
+                print(f"Appending to {trove_result_file_name}")
+                trove_result_df.to_csv(trove_result_file_name, mode='a', header=False)
+
         
 # IDEA: summary of key words
 

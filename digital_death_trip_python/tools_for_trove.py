@@ -47,7 +47,9 @@ def try_read_trove_key_file(trove_key_file_path="my_trove.txt"):
         return(trove_key)
     
 
-def return_existing_trove_result_files(output_path_name, also_print=False, file_pattern="trove_result*"):
+def return_existing_trove_result_files(output_path_name, 
+                                       also_print=False, 
+                                       file_pattern="trove_result*"):
     existing_trove_result_files = []
     try:
         existing_trove_result_files = return_matching_file_names(input_path_name=output_path_name, 
@@ -66,7 +68,7 @@ def print_existing_trove_result_files(existing_trove_result_files):
         for file_name in existing_trove_result_files:
             search_town = return_trove_file_search_town(file_name)
             search_word = return_trove_file_search_word(file_name)
-            result_count = count_trove_search_results_from_csv(file_name)
+            result_count = return_trove_file_result_count(file_name)
             print(f"{os.path.basename(file_name)}: {search_town} {search_word} ({result_count} records)")
     except:
         return()
@@ -117,7 +119,9 @@ def return_trove_file_result_count(input_trove_file):
         return(result)
 
 
-def search_for_matching_trove_file(existing_trove_result_files, search_town, search_word='', search_word_field=0, search_town_field=1):
+def search_for_matching_trove_file(existing_trove_result_files, 
+                                   search_town, search_word='', 
+                                   search_word_field=0, search_town_field=1):
     """
     Looks for a matching Trove file from list: the first (if any) that matches the search_town and search_word
     Can save an unnecessary internet search if file already exists
@@ -148,20 +152,20 @@ def search_for_matching_trove_file(existing_trove_result_files, search_town, sea
 
 
 
-def fetch_trove_search_result(trove_key='', search_town='', search_word='', 
-                           trove_search_base="https://api.trove.nla.gov.au/v3/result?",
-                           url_quote='%22', url_space='%20',
-                           search_category='newspaper',
-                           result_start='%2A',
-                           result_n=20,
-                           result_sortby='relevance',
-                           result_bulkharvest='false',
-                           result_reclevel='brief',
-                           result_encoding='json'):
+def build_trove_search_url(trove_key='',
+                                search_town='', search_word='',
+                                trove_search_base="https://api.trove.nla.gov.au/v3/result?",
+                                url_quote='%22', url_space='%20',
+                                search_category='newspaper',
+                                result_start='%2A', result_n=20,
+                                result_sortby='relevance',
+                                result_bulkharvest='false',
+                                result_reclevel='brief',
+                                result_encoding='json'):
     """
-    Build URL and try request for Trove basic search
+    Build URL for Trove search: suited to the Digital Death Trip town search
     """
-    trove_search_result = None
+    trove_search_url = None
     try:
         search_string_list = []
         for input_word in [search_town, search_word]:
@@ -187,25 +191,38 @@ def fetch_trove_search_result(trove_key='', search_town='', search_word='',
         trove_search_string = "&".join(request_list)
         trove_search_url = trove_search_base + trove_search_string
         print(trove_search_url)
-        
+        return(trove_search_url)
+    except:
+        print("Error getting API results...")
+        return(trove_search_url)
+
+
+def fetch_trove_search_result(trove_key='',
+                              trove_search_url=''):
+    trove_search_result = None
+    try:
+        if ('key=' not in trove_search_url):
+            trove_search_url = trove_search_url + "&key=" + trove_key
         trove_search_full_result = trove_search_result = requests.get(trove_search_url)
         if (trove_search_full_result.status_code == 200):
             trove_search_result= json.loads(trove_search_full_result.content)
             print(trove_search_result)
-        return(trove_search_result)
-    
+        return(trove_search_result)    
     except:
         print("Error getting API results...")
         return(trove_search_result)
 
 
-def parse_trove_result_metadata(trove_search_result, search_word='', search_town='', category_code='newspaper'):
+def parse_trove_result_metadata(trove_search_result,
+                                search_word='', search_town='',
+                                category_code='newspaper'):
     result_metadata = {}
     try:
         result_metadata["search_town"] = search_town
         result_metadata["search_word"] = search_word
         result_metadata["category_code"] = category_code
 
+        # TODO: rewrite as a list
         result_metadata["total"] = None
         result_metadata["s"] = None
         result_metadata["n"] = None
@@ -224,6 +241,19 @@ def parse_trove_result_metadata(trove_search_result, search_word='', search_town
     except:
         print("Error parsing metadata...")
         return(result_metadata)
+
+
+def return_next_url_from_trove_result_metadata(trove_result_metadata, next_field_name="next"):
+    next_url = None
+    # todo: fix naming conventions re: result, search, etc.
+    try:
+        if (next_field_name in trove_result_metadata):
+            next_url = trove_result_metadata[next_field_name]
+        print(f"Next URL: {next_url}")
+        return(next_url)
+    except:
+        print("Error getting API results...")
+        return(next_url) 
 
 
 def parse_trove_result_records_to_df(trove_search_result,

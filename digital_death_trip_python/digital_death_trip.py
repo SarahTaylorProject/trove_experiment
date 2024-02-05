@@ -13,8 +13,11 @@ clear_screen()
 
 # options
 search_word = 'tragedy'
+# IDEA: use random word generator
+
 default_speed = 180
 max_articles_to_read = 3
+max_calls = 20
 try_say = test_say_something()
 
 # directory setup
@@ -80,6 +83,7 @@ elif (user_input.upper() == 'RF'):
 else:
     search_town = user_input.strip().title()
 
+# TODO: add option for choosing search word; tragedy is too depressing all the time
 
 if (continue_script == True):
     print("continuing...")
@@ -108,9 +112,8 @@ if (continue_script == True and trove_result_file_name == ''):
             print(trove_result_file_name)
             # TODO: give option to create multiple calls or not
             print(f"Writing to {trove_result_file_name}")
-            trove_result_df.to_csv(trove_result_file_name)
+            trove_result_df.to_csv(trove_result_file_name, index=False)
             next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
-            max_calls = 10
             call_count = 0
             while (next_url != None and call_count < max_calls):
                 call_count += 1
@@ -119,20 +122,24 @@ if (continue_script == True and trove_result_file_name == ''):
                 trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url)
                 trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
                 trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
-                print(call_count)
+                print(f"Total results from search {search_town} {search_word}: {result_count}")
+                print(f"API call number {call_count} of maximum {max_calls}")
                 print(f"Appending to {trove_result_file_name}")
-                trove_result_df.to_csv(trove_result_file_name, mode='a', header=False)
-
+                trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
+                next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
+                print(f"\n{next_url}")
         
 # IDEA: summary of key words
 
 if (continue_script == True):
     # TODO: neaten the work with result count: total results vs available result
     available_result_count = return_trove_file_result_count(trove_result_file_name)
-    for field_name in ["trove_article_heading", "heading"]:
+    summary_fields = []
+    for field_name in ["year", "trove_article_heading", "heading"]:
         if (field_name in trove_result_df):
-            heading_field_name = field_name
-    print(trove_result_df[heading_field_name])
+            summary_fields.append(field_name)
+    print(summary_fields)
+    print(trove_result_df[summary_fields])
     #say_something(f"\nI now have {result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
 #    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
 #    if (user_input.upcase == 'EXIT') then

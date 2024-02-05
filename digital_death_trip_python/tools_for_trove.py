@@ -227,7 +227,6 @@ def parse_trove_result_metadata(trove_search_result,
         result_metadata["s"] = None
         result_metadata["n"] = None
         result_metadata["next"] = None
-        result_metadata["nextStart"] = None
 
         category_list = trove_search_result["category"]
         for current_category in category_list:
@@ -259,7 +258,7 @@ def return_next_url_from_trove_result_metadata(trove_result_metadata, next_field
 def parse_trove_result_records_to_df(trove_search_result,
                                      result_metadata=None,
                                      category_code='newspaper',
-                                     result_headings=["url", "heading", "title", "date", "page", "snippet", "id"]):
+                                     result_headings=["year", "heading", "snippet", "troveUrl", "id", "url", "date", "title", "page", "relevance"]):
     result_records = []
     try:
         category_list = trove_search_result["category"]
@@ -272,13 +271,12 @@ def parse_trove_result_records_to_df(trove_search_result,
                     for key in result_headings:
                         if key in current_article:
                             current_article_dict[key] = current_article[key]
-
+                    current_article_dict["year"] = current_article_dict["date"].split("-")[0]
                     if (result_metadata != None):
                         current_article_dict.update(result_metadata)
  
                     result_records.append(current_article_dict)
-        # TODO: deal with making multiple requests when there are many records
-        # TODO: put individual article parsing in separate funciton to deal with potential duds
+        # TODO: put individual article parsing in separate function to deal with potential duds
         result_df = pandas.DataFrame.from_dict(result_records)
         print(result_records)
         print(result_df)

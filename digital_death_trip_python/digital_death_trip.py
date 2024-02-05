@@ -184,14 +184,14 @@ while (continue_script == True and article_number == None):
             article_number = int(user_input) 
             say_something("Ok. Let's see.", try_say=try_say, speed=default_speed)
             article = trove_result_df.loc[article_number]
-            print(article)
+            print(article[summary_fields])
     else:
         article_number = random.choice(trove_result_df.index)
         print(article_number)
         say_something("Ok. Let's see. Here is my random #{search_word} from #{search_town}.", try_say=try_say, speed=default_speed)
         # TODO: reduce repetition with pick option
         article = trove_result_df.loc[article_number]
-        print(article)
+        print(article[summary_fields])
         # TODO: OPTION TO KEEP LOOPING! currently stops
 
 #    if (continue_script == true) then  

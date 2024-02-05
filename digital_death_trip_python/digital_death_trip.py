@@ -18,7 +18,7 @@ search_word = 'tragedy'
 # IDEA: use random word generator, or at least an override option
 default_speed = 180
 max_articles_to_read = 3
-max_calls = 20
+max_calls = 10
 try_say = test_say_something()
 continue_script = True
 trove_result_file_name = ''
@@ -142,6 +142,7 @@ if (continue_script == True):
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
+    # NOTE: I think this summary is better than the random picker; extend on this and summarise?
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
@@ -163,7 +164,7 @@ if (continue_script == True):
                                   row_numbers=random_row_numbers)
    
 if (continue_script == True): 
-    say_something("\nShall I pick a random #{search_word} from this place?", try_say=try_say, speed=default_speed)
+    say_something(f"\nShall I pick a random {search_word} from this place?", try_say=try_say, speed=default_speed)
     say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  
     #TODO: build this functionality; and decide on best option for using ID field
 

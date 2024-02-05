@@ -141,51 +141,59 @@ if (continue_script == True):
     for field_name in ["year", "trove_article_heading", "heading", "date", "snippet"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
-    print(summary_fields)
+    
+    print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
-    say_something(f"\nI now have {result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
+
+    say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
     user_input = get_user_input(prompt_text="Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
     if (user_input.upper() == 'EXIT'):
         continue_script = False
     elif (user_input.upper() != 'N'):
         # reads summaries of random sample
-        sample_size = 5
+        sample_size = 10
+        if (available_result_count < sample_size):
+            sample_size = available_result_count
         random_row_numbers = random.sample(range(0, available_result_count), sample_size)
         random_row_numbers = list(set(random_row_numbers))
         read_trove_summary_fields(trove_result_df=trove_result_df, 
                                   try_say=try_say,
                                   speed=default_speed,
-                                  summary_fields=summary_fields, 
+                                  summary_fields=["year", "heading"], 
                                   row_numbers=random_row_numbers)
    
-# if (continue_script == true) then 
-#    say_something("\nShall I pick a random #{search_word} from this place?", also_print = true, speed = default_speed)
-#    say_something("Or let me know if you would like to pick a specific article.", also_print = true, speed = default_speed)  
-# end
+if (continue_script == True): 
+    say_something("\nShall I pick a random #{search_word} from this place?", try_say=try_say, speed=default_speed)
+    say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  
+    #TODO: build this functionality; and decide on best option for using ID field
 
-# while (continue_script == true) do      
-#    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.")
-#    if (user_input.upcase == 'EXIT') then
-#       continue_script = false
-#    elsif (user_input.upcase == 'PICK') then 
-#       say_something("\nWhich article are you interested in?", also_print = true, speed = default_speed)  
-#       user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
-#       if (user_input.upcase == 'EXIT') then
-#          continue_script = false
-#       else
-#          article_numbers = return_int_array_from_string(user_input, divider = ",")   
-#          if (article_numbers == false) then
-#             continue_script = false
-#          else
-#             say_something("Ok. Let's see.", also_print = true, speed = default_speed)
-#             article_number = article_numbers[0]
-#          end
-#       end
-#    else
-#       article_number = random_article_range.sample
-#       say_something("Ok. Let's see. Here is my random #{search_word} from #{search_town}.", also_print = true, speed = default_speed)
-#       puts(article_number)
-#    end
+article_number = None
+# TODO: fix loop condition
+while (continue_script == True and article_number == None):      
+    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.")
+    # TODO: update the user input format to list
+    if (user_input.upper() == 'EXIT'):
+        continue_script = False
+    elif (user_input.upper() == 'PICK'):
+        say_something("\nWhich article are you interested in?", try_say=try_say, speed = default_speed)  
+        user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
+        # TODO: decide on whether to use article number or row number
+        if (user_input.upper() == 'EXIT'):
+            continue_script = False
+        else:
+            article_number = int(user_input) 
+            say_something("Ok. Let's see.", try_say=try_say, speed=default_speed)
+            article = trove_result_df.loc[article_number]
+            print(article)
+    else:
+        article_number = random.choice(trove_result_df.index)
+        print(article_number)
+        say_something("Ok. Let's see. Here is my random #{search_word} from #{search_town}.", try_say=try_say, speed=default_speed)
+        # TODO: reduce repetition with pick option
+        article = trove_result_df.loc[article_number]
+        print(article)
+        # TODO: OPTION TO KEEP LOOPING! currently stops
+
 #    if (continue_script == true) then  
 #       puts(article_number)
 #       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
@@ -211,11 +219,4 @@ if (continue_script == True):
 
 # say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
 
-# puts("\nWill update map files before exiting...")
-# current_result = write_geojson_for_all_csv_files(town_directory = default_town_directory, output_path_name = default_output_path_name)
-# if (current_result != false) then
-#    puts("\nHave written #{current_result} map objects to your output directory.")
-#    puts("\nYou may find the map files useful.\nYou can open them in QGIS or in Google Maps.")
-# else
-#    puts("\nSorry, encountered error with updating map files.")
-# end
+# TODO: replicate some map summary potential here

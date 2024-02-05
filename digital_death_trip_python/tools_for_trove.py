@@ -248,7 +248,7 @@ def return_next_url_from_trove_result_metadata(trove_result_metadata, next_field
     try:
         if (next_field_name in trove_result_metadata):
             next_url = trove_result_metadata[next_field_name]
-        print(f"Next URL: {next_url}")
+        # print(f"Next URL: {next_url}")
         return(next_url)
     except:
         print("Error getting API results...")
@@ -266,7 +266,6 @@ def parse_trove_result_records_to_df(trove_search_result,
             if current_category["code"] == category_code:
                 current_category_articles = current_category["records"]["article"]
                 for current_article in current_category_articles:
-                    print(current_article)
                     current_article_dict = dict.fromkeys(result_headings)
                     for key in result_headings:
                         if key in current_article:
@@ -293,8 +292,8 @@ def read_trove_summary_fields(trove_result_df,
                               row_numbers=[0, 1, 2]):
     print("\n***")
     for row_number in row_numbers:
-        print(f"\nRow number: {row_number}")
         row = trove_result_df.loc[row_number]
+        say_something(f"ARTICLE: {row_number}:", try_say=try_say, speed=speed)
         for field_name in summary_fields:
             if (field_name in trove_result_df):
                 say_something(f"{field_name.upper()}:", try_say=try_say, speed=speed)

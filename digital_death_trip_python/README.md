@@ -39,10 +39,8 @@ Then (if you are not using an existing CSV file):
 - it will write the results to a CSV file
 - it will preview some headlines
 
-Then it will then write the results to a CSV file, and make up to 10 calls to get extra results.
-read a random article or read a specific article
-And give the option to keep trying different articles
-And write the article to html
+Then it will then write the results to a CSV file, and make multiple calls to get extra results (up to a given limit)
+Note: doesn't yet do the part of reading out random more articles.
 
 
 See example use here: https://soundcloud.com/david-nichols-738987609/the-pyramid-hill-tragedy-1906-the-lie-of-the-land-digital-death-trip-investigatesep-1-of-3
@@ -67,6 +65,7 @@ When the program runs well, it can be both memorable and emotionally affecting.
 When the program runs poorly it is just distracting and annoying!
 
 ## Improvements Needed/Ideas
+- Need to update to bring across/ replicate the last parts of (v1) functionality from Ruby to Python: reading headlines, picking random article, and fetching article.
 - Code cleanup.
 - More flexibility in search terms.
 - More map smarts.

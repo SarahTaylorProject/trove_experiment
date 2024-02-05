@@ -1,5 +1,3 @@
-# Digital Death Trip and Poetry Mashup
-
 This repository contains two folders with experimental scripts.
 Both make use of randomness and interesting sources.
 

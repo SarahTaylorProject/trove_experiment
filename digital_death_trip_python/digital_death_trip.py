@@ -11,30 +11,28 @@ from tools_for_towns import *
 
 clear_screen()
 
-# options
-search_word = 'tragedy'
-# IDEA: use random word generator
-
+# start variables
+search_word = 'tragedy' 
+# changed temporarily from tragedy, getting too depressing
+# TODO: change back
+# IDEA: use random word generator, or at least an override option
 default_speed = 180
 max_articles_to_read = 3
 max_calls = 20
 try_say = test_say_something()
+continue_script = True
+trove_result_file_name = ''
 
 # directory setup
 script_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = return_parent_directory(script_directory)
 operating_system = return_operating_system()
 trove_key = return_trove_key()
-
 default_output_path_name = os.path.join(script_directory, 'output_files')
 os.makedirs(default_output_path_name, exist_ok=True)
-
 default_town_directory = os.path.join(script_directory, 'town_lists')
 
-continue_script = True
-trove_result_file_name = ''
-
-print("Hello")
+# check for Trove key
 if (trove_key == None):
     prompt_text = "\nNo Trove key found! Press 'N' to cancel script or any other key to continue...\n"
     user_input = get_user_input(prompt_text=prompt_text)
@@ -42,10 +40,11 @@ if (trove_key == None):
         continue_script = False
         sys.exit()
     
-
+# start conversation        
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
 
+# choice of town data
 say_something("\nWould you like to choose a town, or would you like me to make a random selection?", try_say=try_say, speed=default_speed)
 prompt_options = ['']
 prompt_options.append("Type 'r' or Enter for a random town choice (DEFAULT); OR")
@@ -53,9 +52,9 @@ prompt_options.append("Type town name directly; OR")
 prompt_options.append("Type 'rf' for a random choice from existing output files; OR")
 prompt_options.append("Type 'exit' to cancel")
 prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
-
 user_input = get_user_input(prompt_text)
 
+# different options for assigning search town, depending on user choice
 if (user_input.upper() == 'EXIT'):
     continue_script = False
 elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
@@ -90,6 +89,7 @@ if (continue_script == True):
     print(f"Search town: {search_town}")
     print(f"Search word: {search_word}")
 
+# start search (unless using existing file)
 if (continue_script == True and trove_result_file_name == ''):
     say_something(f"Ok. I will now see if I can find any newspaper references to a {search_word} in {search_town}", try_say=try_say, speed=default_speed)
     # TODO: incorporate more file name error catching
@@ -130,7 +130,9 @@ if (continue_script == True and trove_result_file_name == ''):
                 print(f"\n{next_url}")
         
 # IDEA: summary of key words
+# TODO: limit random files to those with matching search word?
 
+# summarise results
 if (continue_script == True):
     # TODO: neaten the work with result count: total results vs available result
     trove_result_df = pandas.read_csv(trove_result_file_name)
@@ -141,20 +143,21 @@ if (continue_script == True):
             summary_fields.append(field_name)
     print(summary_fields)
     print(trove_result_df[summary_fields])
-    #say_something(f"\nI now have {result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
-#    user_input = get_user_input(prompt_text = "Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
-#    if (user_input.upcase == 'EXIT') then
-#       continue_script = False
-#    elsif (user_input.upcase == 'ALL') then
-#       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed)
-#    elsif (user_input.upcase != 'N') then
-#       # reads random sample of 5
-#       random_article_numbers = Array.new(4) { rand(1..result_count) }
-#       random_article_numbers = random_article_numbers.uniq
-#       read_trove_headlines(input_trove_file = trove_result_file_name, speed = default_speed, article_numbers = random_article_numbers)
-#    end
-# end
-
+    say_something(f"\nI now have {result_count} results on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
+    user_input = get_user_input(prompt_text="Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
+    if (user_input.upper() == 'EXIT'):
+        continue_script = False
+    elif (user_input.upper() != 'N'):
+        # reads summaries of random sample
+        sample_size = 5
+        random_row_numbers = random.sample(range(0, available_result_count), sample_size)
+        random_row_numbers = list(set(random_row_numbers))
+        read_trove_summary_fields(trove_result_df=trove_result_df, 
+                                  try_say=try_say,
+                                  speed=default_speed,
+                                  summary_fields=summary_fields, 
+                                  row_numbers=random_row_numbers)
+   
 # if (continue_script == true) then 
 #    say_something("\nShall I pick a random #{search_word} from this place?", also_print = true, speed = default_speed)
 #    say_something("Or let me know if you would like to pick a specific article.", also_print = true, speed = default_speed)  

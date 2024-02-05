@@ -282,5 +282,21 @@ def parse_trove_result_records_to_df(trove_search_result,
         print(result_df)
         return(result_df)
     except:
-        print("error")
+        print("error in parse_trove_results_to_df")
         return(result_records)
+
+
+def read_trove_summary_fields(trove_result_df,
+                              try_say=True,
+                              speed=180,
+                              summary_fields=["year", "trove_article_heading", "heading", "date", "snippet"],
+                              row_numbers=[0, 1, 2]):
+    print("\n***")
+    for row_number in row_numbers:
+        print(f"\nRow number: {row_number}")
+        row = trove_result_df.loc[row_number]
+        for field_name in summary_fields:
+            if (field_name in trove_result_df):
+                say_something(f"{field_name.upper()}:", try_say=try_say, speed=speed)
+                say_something(row[field_name], try_say=try_say, speed=speed)
+    # TODO: account for usefulness of id numbers here (but boring to hear aloud)

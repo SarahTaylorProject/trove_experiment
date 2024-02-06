@@ -148,7 +148,7 @@ if (continue_script == True):
     trove_result_df = pandas.read_csv(trove_result_file_name)
     available_result_count = return_trove_file_result_count(trove_result_file_name)
     summary_fields = []
-    for field_name in ["year", "trove_article_heading", "heading", "date", "snippet"]:
+    for field_name in ["year", "trove_article_heading", "heading", "date", "snippet", "id"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     

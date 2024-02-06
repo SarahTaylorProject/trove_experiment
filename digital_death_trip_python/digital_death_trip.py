@@ -12,13 +12,18 @@ from tools_for_towns import *
 clear_screen()
 
 # start variables: will default to tragedy unless command line argument passed
+# IDEA: use random word generator
 if len(sys.argv) > 1:
     search_word = sys.argv[1]
 else:
     search_word = 'tragedy' 
 
-# IDEA: use random word generator
-    
+if len(sys.argv) > 2:
+    search_town = sys.argv[2]
+else:
+    search_town = None
+
+# other start variables
 default_speed = 180
 max_articles_to_read = 3
 max_calls = 10
@@ -49,45 +54,45 @@ if (trove_key == None):
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)
 
-# choice of town data
-say_something("\nWould you like to choose a town, or would you like me to make a random selection?", try_say=try_say, speed=default_speed)
-prompt_options = ['']
-prompt_options.append("Type 'r' or Enter for a random town choice (DEFAULT); OR")
-prompt_options.append("Type town name directly; OR")
-prompt_options.append("Type 'rf' for a random choice from existing output files; OR")
-prompt_options.append("Type 'exit' to cancel")
-prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
-user_input = get_user_input(prompt_text)
+# choice of town data: block only runs if no town name passed as command line
+# TODO: move to function
+if (search_town == None):
+    say_something("\nWould you like to choose a town, or would you like me to make a random selection?", try_say=try_say, speed=default_speed)
+    prompt_options = ['']
+    prompt_options.append("Type 'r' or Enter for a random town choice (DEFAULT); OR")
+    prompt_options.append("Type town name directly; OR")
+    prompt_options.append("Type 'rf' for a random choice from existing output files; OR")
+    prompt_options.append("Type 'exit' to cancel")
+    prompt_text = "You can:" + "\n-\t".join(prompt_options) + "\n\n"
+    user_input = get_user_input(prompt_text)
 
-# different options for assigning search town, depending on user choice
-if (user_input.upper() == 'EXIT'):
-    continue_script = False
-elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
-    print("Random town")
-    town_list = return_town_list_with_user_input(speed=default_speed,
-        try_say=try_say, town_directory=default_town_directory)
-    if (len(town_list) > 0):
-        search_town = select_random_town_with_user_input(town_list=town_list, try_say=try_say, speed=default_speed)
-    else:
+    # different options for assigning search town, depending on user choice
+    if (user_input.upper() == 'EXIT'):
         continue_script = False
-elif (user_input.upper() == 'RF'):
-    print("\nSelecting random existing Trove file...")
-    existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
-    if (len(existing_trove_result_files) == 0):
-        print("Sorry, no existing Trove files found")
-        continue_script = False
+    elif ((len(user_input) == 0) or (user_input.upper() == 'R')):
+        print("Random town")
+        town_list = return_town_list_with_user_input(speed=default_speed,
+            try_say=try_say, town_directory=default_town_directory)
+        if (len(town_list) > 0):
+            search_town = select_random_town_with_user_input(town_list=town_list, try_say=try_say, speed=default_speed)
+        else:
+            continue_script = False
+    elif (user_input.upper() == 'RF'):
+        print("\nSelecting random existing Trove file...")
+        existing_trove_result_files = return_existing_trove_result_files(output_path_name=default_output_path_name)
+        if (len(existing_trove_result_files) == 0):
+            print("Sorry, no existing Trove files found")
+            continue_script = False
+        else:
+            trove_result_file_name = random.choice(existing_trove_result_files)
+            print(f"Selected file: {os.path.basename(trove_result_file_name)}")
+            search_town = return_trove_file_search_town(trove_result_file_name)
+            search_word = return_trove_file_search_word(trove_result_file_name)
+            result_count = return_trove_file_result_count(trove_result_file_name)
+            print(f"\n{result_count} result/s found on file for {search_town}")
+            trove_result_df = pandas.read_csv(trove_result_file_name)
     else:
-        trove_result_file_name = random.choice(existing_trove_result_files)
-        print(f"Selected file: {os.path.basename(trove_result_file_name)}")
-        search_town = return_trove_file_search_town(trove_result_file_name)
-        search_word = return_trove_file_search_word(trove_result_file_name)
-        result_count = return_trove_file_result_count(trove_result_file_name)
-        print(f"\n{result_count} result/s found on file for {search_town}")
-        trove_result_df = pandas.read_csv(trove_result_file_name)
-else:
-    search_town = user_input.strip().title()
-
-# TODO: add option for choosing search word; tragedy is too depressing all the time
+        search_town = user_input.strip().title()
 
 if (continue_script == True):
     print("continuing...")
@@ -151,8 +156,8 @@ if (continue_script == True):
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
-    say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines, to get a sense of the {search_word}s in {search_town}?", try_say=try_say, speed=default_speed)
-    user_input = get_user_input(prompt_text="Enter 'n' if not interested, \nEnter 'exit' to cancel entirely, \nEnter any other key to hear a few sample headlines...")
+    say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines?", try_say=try_say, speed=default_speed)
+    user_input = get_user_input(prompt_text="Enter 'n' if not interested\nEnter any other key to hear a few sample headlines...")
     if (user_input.upper() == 'EXIT'):
         continue_script = False
     elif (user_input.upper() != 'N'):
@@ -161,6 +166,7 @@ if (continue_script == True):
         if (available_result_count < sample_size):
             sample_size = available_result_count
         random_row_numbers = random.sample(range(0, available_result_count), sample_size)
+
         random_row_numbers = list(set(random_row_numbers))
         read_trove_summary_fields(trove_result_df=trove_result_df, 
                                   try_say=try_say,

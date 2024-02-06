@@ -293,9 +293,8 @@ def read_trove_summary_fields(trove_result_df,
     print("\n***")
     for row_number in row_numbers:
         row = trove_result_df.loc[row_number]
-        say_something(f"ARTICLE: {row_number}:", try_say=try_say, speed=speed)
         for field_name in summary_fields:
             if (field_name in trove_result_df):
-                say_something(f"{field_name.upper()}:", try_say=try_say, speed=speed)
+                # say_something(f"{field_name.upper()}:", try_say=try_say, speed=speed)
                 say_something(row[field_name], try_say=try_say, speed=speed)
     # TODO: account for usefulness of id numbers here (but boring to hear aloud)

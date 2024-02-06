@@ -11,11 +11,14 @@ from tools_for_towns import *
 
 clear_screen()
 
-# start variables
-search_word = 'tragedy' 
-# changed temporarily from tragedy, getting too depressing
-# TODO: change back
-# IDEA: use random word generator, or at least an override option
+# start variables: will default to tragedy unless command line argument passed
+if len(sys.argv) > 1:
+    search_word = sys.argv[1]
+else:
+    search_word = 'tragedy' 
+
+# IDEA: use random word generator
+    
 default_speed = 180
 max_articles_to_read = 3
 max_calls = 10
@@ -34,11 +37,13 @@ default_town_directory = os.path.join(script_directory, 'town_lists')
 
 # check for Trove key
 if (trove_key == None):
-    prompt_text = "\nNo Trove key found! Press 'N' to cancel script or any other key to continue...\n"
+    prompt_text = "\nNo Trove key found!\nEnter Trove key or 'N' to cancel script...\n"
     user_input = get_user_input(prompt_text=prompt_text)
     if (user_input[0].upper() == 'N'):
         continue_script = False
         sys.exit()
+    else:
+        trove_key = user_input.strip()
     
 # start conversation        
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)

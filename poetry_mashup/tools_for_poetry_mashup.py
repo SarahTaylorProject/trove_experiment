@@ -324,7 +324,7 @@ def return_string_of_random_words(word_count=2):
     return(None)
 
 # TODO: clarify across functions, when using Brown/default corpus or specific corpus
-def return_string_of_random_words_from_custom_corpus(word_count=2, custom_corpus_words_sorted=None):
+def return_string_of_random_corpus_words(word_count=2, custom_corpus_words_sorted=None):
   try:
     if (custom_corpus_words_sorted == None):
       custom_corpus_words_sorted = corpus_words_sorted

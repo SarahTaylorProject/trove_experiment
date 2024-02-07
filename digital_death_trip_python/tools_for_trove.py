@@ -154,6 +154,7 @@ def search_for_matching_trove_file(existing_trove_result_files,
 
 def build_trove_search_url(trove_key='',
                                 search_town='', search_word='',
+                                separate_search_word_list=[],
                                 trove_search_base="https://api.trove.nla.gov.au/v3/result?",
                                 url_quote='%22', url_space='%20',
                                 search_category='newspaper',
@@ -169,6 +170,12 @@ def build_trove_search_url(trove_key='',
     try:
         search_string_list = []
         for input_word in [search_town, search_word]:
+            current_word = remove_nuisance_characters_from_string(input_word)
+            current_word = url_quote + current_word.replace(' ', url_space) + url_quote
+            if (len(current_word) > 0):
+                search_string_list.append(current_word)
+
+        for input_word in separate_search_word_list:
             current_word = remove_nuisance_characters_from_string(input_word)
             current_word = url_quote + current_word.replace(' ', url_space) + url_quote
             if (len(current_word) > 0):

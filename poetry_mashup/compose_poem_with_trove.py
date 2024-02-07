@@ -155,12 +155,11 @@ if (line_count > 0 and continue_script == True):
       current_quote = [current_quote_string, current_quote_metadata]
     elif (meta_source_choice == "trove"):       
       current_quote_string = random.choice(trove_result_list)
-      print(current_quote_string)
       if (random_start_per_line == True):
         current_quote_stripped = current_quote_string.translate(str.maketrans('', '', string.punctuation))
         current_quote_split = word_tokenize(current_quote_stripped)
         start_word = random.choice(range(0, len(current_quote_split)))
-        current_quote_string =  ' '.join(current_quote_split[start_word:])
+        current_quote_string = ' '.join(current_quote_split[start_word:])
         current_quote = [current_quote_string, "Trove"]
 
     print(current_quote)
@@ -189,21 +188,21 @@ if (continue_script == True):
         sys.exit()
 
 if (continue_script == True):
-    print("\n\nI USED THE FOLLOWING SOURCES:")
-    count = 0
-    for quote in random_poetry_quotes:
-      count += 1
-      metadata_string = "{}-{}".format(count, quote[1])
-      print(metadata_string)
+  print("\n\nI USED THE FOLLOWING SOURCES:")
+  count = 0
+  for quote in random_poetry_quotes:
+    count += 1
+    metadata_string = "{}-{}".format(count, quote[1])
+    print(metadata_string)
 
-      print("\n***")
-      greeting_string = "\n\nHERE IS MY POEM"
-      say_something(text=greeting_string, try_say=try_say, speed=default_speed)
-      for quote in random_poetry_quotes:
-        output_quote = remove_nuisance_characters_from_string(quote[0]).strip()
-        output_quote = remove_stop_words_from_end_of_string(output_quote)
-        # output_quote = output_quote.title()
-        if (output_quote != False):
-            say_something(text=output_quote, try_say=try_say, speed=default_speed)
+    print("\n***")
+    greeting_string = "\n\nHERE IS MY POEM"
+    say_something(text=greeting_string, try_say=try_say, speed=default_speed)
+    for quote in random_poetry_quotes:
+      output_quote = remove_nuisance_characters_from_string(quote[0]).strip()
+      output_quote = remove_stop_words_from_end_of_string(output_quote)
+      # output_quote = output_quote.title()
+      if (output_quote != False):
+        say_something(text=output_quote, try_say=try_say, speed=default_speed)
 
 print("\n")

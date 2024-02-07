@@ -176,6 +176,7 @@ def build_trove_search_url(trove_key='',
                 search_string_list.append(current_word)
 
         for input_word in separate_search_word_list:
+            input_word = input_word.strip()
             current_word = remove_nuisance_characters_from_string(input_word)
             current_word = url_quote + current_word.replace(' ', url_space) + url_quote
             if (len(current_word) > 0):

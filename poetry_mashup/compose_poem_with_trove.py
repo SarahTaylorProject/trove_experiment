@@ -59,10 +59,12 @@ greeting_string = "\nThankyou. Let me think...\n"
 say_something(text=greeting_string, try_say=try_say, speed=default_speed)
 
 # 2.1 CHOOSE CORPUS
-# comment out line after this to keep Moby Dick as default corpus
+# comment out lines after this to keep Moby Dick as default corpus
 corpus_text = 'melville-moby_dick.txt'
-corpus_file_id = random.choice(nltk.corpus.gutenberg.fileids())
-greeting_string = f"My corpus of random words is {corpus_file_id}"
+corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids() if 'shakespeare' not in file_id]
+#corpus_file_id = random.choice(nltk.corpus.gutenberg.fileids())
+corpus_file_id = random.choice(corpus_file_id_list)
+greeting_string = f"\nMy corpus of random words is {corpus_file_id}"
 say_something(text=greeting_string, try_say=try_say, speed=default_speed)
 
 # 2.2. import corpus
@@ -76,7 +78,7 @@ else:
     search_word_list = random.sample(custom_corpus_words_sorted, default_search_word_count)
 
 search_word = ' '.join(search_word_list)
-greeting_string = f"I will search Trove for the following word/s: {search_word}"
+greeting_string = f"\nI will search Trove for the following word/s: {search_word}"
 say_something(text=greeting_string, try_say=try_say, speed=default_speed)
 
 
@@ -119,7 +121,7 @@ if (continue_script == True):
             trove_result_heading_list = list(trove_result_df["heading"])
             trove_result_snippet_list = list(trove_result_df["snippet"])
             # DECIDE HERE WHICH FIELDS TO USE: currently set to snippet, but not headlines
-            trove_result_long_list = trove_result_snippet_list
+            trove_result_long_list = trove_result_snippet_list + trove_result_heading_list
             trove_result_list = [trove_result for trove_result in trove_result_long_list if len(trove_result) > 1]
             trove_result_list = list(set(trove_result_list))
             # TODO: populate this neatly in loop

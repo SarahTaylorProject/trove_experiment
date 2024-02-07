@@ -99,7 +99,7 @@ if (trove_key == None):
 # if successful, read result to trove_result_df
 if (continue_script == True):
     print(f"Searching Trove for {search_word}")
-    trove_search_url = build_trove_search_url(trove_key=trove_key, search_word=search_word)
+    trove_search_url = build_trove_search_url(trove_key=trove_key, separate_search_word_list=search_word_list)
     trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url, also_print=False)
     if (trove_search_result == None):        
         continue_script = False

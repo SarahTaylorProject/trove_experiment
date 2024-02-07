@@ -170,18 +170,20 @@ def build_trove_search_url(trove_key='',
     try:
         search_string_list = []
         for input_word in [search_town, search_word]:
-            current_word = remove_nuisance_characters_from_string(input_word)
-            current_word = url_quote + current_word.replace(' ', url_space) + url_quote
-            if (len(current_word) > 0):
-                search_string_list.append(current_word)
+            print("Here")
+            if (input_word != ''):
+                current_word = remove_nuisance_characters_from_string(input_word)
+                current_word = url_quote + current_word.replace(' ', url_space) + url_quote
+                if (len(current_word) > 0):
+                    search_string_list.append(current_word)
 
         for input_word in separate_search_word_list:
             input_word = input_word.strip()
             current_word = remove_nuisance_characters_from_string(input_word)
-            current_word = url_quote + current_word.replace(' ', url_space) + url_quote
+            current_word = current_word.replace(' ', url_space)
             if (len(current_word) > 0):
                 search_string_list.append(current_word)
-
+        print(search_string_list)
         search_string = url_space.join(search_string_list)
         print(search_string)
 

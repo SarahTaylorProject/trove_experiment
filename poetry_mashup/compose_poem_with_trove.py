@@ -15,6 +15,7 @@ default_search_word_count = 2
 default_speed = 180
 default_line_count = 12
 default_max_words_per_line = 8
+random_start_per_line = True
 
 try_say = test_say_something()
 continue_script = True
@@ -123,8 +124,6 @@ if (continue_script == True):
             trove_result_list = list(set(trove_result_list))
             # TODO: populate this neatly in loop
 
-current_quote = return_random_poetry(author_list=[])
-print(current_quote)
 
 if (continue_script == False):
    sys.exit()
@@ -155,10 +154,14 @@ if (line_count > 0 and continue_script == True):
       current_quote_metadata = "{} random words from {}".format(word_count, corpus_file_id)
       current_quote = [current_quote_string, current_quote_metadata]
     elif (meta_source_choice == "trove"):       
-       current_quote_string = random.choice(trove_result_list)
-       current_quote_string = remove_stop_words_from_end_of_string(current_quote_string)
-       #todo: random start word
-       current_quote = [current_quote_string, f"Trove search for {search_word}"]
+      current_quote_string = random.choice(trove_result_list)
+      print(current_quote_string)
+      if (random_start_per_line == True):
+        current_quote_stripped = current_quote_string.translate(str.maketrans('', '', string.punctuation))
+        current_quote_split = word_tokenize(current_quote_stripped)
+        start_word = random.choice(range(0, len(current_quote_split)))
+        current_quote_string =  ' '.join(current_quote_split[start_word:])
+        current_quote = [current_quote_string, "Trove"]
 
     print(current_quote)
     if (current_quote != False):      

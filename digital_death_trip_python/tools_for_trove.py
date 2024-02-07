@@ -196,9 +196,11 @@ def build_trove_search_url(trove_key='',
         print("Error getting API results...")
         return(trove_search_url)
 
+# TODO: make separate url function for just a list of words
 
 def fetch_trove_search_result(trove_key='',
-                              trove_search_url=''):
+                              trove_search_url='',
+                              also_print=True):
     trove_search_result = None
     try:
         if ('key=' not in trove_search_url):
@@ -206,7 +208,8 @@ def fetch_trove_search_result(trove_key='',
         trove_search_full_result = trove_search_result = requests.get(trove_search_url)
         if (trove_search_full_result.status_code == 200):
             trove_search_result= json.loads(trove_search_full_result.content)
-            print(trove_search_result)
+            if (also_print==True):
+                print(trove_search_result)
         return(trove_search_result)    
     except:
         print("Error getting API results...")
@@ -277,8 +280,6 @@ def parse_trove_result_records_to_df(trove_search_result,
                     result_records.append(current_article_dict)
         # TODO: put individual article parsing in separate function to deal with potential duds
         result_df = pandas.DataFrame.from_dict(result_records)
-        print(result_records)
-        print(result_df)
         return(result_df)
     except:
         print("error in parse_trove_results_to_df")

@@ -19,6 +19,7 @@ from tools_for_general_use import *
 # nltk.download('stopwords')
 # nltk.download('punkt')
 # nltk.download('brown')
+# nltk.download('gutenberg')
 
 stop_words = set(stopwords.words('english'))
 corpus_words = set(w.lower() for w in nltk.corpus.brown.words())
@@ -317,6 +318,17 @@ def return_string_of_random_words(word_count=2):
   try:
     string_of_random_words = ' '.join(sample(corpus_words_sorted, word_count))
     string_of_random_words = string_of_random_words.capitalize()
+    return(string_of_random_words)
+  except:
+    traceback.print_exc()
+    return(None)
+
+# TODO: clarify across functions, when using Brown/default corpus or specific corpus
+def return_string_of_random_words_from_custom_corpus(word_count=2, custom_corpus_words_sorted=None):
+  try:
+    if (custom_corpus_words_sorted == None):
+      custom_corpus_words_sorted = corpus_words_sorted
+    string_of_random_words = ' '.join(sample(custom_corpus_words_sorted, word_count))
     return(string_of_random_words)
   except:
     traceback.print_exc()

@@ -19,10 +19,13 @@ default_max_words_per_line = 8
 try_say = test_say_something()
 continue_script = True
 
+# IDEA: PICK ONE POET
+
 # PART 1: *** POEM GREETING ***    
 
 # 1.1 start up the meta source list
-meta_source_list = ["trove", "random poetry", "random words from corpus"]
+meta_source_list = ["trove", "the online poetry database", "random words from corpus"]
+#meta_source_list = ["trove", "the online poetry database"]
 
 # 1.2. start talking to user
 print("\n***")
@@ -48,6 +51,8 @@ if (max_words_input.isnumeric()):
 else:
   max_words_per_line = default_max_words_per_line
 
+current_quote = return_random_poetry(author_list=[])
+print(current_quote)
 
 # PART 2: make and display some random choices
 
@@ -119,6 +124,8 @@ if (continue_script == True):
             trove_result_list = [trove_result for trove_result in trove_result_long_list if len(trove_result) > 1]
             # TODO: populate this neatly in loop
 
+current_quote = return_random_poetry(author_list=[])
+print(current_quote)
 
 if (continue_script == False):
    sys.exit()
@@ -142,6 +149,7 @@ if (line_count > 0 and continue_script == True):
     meta_source_choice = random.choice(meta_source_list)
     print("choice: " + meta_source_choice)
     if (meta_source_choice == "the online poetry database"):
+      print("HERE")
       current_quote = return_random_poetry(author_list=[])
     elif (meta_source_choice == "random words from corpus"):
       word_count = random.randint(1, default_random_word_count)
@@ -192,7 +200,7 @@ if (continue_script == True):
       for quote in random_poetry_quotes:
         output_quote = remove_nuisance_characters_from_string(quote[0]).strip()
         output_quote = remove_stop_words_from_end_of_string(output_quote)
-        output_quote = output_quote.title()
+        # output_quote = output_quote.title()
         if (output_quote != False):
             print(output_quote)
             say_something(text=output_quote, try_say=try_say, speed=default_speed, also_print=False)

@@ -49,7 +49,7 @@ if (trove_key == None):
         sys.exit()
     else:
         trove_key = user_input.strip()
-    
+print(trove_key)   
 # start conversation        
 say_something("\nHello, this is Digital Death Trip.", try_say=try_say, also_print=True, speed=default_speed)
 say_something(f"Today I am talking to you from a {operating_system} operating system.", try_say=try_say, speed=default_speed)

@@ -1,0 +1,12 @@
+[H[2J[3JFound Trove key
+
+Hello, this is Digital Death Trip.
+Today I am talking to you from a linux operating system.
+
+Would you like to choose a town, or would you like me to make a random selection?
+You can:
+-	Type 'r' or Enter for a random town choice (DEFAULT); OR
+-	Type town name directly; OR
+-	Type 'rf' for a random choice from existing output files; OR
+-	Type 'exit' to cancel
+

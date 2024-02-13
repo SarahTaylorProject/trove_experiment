@@ -40,7 +40,7 @@ def try_read_trove_key_file(trove_key_file_path="my_trove.txt"):
     trove_key = None
     try:
         with open(trove_key_file_path, 'r') as f:
-            trove_key = f.readline()
+            trove_key = f.readline().strip()
             print(f"Found Trove key")
         return(trove_key)
     except:
@@ -240,7 +240,7 @@ def parse_trove_result_metadata(trove_search_result,
         result_metadata["s"] = None
         result_metadata["n"] = None
         result_metadata["next"] = None
-
+        print(trove_search_result)
         category_list = trove_search_result["category"]
         for current_category in category_list:
             if current_category["code"] == category_code:

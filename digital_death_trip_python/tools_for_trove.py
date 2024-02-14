@@ -203,7 +203,7 @@ def build_trove_search_url(trove_key='',
         print(trove_search_url)
         return(trove_search_url)
     except:
-        print("Error getting API results...")
+        print("Error building URL..")
         return(trove_search_url)
 
 # TODO: make separate url function for just a list of words
@@ -220,9 +220,11 @@ def fetch_trove_search_result(trove_key='',
             trove_search_result= json.loads(trove_search_full_result.content)
             if (also_print==True):
                 print(trove_search_result)
+        else:
+            print("Error fetching from API...")
         return(trove_search_result)    
     except:
-        print("Error getting API results...")
+        print("Error fetching from API...")
         return(trove_search_result)
 
 

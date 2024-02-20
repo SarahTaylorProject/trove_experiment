@@ -18,11 +18,14 @@ from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
 stop_words.add('ye')
 stop_words.add('thee')
+stop_words.add('thou')
+stop_words.add('thy')
+stop_words.add('aye')
 
 tokenizer = RegexpTokenizer(r'\w+')
 
 maximum_line_count = None
-corpus_word_count = 150
+corpus_word_count = 250
 
 #### CHOOSING CORPUS
 corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids()]

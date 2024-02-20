@@ -4,7 +4,7 @@ Magic, madness, heaven, sin
 Saw you there and I thought
 "Oh, my God, look at that face
 You look like my next mistake
-Love's a game, wanna play?" Ay
+Love's a game, wanna play?"
 New money, suit and tie
 I can read you like a magazine
 Ain't it funny? Rumors fly
@@ -15,17 +15,17 @@ Grab your passport and my hand
 I can make the bad guys good for a weekend
 So it's gonna be forever
 Or it's gonna go down in flames
-You can tell me when it's over, mm
+You can tell me when it's over
 If the high was worth the pain
-Got a long list of ex-lovers
+Got a long list of ex lovers
 They'll tell you I'm insane
 'Cause you know I love the players
 And you love the game
 'Cause we're young, and we're reckless
 We'll take this way too far
-It'll leave you breathless, mm
+It'll leave you breathless
 Or with a nasty scar
-Got a long list of ex-lovers
+Got a long list of ex lovers
 They'll tell you I'm insane
 But I've got a blank space, baby
 And I'll write your name
@@ -46,18 +46,18 @@ But you'll come back each time you leave
 'Cause, darling, I'm a nightmare dressed like a daydream
 So it's gonna be forever
 Or it's gonna go down in flames
-You can tell me when it's over, mm
+You can tell me when it's over
 If the high was worth the pain
-Got a long list of ex-lovers
+Got a long list of ex lovers
 They'll tell you I'm insane
 'Cause you know I love the players
 And you love the game
-'Cause we're young, and we're reckless (oh)
+'Cause we're young, and we're reckless
 We'll take this way too far
-It'll leave you breathless, mm (oh)
+It'll leave you breathless
 Or with a nasty scar
-Got a long list of ex-lovers
-They'll tell you I'm insane (insane)
+Got a long list of ex lovers
+They'll tell you I'm insane
 But I've got a blank space, baby
 And I'll write your name
 Boys only want love if it's torture
@@ -66,17 +66,17 @@ Boys only want love if it's torture
 Don't say I didn't, say I didn't warn ya
 So it's gonna be forever
 Or it's gonna go down in flames
-You can tell me when it's over (over)
+You can tell me when it's over
 If the high was worth the pain
-Got a long list of ex-lovers
-They'll tell you I'm insane (I'm insane)
+Got a long list of ex lovers
+They'll tell you I'm insane
 'Cause you know I love the players
 And you love the game
 'Cause we're young, and we're reckless
-We'll take this way too far (ooh)
-It'll leave you breathless, mm
-Or with a nasty scar (leave a nasty scar)
-Got a long list of ex-lovers
+We'll take this way too far
+It'll leave you breathless
+Or with a nasty scar
+Got a long list of ex lovers
 They'll tell you I'm insane
 But I've got a blank space, baby
 And I'll write your name

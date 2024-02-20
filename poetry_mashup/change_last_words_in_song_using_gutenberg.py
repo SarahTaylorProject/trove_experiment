@@ -30,7 +30,8 @@ corpus_word_count = 250
 #### CHOOSING CORPUS
 corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids()]
 
-# will default to moby dick unless 'random' passed to command line
+# will default to moby dick unless can find match to command line argument
+# or if command line argument is 'random'
 corpus_file_id = 'melville-moby_dick.txt'
 if len(sys.argv) > 1:
     command_input = sys.argv[1].strip().lower()

@@ -33,8 +33,17 @@ corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids()]
 # will default to moby dick unless 'random' passed to command line
 corpus_file_id = 'melville-moby_dick.txt'
 if len(sys.argv) > 1:
-    if (sys.argv[1].lower() == 'random'):
+    command_input = sys.argv[1].strip().lower()
+    print(f"Command line input: {command_input}")
+    if (command_input == 'random'):
         corpus_file_id = random.choice(corpus_file_id_list)
+    else:
+        matching_file_list = [file_id for file_id in corpus_file_id_list if command_input in file_id]
+        print(matching_file_list)
+        if (matching_file_list):
+            corpus_file_id = random.choice(matching_file_list)
+        else:
+            print(f"Could not find corpus like {command_input}")
 
 print(f"Gutenberg text: {corpus_file_id}")
 

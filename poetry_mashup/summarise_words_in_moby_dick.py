@@ -11,7 +11,7 @@ freq_limit = 50
 
 corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids()]
 corpus_file_id = 'melville-moby_dick.txt'
-#corpus_file_id = random.choice(corpus_file_id_list)
+corpus_file_id = random.choice(corpus_file_id_list)
 print(f"Text: {corpus_file_id}")
 
 corpus_raw = nltk.corpus.gutenberg.raw(corpus_file_id)
@@ -53,4 +53,4 @@ for tag in tag_list:
     print(f"\nMost common {freq_limit} words of type {tag}:")
     print(most_common)
 
-print(f"Text: {corpus_file_id}")
+print(f"\nText: {corpus_file_id}")

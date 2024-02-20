@@ -14,7 +14,7 @@ try_say = test_say_something()
 print(try_say)
 
 # 1. start up the meta source list with the external sources, if any
-meta_source_list = ["the bible", "random words"]
+meta_source_list = ["the bible", "random words", "the online poetry database"]
 
 book_list = return_bible_book_list()
 

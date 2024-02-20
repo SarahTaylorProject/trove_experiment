@@ -10,8 +10,13 @@ tokenizer = RegexpTokenizer(r'\w+')
 freq_limit = 50
 
 corpus_file_id_list = [file_id for file_id in nltk.corpus.gutenberg.fileids()]
+
+# will default to moby dick unless 'random' passed to command line
 corpus_file_id = 'melville-moby_dick.txt'
-corpus_file_id = random.choice(corpus_file_id_list)
+if len(sys.argv) > 1:
+    if (sys.argv[1].lower() == 'random'):
+        corpus_file_id = random.choice(corpus_file_id_list)
+
 print(f"Text: {corpus_file_id}")
 
 corpus_raw = nltk.corpus.gutenberg.raw(corpus_file_id)

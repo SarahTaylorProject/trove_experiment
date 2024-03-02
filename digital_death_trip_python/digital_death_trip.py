@@ -155,24 +155,52 @@ if (continue_script == True):
     # NOTE: I think this summary is better than the random picker; extend on this and summarise?
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
+    # NOTE: change to ntlk summary and some random headlines
+    import nltk
+    from nltk.tokenize import RegexpTokenizer
+    tokenizer = RegexpTokenizer(r'\w+')
+    from nltk.corpus import stopwords
+
+    
+    stop_words = set(stopwords.words('english'))
+    from nltk.tokenize import word_tokenize
+    freq_limit = 10
+    token_list = []
+    for field_name in ["heading", "snippet"]:
+        for current_string in trove_result_df[field_name].tolist():
+            if isinstance(current_string, str):
+                # token_list.extend(word_tokenize(current_string))
+                token_list.extend(tokenizer.tokenize(current_string))
+
+    # NOTE better to tokenize list in a function; TODO later
+    word_list = [w.lower() for w in token_list if w.lower() not in stop_words]
+    freq = nltk.FreqDist(word_list)
+    most_common = freq.most_common(freq_limit)
+    print(f"Most common {freq_limit} words (excluding stop words):")
+    print(most_common)
+
+    common_word_list = []
+    for item in most_common:
+        common_word_list.append(item[0])
+    print(common_word_list)
 
     say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines?", try_say=try_say, speed=default_speed)
-    user_input = get_user_input(prompt_text="Enter 'n' if not interested\nEnter any other key to hear a few sample headlines...")
-    if (user_input.upper() == 'EXIT'):
-        continue_script = False
-    elif (user_input.upper() != 'N'):
-        # reads summaries of random sample
-        sample_size = 10
-        if (available_result_count < sample_size):
-            sample_size = available_result_count
-        random_row_numbers = random.sample(range(0, available_result_count), sample_size)
+    # user_input = get_user_input(prompt_text="Enter 'n' if not interested\nEnter any other key to hear a few sample headlines...")
+    # if (user_input.upper() == 'EXIT'):
+    #     continue_script = False
+    # elif (user_input.upper() != 'N'):
+    #     # reads summaries of random sample
+    #     sample_size = 10
+    #     if (available_result_count < sample_size):
+    #         sample_size = available_result_count
+    #     random_row_numbers = random.sample(range(0, available_result_count), sample_size)
 
-        random_row_numbers = list(set(random_row_numbers))
-        read_trove_summary_fields(trove_result_df=trove_result_df, 
-                                  try_say=try_say,
-                                  speed=default_speed,
-                                  summary_fields=["year", "heading"], 
-                                  row_numbers=random_row_numbers)
+    #     random_row_numbers = list(set(random_row_numbers))
+    #     read_trove_summary_fields(trove_result_df=trove_result_df, 
+    #                               try_say=try_say,
+    #                               speed=default_speed,
+    #                               summary_fields=["year", "heading"], 
+    #                               row_numbers=random_row_numbers)
    
 if (continue_script == True): 
     say_something(f"\nShall I pick a random {search_word} from this place?", try_say=try_say, speed=default_speed)

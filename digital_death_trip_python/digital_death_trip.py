@@ -153,7 +153,6 @@ if (continue_script == True and trove_result_file_name == ''):
         
 
 # TODO: limit random files to those with matching search word?
-sys.exit()
 
 # summarise results
 if (continue_script == True):
@@ -169,7 +168,7 @@ if (continue_script == True):
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
-    word_list = return_word_list_from_df(trove_result_df, field_list = ["heading", "snippet"])
+    word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
     print(word_list)
     word_summary_list = print_and_return_word_summary(input_words_all=word_list, 
         freq_limit=50, 
@@ -177,10 +176,11 @@ if (continue_script == True):
         freq_limit_tag_summary=5,
         test_words=['man', 'woman', 'tragedy'])
     
+    print(word_summary_list)
     for word_summary in word_summary_list:
         try_say(word_summary)
 
-   
+sys.exit()
 if (continue_script == True): 
     say_something(f"\nShall I pick a random {search_word} from {search_town}?", try_say=try_say, speed=default_speed)
     say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  

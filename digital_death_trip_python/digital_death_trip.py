@@ -234,8 +234,9 @@ if (continue_script == True and article_number != None):
         trove_article_id = article["id"]
         article_json = fetch_trove_newspaper_article(trove_key=trove_key, trove_article_id=trove_article_id, also_print=False)
         # TODO: error handling for json request
-        # TODO: try the beuatiful soup stuff move to tools_for_language_processing if ok, then try reading out?
-        file_description = f"trove_article_{search_town}_{search_word}_"
+        # TODO: neaten this section, written quickly
+        file_description = "trove_article_"
+        file_description += str(article["year"])
         file_description += str(trove_article_id) + "_"
         max_heading = 15
         file_description += str(article["heading"][:max_heading])
@@ -265,26 +266,6 @@ if (continue_script == True and article_number != None):
             soup = BeautifulSoup(article_html)
             article_text = soup.get_text()
             say_something(article_text, try_say=try_say, speed=default_speed)
-        say_something("\nOk. Good luck!", try_say=try_say, speed=default_speed)
-
-#       say_something("So, that was one #{search_word} from #{search_town}", also_print = true, speed = default_speed)   
-#       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
-#       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different #{search_word}\nEnter 'exit' to cancel\nEnter 'y' to find out more")
-#       if (user_input.upcase == 'Y') then
-#          trove_article_id = return_record_from_single_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
-#          puts(trove_article_id)
-#          trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
-#          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
-#          if (trove_article_file != false) then
-#             puts("\nContent written to file: #{trove_article_file}")
-#          end
-#          say_something("Good luck!", also_print = true, speed = default_speed)
-#          continue_script = false
-#       elsif (user_input.upcase == 'EXIT') then      
-#          continue_script = false
-#       end
-#    end
-# end
 
 say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 

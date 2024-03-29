@@ -207,7 +207,8 @@ while (continue_script == True and article_number == None):
         say_something(f"Ok. Let's see. Here is my random {search_word} from {search_town}.", try_say=try_say, speed=default_speed)
         article = trove_result_df.loc[article_number]
         #print(article[summary_fields])
-        for field_name in summary_fields:
+        for field_name in ["year", "heading"]:
+            # TODO: refine what to read out here, or read later
             say_something(field_name, try_say=try_say, speed=default_speed)
             say_something(article[field_name], try_say=try_say, speed=default_speed)
 
@@ -226,10 +227,37 @@ while (continue_script == True and article_number == None):
 print("exited loop")
 print(article_number)
 
-#    if (continue_script == true) then  
-#       puts(article_number)
-#       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
-#       say_something("\n.....")
+if (continue_script == True and article_number != None):  
+    prompt_text = "\nWould you like me to get a copy of the whole article for you?\n"
+    say_something(prompt_text, try_say=try_say, speed=default_speed)
+    prompt_text = "\nEnter 'exit' to cancel\nEnter 'y' to find out more about this article.\n"
+    user_input = get_user_input(prompt_text=prompt_text)                  
+    if (user_input.lower() == 'y'):
+        trove_article_id = article["id"]
+        article_json = fetch_trove_newspaper_article(trove_key=trove_key, trove_article_id=trove_article_id)
+        # TODO: error handling for json request
+        # TODO: compress file name logic but add more descriptive parts
+        file_description = f"trove_article_{search_town}_{search_word}_"
+        file_description += str(article["year"]) + "_"
+        file_description += str(trove_article_id)
+        max_heading = 30
+        file_description += str(article["heading"][:max_heading])
+        pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
+        json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
+        # TODO: error handling for failure getting json
+        with open(json_file_name, 'w') as f:
+            json.dump(article_json, f)
+        print(f"Full article content written to json file: {json_file_name}")
+        # TODO: error handling for failure getting pdf
+        pdf_url = article_json["pdf"][0]
+        print(pdf_url)
+        response = requests.get(pdf_url)
+        with open(pdf_file_name, 'wb') as f:
+            f.write(response.content)
+        print(f"PDF written to: {pdf_file_name}")
+        # TODO: read out article but remove the gumpf like <dart>
+        say_something("Good luck!", try_say=try_say, speed=default_speed)
+
 #       say_something("So, that was one #{search_word} from #{search_town}", also_print = true, speed = default_speed)   
 #       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
 #       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different #{search_word}\nEnter 'exit' to cancel\nEnter 'y' to find out more")

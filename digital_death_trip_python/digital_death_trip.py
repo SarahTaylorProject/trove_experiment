@@ -92,8 +92,6 @@ if (search_town == None):
             result_count = return_trove_file_result_count(trove_result_file_name)
             print(f"\n{result_count} result/s found on file for {search_town}")
             trove_result_df = pandas.read_csv(trove_result_file_name)
-            trove_result_df = filter_trove_result_df(trove_result_df)
-            trove_result_df.to_csv('test_filter2.csv')
     else:
         search_town = user_input.strip().title()
 
@@ -151,6 +149,7 @@ if (continue_script == True and trove_result_file_name == ''):
                 trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
                 next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
                 print(f"\n{next_url}")
+                # TODO: clear up the clutter above!!
         
 
 # TODO: limit random files to those with matching search word?
@@ -158,21 +157,22 @@ if (continue_script == True and trove_result_file_name == ''):
 # summarise results
 if (continue_script == True):
     trove_result_df = pandas.read_csv(trove_result_file_name)
+    trove_result_df = filter_trove_result_df(trove_result_df)
     available_result_count = return_trove_file_result_count(trove_result_file_name)
+    # TODO: deal with possible zero or near-zero results after filtering
     summary_fields = []
     for field_name in ["year", "trove_article_heading", "heading", "snippet"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
     # NOTE: I think this summary is better than the random picker
-    # TODO: add to summary function; read some random headlines
+    # TODO: refine the word summary function; read some random headlines
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
     # print(word_list)
-    word_summary_list = return_custom_word_summary_list(input_words_all=word_list, 
-        target_words=['man', 'woman', 'tragedy'])
+    word_summary_list = return_custom_word_summary_list(input_words_all=word_list)
     
     #print(word_summary_list)
     for summary in word_summary_list:
@@ -205,10 +205,10 @@ while (continue_script == True and article_number == None):
         article_number = random.choice(trove_result_df.index)
         print(article_number)
         say_something(f"Ok. Let's see. Here is my random {search_word} from {search_town}.", try_say=try_say, speed=default_speed)
-        # TODO: reduce repetition with pick option
         article = trove_result_df.loc[article_number]
-        print(article[summary_fields])
+        #print(article[summary_fields])
         for field_name in summary_fields:
+            say_something(field_name, try_say=try_say, speed=default_speed)
             say_something(article[field_name], try_say=try_say, speed=default_speed)
 
     if (continue_script == True and article_number != None):

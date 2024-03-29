@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 from tools_for_general_use import *
 from tools_for_trove import *
 from tools_for_towns import *
+from tools_for_language_processing import *
 
 clear_screen()
 
@@ -107,7 +108,7 @@ if (continue_script == True and trove_result_file_name == ''):
     trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url)
     if (trove_search_result == None):        
         continue_script = False
-        say_something(f"\nSorry, no {search_word} results found for {search_town}")
+        say_something(f"\nSorry, no {search_word} results found for {search_town}", try_say=try_say, speed=default_speed)
     else:
         trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
         print(trove_search_result_metadata)
@@ -118,6 +119,11 @@ if (continue_script == True and trove_result_file_name == ''):
         else:
             say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
             trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
+            print(len(trove_result_df))
+            print("Before filtering")
+            trove_result_df = filter_trove_result_df(trove_result_df)
+            print(len(trove_result_df))
+            print("After filtering")
             trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
             print(trove_result_file_name)
             # TODO: give option to create multiple calls or not
@@ -134,61 +140,59 @@ if (continue_script == True and trove_result_file_name == ''):
                 trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
                 print(f"Total results from search {search_town} {search_word}: {result_count}")
                 print(f"API call number {call_count} of maximum {max_calls}")
+                print(len(trove_result_df))
+                print("Before filtering")
+                trove_result_df = filter_trove_result_df(trove_result_df)
+                print(len(trove_result_df))
+                print("After filtering")
                 print(f"Appending to {trove_result_file_name}")
                 trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
                 next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
                 print(f"\n{next_url}")
+                # TODO: clear up the clutter above!!
         
-# IDEA: summary of key words
+
 # TODO: limit random files to those with matching search word?
 
 # summarise results
 if (continue_script == True):
-    # TODO: neaten the work with result count: total results vs available result
     trove_result_df = pandas.read_csv(trove_result_file_name)
+    trove_result_df = filter_trove_result_df(trove_result_df)
     available_result_count = return_trove_file_result_count(trove_result_file_name)
+    # TODO: deal with possible zero or near-zero results after filtering
     summary_fields = []
-    for field_name in ["year", "trove_article_heading", "heading", "date", "snippet", "id"]:
+    for field_name in ["year", "trove_article_heading", "heading", "snippet"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
-    # NOTE: I think this summary is better than the random picker; extend on this and summarise?
+    # NOTE: I think this summary is better than the random picker
+    # TODO: refine the word summary function; read some random headlines
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
-    say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines?", try_say=try_say, speed=default_speed)
-    user_input = get_user_input(prompt_text="Enter 'n' if not interested\nEnter any other key to hear a few sample headlines...")
-    if (user_input.upper() == 'EXIT'):
-        continue_script = False
-    elif (user_input.upper() != 'N'):
-        # reads summaries of random sample
-        sample_size = 10
-        if (available_result_count < sample_size):
-            sample_size = available_result_count
-        random_row_numbers = random.sample(range(0, available_result_count), sample_size)
+    word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
+    # print(word_list)
+    word_summary_list = return_custom_word_summary_list(input_words_all=word_list)
+    
+    #print(word_summary_list)
+    for summary in word_summary_list:
+        say_something(summary, try_say=try_say, speed=default_speed)
 
-        random_row_numbers = list(set(random_row_numbers))
-        read_trove_summary_fields(trove_result_df=trove_result_df, 
-                                  try_say=try_say,
-                                  speed=default_speed,
-                                  summary_fields=["year", "heading"], 
-                                  row_numbers=random_row_numbers)
-   
+
 if (continue_script == True): 
-    say_something(f"\nShall I pick a random {search_word} from this place?", try_say=try_say, speed=default_speed)
+    say_something(f"\nShall I pick a random {search_word} from {search_town}?", try_say=try_say, speed=default_speed)
     say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  
-    #TODO: build this functionality; and decide on best option for using ID field
 
 article_number = None
-# TODO: fix loop condition
-while (continue_script == True and article_number == None):      
-    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.")
-    # TODO: update the user input format to list
+while (continue_script == True and article_number == None):
+    prompt_text = "\nI will default to a random selection."
+    prompt_text += "\nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.\n"
+    user_input = get_user_input(prompt_text = prompt_text)
     if (user_input.upper() == 'EXIT'):
         continue_script = False
     elif (user_input.upper() == 'PICK'):
         say_something("\nWhich article are you interested in?", try_say=try_say, speed = default_speed)  
-        user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
+        user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel.\n")   
         # TODO: decide on whether to use article number or row number
         if (user_input.upper() == 'EXIT'):
             continue_script = False
@@ -201,34 +205,68 @@ while (continue_script == True and article_number == None):
         article_number = random.choice(trove_result_df.index)
         print(article_number)
         say_something(f"Ok. Let's see. Here is my random {search_word} from {search_town}.", try_say=try_say, speed=default_speed)
-        # TODO: reduce repetition with pick option
         article = trove_result_df.loc[article_number]
-        print(article[summary_fields])
-        # TODO: OPTION TO KEEP LOOPING! currently stops
+        #print(article[summary_fields])
+        for field_name in ["year", "heading"]:
+            # TODO: refine what to read out here, or read later
+            say_something(field_name, try_say=try_say, speed=default_speed)
+            say_something(article[field_name], try_say=try_say, speed=default_speed)
 
-#    if (continue_script == true) then  
-#       puts(article_number)
-#       read_trove_results_by_array(input_trove_file = trove_result_file_name, article_numbers = [article_number], speed = default_speed)
-#       say_something("\n.....")
-#       say_something("So, that was one #{search_word} from #{search_town}", also_print = true, speed = default_speed)   
-#       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  
-#       user_input = get_user_input(prompt_text = "\nEnter 'n' for a different #{search_word}\nEnter 'exit' to cancel\nEnter 'y' to find out more")
-#       if (user_input.upcase == 'Y') then
-#          trove_article_id = return_record_from_single_file(input_file = trove_result_file_name, row_number = article_number, column_number = 9)
-#          puts(trove_article_id)
-#          trove_article_result = fetch_trove_newspaper_article(trove_article_id = trove_article_id, trove_key = my_trove_key)
-#          trove_article_file = write_trove_newspaper_article_to_file(trove_article_result = trove_article_result, trove_article_id = trove_article_id, output_path_name = default_output_path_name)        
-#          if (trove_article_file != false) then
-#             puts("\nContent written to file: #{trove_article_file}")
-#          end
-#          say_something("Good luck!", also_print = true, speed = default_speed)
-#          continue_script = false
-#       elsif (user_input.upcase == 'EXIT') then      
-#          continue_script = false
-#       end
-#    end
-# end
+    if (continue_script == True and article_number != None):
+        say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
+        prompt_text = "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
+        prompt_text += f"\nEnter any other key to continue with this article ({article_number}).\n"
+        user_input = get_user_input(prompt_text = prompt_text)
+        if (user_input.upper() == 'EXIT'):
+            continue_script = False
+        elif (user_input.upper() == 'N'):
+            article_number = None
 
-# say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
+
+print("exited loop...")
+
+if (continue_script == True and article_number != None):  
+    prompt_text = "\nWould you like me to get a copy of the whole article for you?"
+    say_something(prompt_text, try_say=try_say, speed=default_speed)
+    prompt_text = "\nEnter 'exit' to cancel\nEnter 'y' to find out more about this article.\n"
+    user_input = get_user_input(prompt_text=prompt_text)                  
+    if (user_input.lower() == 'y'):
+        trove_article_id = article["id"]
+        article_json = fetch_trove_newspaper_article(trove_key=trove_key, trove_article_id=trove_article_id, also_print=False)
+        # TODO: error handling for json request
+        # TODO: neaten this section, written quickly
+        file_description = "trove_article_"
+        file_description += str(article["year"]) + "_"
+        file_description += str(trove_article_id) + "_"
+        max_heading = 15
+        file_description += str(article["heading"][:max_heading])
+        pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
+        json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
+        # TODO: error handling for failure getting json
+        with open(json_file_name, 'w') as f:
+            json.dump(article_json, f)
+        print(f"Full article content written to json file: {json_file_name}")
+        # TODO: error handling for failure getting pdf
+        pdf_url = article_json["pdf"][0]
+        print(pdf_url)
+        response = requests.get(pdf_url)
+        with open(pdf_file_name, 'wb') as f:
+            f.write(response.content)
+        print(f"PDF written to: {pdf_file_name}")
+        # TODO: add speaking reference to files
+        
+        prompt_text = "Would you like me to read the full article?\n"
+        say_something(prompt_text, try_say=try_say, speed=default_speed)
+        prompt_text = "Enter 'y' to hear the full article.\nEnter any other key to skip this and just check output files.\n"
+        user_input = get_user_input(prompt_text=prompt_text)                  
+        if (user_input.lower() == 'y'):
+            # TODO: decide on html approach and update dependencies if needed; e.g. requirements.txt
+            article_html = article_json["articleText"]
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(article_html)
+            article_text = soup.get_text()
+            say_something(article_text, try_say=try_say, speed=default_speed)
+
+say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 
 # TODO: replicate some map summary potential here

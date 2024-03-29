@@ -1,3 +1,6 @@
 *.csv
 *.pyc
 keys
+*_ssh*
+*pdf
+*json

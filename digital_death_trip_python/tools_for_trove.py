@@ -296,16 +296,78 @@ def parse_trove_result_records_to_df(trove_search_result,
         return(result_records)
 
 
-def read_trove_summary_fields(trove_result_df,
-                              try_say=True,
-                              speed=180,
-                              summary_fields=["year", "trove_article_heading", "heading", "date", "snippet"],
-                              row_numbers=[0, 1, 2]):
-    print("\n***")
-    for row_number in row_numbers:
-        row = trove_result_df.loc[row_number]
-        for field_name in summary_fields:
-            if (field_name in trove_result_df):
-                # say_something(f"{field_name.upper()}:", try_say=try_say, speed=speed)
-                say_something(row[field_name], try_say=try_say, speed=speed)
-    # TODO: account for usefulness of id numbers here (but boring to hear aloud)
+def filter_trove_result_df(trove_result_df, 
+        remove_advertising=True, 
+        min_heading_length=5,
+        min_snippet_length=15):
+    try:
+
+        if (("heading" in trove_result_df.columns) and (min_heading_length > 0)):
+            print(f"removing records with headings less than {min_heading_length} characters")
+            trove_result_df = trove_result_df[trove_result_df["heading"].str.len() >= min_heading_length]
+            print(len(trove_result_df))
+
+        if (("snippet" in trove_result_df.columns) and (min_snippet_length > 0)):
+            print(f"removing records with snippets shorter than {min_snippet_length} characters")
+            trove_result_df = trove_result_df[trove_result_df["snippet"].str.len() >= min_snippet_length]
+            print(len(trove_result_df))
+
+        if (("heading" in trove_result_df.columns) and (remove_advertising == True)):
+            print("Removing advertising...")
+            trove_result_df = trove_result_df[trove_result_df["heading"].str.contains("dvertising") == False]
+            # TODO: make case insensitive
+            print(len(trove_result_df))
+
+        return(trove_result_df)
+    except:
+        print("Error in filter_trove_result_df")
+        return(trove_result_df)
+
+
+#e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>
+
+def fetch_trove_newspaper_article(trove_article_id,
+                                trove_key,
+                                trove_article_base="https://api.trove.nla.gov.au/v3/newspaper/",
+                                result_reclevel='full',
+                                result_include='articletext',
+                                result_encoding='json',
+                                also_print=True):
+    try:
+        print(f"Attempting to fetch newspaper article {trove_article_id}")
+        request_list = []
+        request_list.append(f"key={trove_key}")
+        request_list.append(f"reclevel={result_reclevel}")
+        request_list.append(f"include={result_include}")
+        request_list.append(f"encoding={result_encoding}")
+        request_string = "&".join(request_list)
+        trove_article_url = trove_article_base + str(trove_article_id) + '?' + request_string
+        
+        trove_article_result = requests.get(trove_article_url)
+        print(trove_article_result)
+        if (trove_article_result.status_code == 200):
+            trove_article_result = json.loads(trove_article_result.content)
+            if (also_print==True):
+                print(trove_article_result)
+        return(trove_article_result)    
+
+    except:
+        print("Error getting article...")
+        return(None)
+
+
+
+# def fetch_trove_newspaper_article(trove_article_id, trove_key, trove_api_base_request="https://api.trove.nla.gov.au/v2/newspaper/")
+#    # Added August 18th: fetches individual article
+#    # Note: add more functions to handle this kind of return value
+#    puts("\nFetching individual article: #{trove_article_id}...")
+#    trove_api_request = trove_api_base_request + trove_article_id + "?key=" + trove_key + "&reclevel=full&include=articletext"
+#    begin
+#       uri = URI(trove_api_request)
+#       response = Net::HTTP.get(uri)
+#       trove_api_results = Nokogiri::XML.parse(response)
+#       #puts(trove_api_results)
+#    rescue
+#       puts "Error getting API results"
+#       return(0)
+#    end

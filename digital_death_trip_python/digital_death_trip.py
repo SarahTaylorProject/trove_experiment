@@ -221,26 +221,23 @@ while (continue_script == True and article_number == None):
             continue_script = False
         elif (user_input.upper() == 'N'):
             article_number = None
-        print(article_number)
-        print(continue_script)
 
-print("exited loop")
-print(article_number)
+
+print("exited loop...")
 
 if (continue_script == True and article_number != None):  
-    prompt_text = "\nWould you like me to get a copy of the whole article for you?\n"
+    prompt_text = "\nWould you like me to get a copy of the whole article for you?"
     say_something(prompt_text, try_say=try_say, speed=default_speed)
     prompt_text = "\nEnter 'exit' to cancel\nEnter 'y' to find out more about this article.\n"
     user_input = get_user_input(prompt_text=prompt_text)                  
     if (user_input.lower() == 'y'):
         trove_article_id = article["id"]
-        article_json = fetch_trove_newspaper_article(trove_key=trove_key, trove_article_id=trove_article_id)
+        article_json = fetch_trove_newspaper_article(trove_key=trove_key, trove_article_id=trove_article_id, also_print=False)
         # TODO: error handling for json request
-        # TODO: compress file name logic but add more descriptive parts
+        # TODO: try the beuatiful soup stuff move to tools_for_language_processing if ok, then try reading out?
         file_description = f"trove_article_{search_town}_{search_word}_"
-        file_description += str(article["year"]) + "_"
-        file_description += str(trove_article_id)
-        max_heading = 30
+        file_description += str(trove_article_id) + "_"
+        max_heading = 15
         file_description += str(article["heading"][:max_heading])
         pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
         json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
@@ -255,8 +252,20 @@ if (continue_script == True and article_number != None):
         with open(pdf_file_name, 'wb') as f:
             f.write(response.content)
         print(f"PDF written to: {pdf_file_name}")
-        # TODO: read out article but remove the gumpf like <dart>
-        say_something("Good luck!", try_say=try_say, speed=default_speed)
+        # TODO: add speaking reference to files
+        
+        prompt_text = "Would you like me to read the full article?\n"
+        say_something(prompt_text, try_say=try_say, speed=default_speed)
+        prompt_text = "Enter 'y' to hear the full article.\nEnter any other key to skip this and just check output files.\n"
+        user_input = get_user_input(prompt_text=prompt_text)                  
+        if (user_input.lower() == 'y'):
+            # TODO: decide on html approach and update dependencies if needed; e.g. requirements.txt
+            article_html = article_json["articleText"]
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(article_html)
+            article_text = soup.get_text()
+            say_something(article_text, try_say=try_say, speed=default_speed)
+        say_something("\nOk. Good luck!", try_say=try_say, speed=default_speed)
 
 #       say_something("So, that was one #{search_word} from #{search_town}", also_print = true, speed = default_speed)   
 #       say_something("\nWould you like me to get a copy of the whole article for you?", also_print = true, speed = default_speed)                  

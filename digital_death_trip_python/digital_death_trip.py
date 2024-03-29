@@ -212,7 +212,7 @@ while (continue_script == True and article_number == None):
     if (continue_script == True and article_number != None):
         say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
         prompt_text = "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
-        prompt_text += "\nEnter any other key to continue with this article."
+        prompt_text += f"\nEnter any other key to continue with this article ({article_number}).\n"
         user_input = get_user_input(prompt_text = prompt_text)
         if (user_input.upper() == 'EXIT'):
             continue_script = False

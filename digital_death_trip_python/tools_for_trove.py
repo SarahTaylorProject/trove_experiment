@@ -301,6 +301,7 @@ def filter_trove_result_df(trove_result_df,
         min_heading_length=5,
         min_snippet_length=15):
     try:
+
         if (("heading" in trove_result_df.columns) and (min_heading_length > 0)):
             print(f"removing records with headings less than {min_heading_length} characters")
             trove_result_df = trove_result_df[trove_result_df["heading"].str.len() >= min_heading_length]
@@ -316,7 +317,7 @@ def filter_trove_result_df(trove_result_df,
             trove_result_df = trove_result_df[trove_result_df["heading"].str.contains("dvertising") == False]
             # TODO: make case insensitive
             print(len(trove_result_df))
-
+        trove_result_df.to_csv('test_filter.csv')
         return(trove_result_df)
     except:
         print("Error in filter_trove_result_df")

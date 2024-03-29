@@ -93,6 +93,7 @@ if (search_town == None):
             print(f"\n{result_count} result/s found on file for {search_town}")
             trove_result_df = pandas.read_csv(trove_result_file_name)
             trove_result_df = filter_trove_result_df(trove_result_df)
+            trove_result_df.to_csv('test_filter2.csv')
     else:
         search_town = user_input.strip().title()
 
@@ -159,18 +160,18 @@ if (continue_script == True):
     trove_result_df = pandas.read_csv(trove_result_file_name)
     available_result_count = return_trove_file_result_count(trove_result_file_name)
     summary_fields = []
-    for field_name in ["year", "trove_article_heading", "heading", "date", "snippet", "id"]:
+    for field_name in ["year", "trove_article_heading", "heading", "snippet"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
     # NOTE: I think this summary is better than the random picker
-    # TODO: fix summary function, and read some random headlines
+    # TODO: add to summary function; read some random headlines
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
     # print(word_list)
-    word_summary_list = print_and_return_word_summary(input_words_all=word_list, 
+    word_summary_list = return_custom_word_summary_list(input_words_all=word_list, 
         target_words=['man', 'woman', 'tragedy'])
     
     #print(word_summary_list)
@@ -207,7 +208,8 @@ while (continue_script == True and article_number == None):
         # TODO: reduce repetition with pick option
         article = trove_result_df.loc[article_number]
         print(article[summary_fields])
-        # TODO: OPTION TO KEEP LOOPING! currently stops
+        for field_name in summary_fields:
+            say_something(article[field_name], try_say=try_say, speed=default_speed)
 
     if (continue_script == True and article_number != None):
         say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  

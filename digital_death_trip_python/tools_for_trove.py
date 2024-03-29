@@ -296,6 +296,28 @@ def parse_trove_result_records_to_df(trove_search_result,
         return(result_records)
 
 
+def filter_trove_result_df(trove_result_df, 
+        remove_advertising=True, 
+        min_heading_length=5, 
+        min_snippet_length=10):
+    try:
+        if (("heading" in trove_result_df.columns) and (minheading_length > 0)):
+            print(f"removing records with headings less than {min_heading_length}")
+            trove_result_df = trove_result_df[trove_result_df["heading"].str.len() >= min_heading_length]
+
+        if (("snippet" in trove_result_df.columns) and (min_snippet_length > 0)):
+            print(f"removing records with snippets shorter than {min_snippet_length}")
+            trove_result_df = trove_result_df[trove_result_df["snippet"].str.len() >= min_snippet_length]
+
+        if (("heading" in trove_result_df.columns) and (remove_advertising == True)):
+            print("Removing advertising...")
+            trove_result_df = trove_result_df[trove_result_df["heading"].str.contains("advertising")]
+
+        return(trove_result_df)
+    except:
+        print("Error in filter_trove_result_df")
+        return(trove_result_df)
+
 def read_trove_summary_fields(trove_result_df,
                               try_say=True,
                               speed=180,

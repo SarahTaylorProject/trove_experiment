@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 from tools_for_general_use import *
 from tools_for_trove import *
 from tools_for_towns import *
+from tools_for_language_processing import *
 
 clear_screen()
 
@@ -91,6 +92,7 @@ if (search_town == None):
             result_count = return_trove_file_result_count(trove_result_file_name)
             print(f"\n{result_count} result/s found on file for {search_town}")
             trove_result_df = pandas.read_csv(trove_result_file_name)
+            trove_result_df = filter_trove_result_df(trove_result_df)
     else:
         search_town = user_input.strip().title()
 
@@ -107,7 +109,7 @@ if (continue_script == True and trove_result_file_name == ''):
     trove_search_result = fetch_trove_search_result(trove_key=trove_key, trove_search_url=trove_search_url)
     if (trove_search_result == None):        
         continue_script = False
-        say_something(f"\nSorry, no {search_word} results found for {search_town}")
+        say_something(f"\nSorry, no {search_word} results found for {search_town}", try_say=try_say, speed=default_speed)
     else:
         trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
         print(trove_search_result_metadata)
@@ -118,6 +120,11 @@ if (continue_script == True and trove_result_file_name == ''):
         else:
             say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
             trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
+            print(len(trove_result_df))
+            print("Before filtering")
+            trove_result_df = filter_trove_result_df(trove_result_df)
+            print(len(trove_result_df))
+            print("After filtering")
             trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
             print(trove_result_file_name)
             # TODO: give option to create multiple calls or not
@@ -134,6 +141,11 @@ if (continue_script == True and trove_result_file_name == ''):
                 trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
                 print(f"Total results from search {search_town} {search_word}: {result_count}")
                 print(f"API call number {call_count} of maximum {max_calls}")
+                print(len(trove_result_df))
+                print("Before filtering")
+                trove_result_df = filter_trove_result_df(trove_result_df)
+                print(len(trove_result_df))
+                print("After filtering")
                 print(f"Appending to {trove_result_file_name}")
                 trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
                 next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
@@ -155,52 +167,17 @@ if (continue_script == True):
     # NOTE: I think this summary is better than the random picker; extend on this and summarise?
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
-    # NOTE: change to ntlk summary and some random headlines
-    import nltk
-    from nltk.tokenize import RegexpTokenizer
-    tokenizer = RegexpTokenizer(r'\w+')
-    from nltk.corpus import stopwords
 
+    word_list = return_word_list_from_df(trove_result_df, field_list = ["heading", "snippet"])
+    word_summary_list = print_and_return_word_summary(input_words_all=word_list, 
+        freq_limit=50, 
+        stop_words=None, 
+        freq_limit_tag_summary=5,
+        test_words=['man', 'woman', 'tragedy'])
     
-    stop_words = set(stopwords.words('english'))
-    from nltk.tokenize import word_tokenize
-    freq_limit = 10
-    token_list = []
-    for field_name in ["heading", "snippet"]:
-        for current_string in trove_result_df[field_name].tolist():
-            if isinstance(current_string, str):
-                # token_list.extend(word_tokenize(current_string))
-                token_list.extend(tokenizer.tokenize(current_string))
+    for word_summary in word_summary_list:
+        try_say(word_summary)
 
-    # NOTE better to tokenize list in a function; TODO later
-    word_list = [w.lower() for w in token_list if w.lower() not in stop_words]
-    freq = nltk.FreqDist(word_list)
-    most_common = freq.most_common(freq_limit)
-    print(f"Most common {freq_limit} words (excluding stop words):")
-    print(most_common)
-
-    common_word_list = []
-    for item in most_common:
-        common_word_list.append(item[0])
-    print(common_word_list)
-
-    say_something(f"\nI now have {result_count} results available on file.\nWould you like me to read a few headlines?", try_say=try_say, speed=default_speed)
-    # user_input = get_user_input(prompt_text="Enter 'n' if not interested\nEnter any other key to hear a few sample headlines...")
-    # if (user_input.upper() == 'EXIT'):
-    #     continue_script = False
-    # elif (user_input.upper() != 'N'):
-    #     # reads summaries of random sample
-    #     sample_size = 10
-    #     if (available_result_count < sample_size):
-    #         sample_size = available_result_count
-    #     random_row_numbers = random.sample(range(0, available_result_count), sample_size)
-
-    #     random_row_numbers = list(set(random_row_numbers))
-    #     read_trove_summary_fields(trove_result_df=trove_result_df, 
-    #                               try_say=try_say,
-    #                               speed=default_speed,
-    #                               summary_fields=["year", "heading"], 
-    #                               row_numbers=random_row_numbers)
    
 if (continue_script == True): 
     say_something(f"\nShall I pick a random {search_word} from this place?", try_say=try_say, speed=default_speed)
@@ -209,14 +186,15 @@ if (continue_script == True):
 
 article_number = None
 # TODO: fix loop condition
-while (continue_script == True and article_number == None):      
-    user_input = get_user_input(prompt_text = "\nI will default to a random selection. \nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.")
-    # TODO: update the user input format to list
+while (continue_script == True and article_number == None):
+    prompt_text = "\nI will default to a random selection."
+    prompt_text += "\nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.\n"
+    user_input = get_user_input(prompt_text = prompt_text)
     if (user_input.upper() == 'EXIT'):
         continue_script = False
     elif (user_input.upper() == 'PICK'):
         say_something("\nWhich article are you interested in?", try_say=try_say, speed = default_speed)  
-        user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel")   
+        user_input = get_user_input(prompt_text = "\Please enter article number\nEnter 'exit' to cancel.\n")   
         # TODO: decide on whether to use article number or row number
         if (user_input.upper() == 'EXIT'):
             continue_script = False
@@ -233,6 +211,21 @@ while (continue_script == True and article_number == None):
         article = trove_result_df.loc[article_number]
         print(article[summary_fields])
         # TODO: OPTION TO KEEP LOOPING! currently stops
+
+    if (continue_script == True and article_number != None):
+        say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
+        prompt_text == "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
+        prompt_text += "\nEnter any other key to continue with this article."
+        user_input = get_user_input(prompt_text = prompt_text)
+        if (user_input.upper() == 'EXIT'):
+            continue_script = False
+        elif (user_input.upper() == 'N'):
+            article_number = None
+        print(article_number)
+        print(continue_script)
+
+print("exited loop")
+print(article_number)
 
 #    if (continue_script == true) then  
 #       puts(article_number)
@@ -257,6 +250,6 @@ while (continue_script == True and article_number == None):
 #    end
 # end
 
-# say_something("\nThank you, goodbye.", also_print = true, speed = default_speed)
+say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 
 # TODO: replicate some map summary potential here

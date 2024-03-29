@@ -47,7 +47,7 @@ freq = nltk.FreqDist(corpus_test_words)
 most_common = freq.most_common(freq_limit)
 print(most_common)
 
-#nltk.download('averaged_perceptron_tagger')
+# nltk.download('averaged_perceptron_tagger')
 freq_limit = 20
 corpus_words_tagged = nltk.pos_tag(corpus_words)
 tag_list = ['NN', 'NNS', 'JJ', 'VB', 'VBG']

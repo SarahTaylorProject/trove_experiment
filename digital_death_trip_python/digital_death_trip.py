@@ -236,7 +236,7 @@ if (continue_script == True and article_number != None):
         # TODO: error handling for json request
         # TODO: neaten this section, written quickly
         file_description = "trove_article_"
-        file_description += str(article["year"])
+        file_description += str(article["year"]) + "_"
         file_description += str(trove_article_id) + "_"
         max_heading = 15
         file_description += str(article["heading"][:max_heading])

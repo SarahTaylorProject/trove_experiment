@@ -151,12 +151,12 @@ if (continue_script == True and trove_result_file_name == ''):
                 next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
                 print(f"\n{next_url}")
         
-# IDEA: summary of key words
+
 # TODO: limit random files to those with matching search word?
+sys.exit()
 
 # summarise results
 if (continue_script == True):
-    # TODO: neaten the work with result count: total results vs available result
     trove_result_df = pandas.read_csv(trove_result_file_name)
     available_result_count = return_trove_file_result_count(trove_result_file_name)
     summary_fields = []
@@ -164,11 +164,13 @@ if (continue_script == True):
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
-    # NOTE: I think this summary is better than the random picker; extend on this and summarise?
+    # NOTE: I think this summary is better than the random picker
+    # TODO: fix summary function, and read some random headlines
     print("\n**SUMMARY VIEW**\n")
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(trove_result_df, field_list = ["heading", "snippet"])
+    print(word_list)
     word_summary_list = print_and_return_word_summary(input_words_all=word_list, 
         freq_limit=50, 
         stop_words=None, 
@@ -180,12 +182,10 @@ if (continue_script == True):
 
    
 if (continue_script == True): 
-    say_something(f"\nShall I pick a random {search_word} from this place?", try_say=try_say, speed=default_speed)
+    say_something(f"\nShall I pick a random {search_word} from {search_town}?", try_say=try_say, speed=default_speed)
     say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  
-    #TODO: build this functionality; and decide on best option for using ID field
 
 article_number = None
-# TODO: fix loop condition
 while (continue_script == True and article_number == None):
     prompt_text = "\nI will default to a random selection."
     prompt_text += "\nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.\n"

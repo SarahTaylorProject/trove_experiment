@@ -169,18 +169,15 @@ if (continue_script == True):
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
-    print(word_list)
+    # print(word_list)
     word_summary_list = print_and_return_word_summary(input_words_all=word_list, 
-        freq_limit=50, 
-        stop_words=None, 
-        freq_limit_tag_summary=5,
-        test_words=['man', 'woman', 'tragedy'])
+        target_words=['man', 'woman', 'tragedy'])
     
-    print(word_summary_list)
-    for word_summary in word_summary_list:
-        try_say(word_summary)
+    #print(word_summary_list)
+    for summary in word_summary_list:
+        say_something(summary, try_say=try_say, speed=default_speed)
 
-sys.exit()
+
 if (continue_script == True): 
     say_something(f"\nShall I pick a random {search_word} from {search_town}?", try_say=try_say, speed=default_speed)
     say_something("Or let me know if you would like to pick a specific article.", try_say=try_say, speed=default_speed)  
@@ -214,7 +211,7 @@ while (continue_script == True and article_number == None):
 
     if (continue_script == True and article_number != None):
         say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
-        prompt_text == "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
+        prompt_text = "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
         prompt_text += "\nEnter any other key to continue with this article."
         user_input = get_user_input(prompt_text = prompt_text)
         if (user_input.upper() == 'EXIT'):

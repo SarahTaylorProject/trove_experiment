@@ -11,6 +11,9 @@ from tools_for_trove import *
 from tools_for_towns import *
 from tools_for_language_processing import *
 
+# TODO: move to separate module, include in requirements
+from bs4 import BeautifulSoup
+
 clear_screen()
 
 # start variables: will default to tragedy unless command line argument passed
@@ -29,7 +32,6 @@ else:
 default_speed = 180
 max_articles_to_read = 3
 max_calls = 10
-max_file_description_length = 50
 try_say = test_say_something()
 continue_script = True
 trove_result_file_name = ''
@@ -216,12 +218,11 @@ while (continue_script == True and selected_article_number == None):
 
 
     if (continue_script == True and selected_article_number != None):
-        print("HERE 1")
-        print(selected_article[summary_fields])
-        print("HERE 2")
-        for field_name in ["year", "heading"]:
-            say_something(field_name, try_say=try_say, speed=default_speed)
+        print("\n***")
+        for field_name in ["year", "heading", "snippet"]:
+            say_something(field_name.upper(), try_say=try_say, speed=default_speed)
             say_something(selected_article[field_name], try_say=try_say, speed=default_speed)
+        print("***\n")
 
         say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
         prompt_text = "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
@@ -247,53 +248,46 @@ if (continue_script == True and selected_article_number != None):
     else:
         # TODO: neaten this section / put in function
         file_description = "trove_article_"
+        file_description += search_town + "_"
         file_description += str(selected_article["year"]) + "_"
-        file_description += str(selected_article["id"]) + "_"
-        file_description += str(selected_article["heading"])
-        file_description = file_description[:max_file_description_length]
+        file_description += str(selected_article["id"])
         
         # 1 write json file
         json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
-        try:
-            with open(json_file_name, 'w') as f:
-                json.dump(selected_article_json, f)
-            print(f"Full article content written to json file: {html_file_name}")
-        except:
-            print("Error writing json file...")
+        print(selected_article_json)
+        with open(json_file_name, 'w') as f:
+            json.dump(selected_article_json, f)
+        print(f"Full article content written to json file: {html_file_name}")
 
         # 2 write pdf file
         pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
-        try:
-            pdf_url = article_html["pdf"][0]
-            print(pdf_url)
-            response = requests.get(pdf_url)
-            with open(pdf_file_name, 'wb') as f:
-                f.write(response.content)
-            print(f"PDF written to: {pdf_file_name}")
-        except:
-            print("Error writing PDF file...")
+        print(pdf_file_name)
+        pdf_url = article_html["pdf"][0]
+        print(pdf_url)
+        response = requests.get(pdf_url)
+        with open(pdf_file_name, 'wb') as f:
+            f.write(response.content)
+        print(f"PDF written to: {pdf_file_name}")
+
 
         # 3 html of article text
         html_file_name = os.path.join(default_output_path_name, f"{file_description}.html")
-        try:
-            article_html = article_html["articleText"]
-            with open(html_file_name, 'w') as f:
-                f.write(article_html)
-            subprocess.run(['open', html_file_name])
-        except:
-            print("Error writing HTML of article text...")
+        print(html_file_name)
+        selected_article_html = selected_article_json["articleText"]
+        with open(html_file_name, 'w') as f:
+            f.write(selected_article_html)
+
 
         # 4 read article out loud (optional)
-        prompt_text = "Would you like me to read the full article text?\n"
-        say_something(prompt_text, try_say=try_say, speed=default_speed)
-        prompt_text = "Enter 'y' to hear the full article.\nEnter any other key to skip this and just create output files.\n"
-        user_input = get_user_input(prompt_text=prompt_text)
-        if (user_input.lower() == 'y'): 
-            # TODO: move to separate module, include in requirements
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(article_html)
-            article_text = soup.get_text()
-            say_something(article_text, try_say=try_say, speed=default_speed)
+        # prompt_text = "Would you like me to read the full article text?\n"
+        # say_something(prompt_text, try_say=try_say, speed=default_speed)
+        # prompt_text = "Enter 'y' to hear the full article.\nEnter any other key to skip this and just create output files.\n"
+        # user_input = get_user_input(prompt_text=prompt_text)
+        # if (user_input.lower() == 'y'): 
+
+        #     soup = BeautifulSoup(selected_article_html)
+        #     selected_article_text = soup.get_text()
+        #     say_something(selected_article_text, try_say=try_say, speed=default_speed)
 
 say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 

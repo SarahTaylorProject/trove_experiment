@@ -353,6 +353,7 @@ def fetch_trove_newspaper_article(trove_article_id,
         print(trove_article_result)
         if (trove_article_result.status_code == 200):
             trove_article = json.loads(trove_article_result.content)
+            #trove_article = trove_article_result.content
             if (also_print):
                 print(trove_article)
         return(trove_article)    

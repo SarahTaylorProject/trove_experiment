@@ -23,7 +23,11 @@ def return_word_list_from_df(df, field_list=None, tokenizer=None):
 
 def run_nltk_downloads():
     nltk.download('averaged_perceptron_tagger')
-    # TODO: add other downloads here, call on error
+    nltk.download('stopwords')
+    nltk.download('punkt')
+    nltk.download('brown')
+    nltk.download('gutenberg')
+    # TODO: call on error
 
 
 def return_nltk_stop_words(language='english'):

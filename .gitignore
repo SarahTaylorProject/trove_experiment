@@ -1,5 +1,6 @@
 *.csv
 *.pyc
+*.html
 keys
 *_ssh*
 *pdf

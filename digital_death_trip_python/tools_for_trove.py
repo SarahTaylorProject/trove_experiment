@@ -324,15 +324,20 @@ def filter_trove_result_df(trove_result_df,
         return(trove_result_df)
 
 
-#e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>
+
 
 def fetch_trove_newspaper_article(trove_article_id,
                                 trove_key,
                                 trove_article_base="https://api.trove.nla.gov.au/v3/newspaper/",
                                 result_reclevel='full',
                                 result_include='articletext',
-                                result_encoding='json',
+                                result_encoding='html',
                                 also_print=True):
+    """
+    Fetches individual Trove article
+    #e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>
+    """
+    trove_article_result = None
     try:
         print(f"Attempting to fetch newspaper article {trove_article_id}")
         request_list = []
@@ -353,7 +358,7 @@ def fetch_trove_newspaper_article(trove_article_id,
 
     except:
         print("Error getting article...")
-        return(None)
+        return(trove_article_result)
 
 
 

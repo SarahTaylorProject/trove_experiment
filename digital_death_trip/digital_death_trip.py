@@ -11,13 +11,11 @@ from tools_for_trove import *
 from tools_for_towns import *
 from tools_for_language_processing import *
 
-# TODO: move to separate module, include in requirements
 from bs4 import BeautifulSoup
 
 clear_screen()
 
 # start variables: will default to tragedy unless command line argument passed
-# IDEA: use random word generator
 if len(sys.argv) > 1:
     search_word = sys.argv[1]
 else:
@@ -98,6 +96,7 @@ if (search_town == None):
             trove_result_df = pandas.read_csv(trove_result_file_name)
     else:
         search_town = user_input.strip().title()
+        print(search_town)
 
 if (continue_script == True):
     print("continuing...")
@@ -179,10 +178,8 @@ if (continue_script == True):
     #print(word_summary_list)
     for summary in word_summary_list:
         say_something(summary, try_say=try_say, speed=default_speed)
-    # TODO: reduce this area
-
+    # TODO: reduce this area to just the most common words, nouns, verbs
     # TODO: read some random headlines
-    # TODO: summarise the most common year?
 
 
 if (continue_script == True): 
@@ -224,7 +221,7 @@ while (continue_script == True and selected_article_number == None):
         say_something(f"ARTICLE\n{selected_article_number}", try_say=try_say, speed=default_speed)
         for field_name in ["year", "heading", "snippet"]:
             say_something(field_name.upper(), try_say=try_say, speed=default_speed)
-            say_something(selected_article[field_name], try_say=try_say, speed=default_speed)
+            say_something(f"{selected_article[field_name]}", try_say=try_say, speed=default_speed)
         print("***\n")
 
         say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  

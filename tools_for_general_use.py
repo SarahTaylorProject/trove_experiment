@@ -33,28 +33,30 @@ def return_operating_system():
   return(result)
 
 
-def test_say_something(text="test", speed=120, espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
+def test_say_something(text="test", speed=120, mac_voice="Agnes", espeak_executable_path='C:\Elevate\eSpeak NG\espeak-ng.exe'):
   """
   Test of say_something: useful to include a call to this before using say_something repeatedly
   Returns True if no error
   Returns False if error
+  # TODO: provisions for installing espeak if not found; on linux it is straightforward
+  # TODO: choose best Mac voice, make changing this easy
   """
   result = False
   try:
     os_result = return_operating_system()
-    command_text = None
+    command_list = []
     if os_result == "mac":
-      command_text = 'say -r ' + ' "' + text + '"'
+      command_list = ["say", "-v", mac_voice, text]
     elif (os.path.isfile(espeak_executable_path)):
-      command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
-      command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
+      command_list = [espeak_executable_path, "-s", str(speed), text]
     elif os_result == "win32":
-      command_text = 'espeak -s' + str(speed) + ' "' + text + '"'
+      command_list = ["espeak", "-s", str(speed), text]
     elif os_result == "linux":
-      command_text = "echo '" + text + "'|espeak -s " + str(speed)
+      command_list = ["espeak", "-s", str(speed), text]
 
-    if (command_text != None):
-      subprocess.check_output(command_text)
+    if (command_list):
+      print(command_list)
+      subprocess.check_output(command_list)
       result = True
 
     return(result)
@@ -79,21 +81,21 @@ def say_something(text, also_print=True, try_say=True, speed=120, espeak_executa
 
   os_result = None
   os_result = return_operating_system()
-  command_text = None
+  command_list = []
 
+  os_result = return_operating_system()
+  command_list = []
   if os_result == "mac":
-    command_text = 'say -r ' + str(speed) + ' "' + text + '"'
-  elif (espeak_executable_path != None and os.path.isfile(espeak_executable_path)):
-    print("here")
-    command_text = '"{0}" -s {1}'.format(espeak_executable_path, speed)
-    command_text += ' "' + remove_nuisance_characters_from_string(text) + '"'
+    command_list = ["say", "-v", mac_voice, text]
+  elif (os.path.isfile(espeak_executable_path)):
+    command_list = [espeak_executable_path, "-s", str(speed), text]
   elif os_result == "win32":
-    command_text = 'espeak -s' + str(speed) + ' "' + text + '"'
+    command_list = ["espeak", "-s", str(speed), text]
   elif os_result == "linux":
-    command_text = "echo '" + text + "'|espeak -s " + str(speed)
+    command_list = ["espeak", "-s", str(speed), text]
 
-  if (command_text != None):
-    subprocess.call(command_text, shell=True)
+  if (command_list):
+    subprocess.call(command_list)
   else:
     return()
 

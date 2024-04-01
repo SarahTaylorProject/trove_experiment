@@ -364,3 +364,5 @@ def fetch_trove_newspaper_article(trove_article_id,
 
 
 
+# TODO: get state for publication title https://api.trove.nla.gov.au/v2/newspaper/title/225?key=KEY
+# use this to filter where state = VIC or state matches town

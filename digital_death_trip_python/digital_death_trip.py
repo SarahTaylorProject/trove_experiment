@@ -243,55 +243,68 @@ if (continue_script == True and selected_article_number != None):
     say_something("\nI am going to fetch the complete article from the Trove API, please wait...", try_say=try_say, speed=default_speed)             
     
     selected_article_json = fetch_trove_newspaper_article(trove_key=trove_key, 
-        trove_article_id=selected_article["id"], also_print=True)
+        trove_article_id=selected_article["id"])
     
     if (selected_article_json == None):
         say_something("\nSorry, I encountered an error searching for this article...")
         continue_script = False
     else:
-        # TODO: neaten this section / put in function
-        # TODO: make download optional only
-        file_description = "trove_article_"
-        file_description += str(selected_article["year"]) + "_"
-        file_description += str(selected_article["id"])
-        
-        # 1 write json file
-        json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
+        say_something("\nHere is an overview of what I found...", try_say=try_say, speed=default_speed)             
+        print("\n***")
         print(selected_article_json)
-        with open(json_file_name, 'w') as f:
-            json.dump(selected_article_json, f)
-        print(f"Article content written to json file: {json_file_name}")
+        print("***\n")
 
-        # 2 write pdf file
-        pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
-        print(pdf_file_name)
-        pdf_url = selected_article_json["pdf"][0]
-        print(pdf_url)
-        response = requests.get(pdf_url)
-        with open(pdf_file_name, 'wb') as f:
-            f.write(response.content)
-        print(f"PDF of article image written to: {pdf_file_name}")
-
-
-        # 3 html of article text
-        html_file_name = os.path.join(default_output_path_name, f"{file_description}.html")
-        print(html_file_name)
         selected_article_html = selected_article_json["articleText"]
-        with open(html_file_name, 'w') as f:
-            f.write(selected_article_html)
-        print(f"HTML of article text written to: {pdf_file_name}")
 
-        # 4 read article out loud (optional)
-        # prompt_text = "Would you like me to read the full article text?\n"
-        # say_something(prompt_text, try_say=try_say, speed=default_speed)
-        # prompt_text = "Enter 'y' to hear the full article.\nEnter any other key to skip this and just create output files.\n"
-        # user_input = get_user_input(prompt_text=prompt_text)
-        # if (user_input.lower() == 'y'): 
+        prompt_text = "Would you like me to read this article?\n"
+        say_something(prompt_text, try_say=try_say, speed=default_speed)
+        prompt_text = "Enter 'y' to read\nEnter any other key to skip this.\n"
+        user_input = get_user_input(prompt_text=prompt_text)
 
-        #     soup = BeautifulSoup(selected_article_html)
-        #     selected_article_text = soup.get_text()
-        #     say_something(selected_article_text, try_say=try_say, speed=default_speed)
+        if (user_input.lower() == 'y'):
+            soup = BeautifulSoup(selected_article_html, features="html.parser")
+            selected_article_text = soup.get_text()
+            say_something(selected_article_text, try_say=try_say, speed=default_speed)
+
+        prompt_text = "Would you like me to download this information to files?\n"
+        say_something(prompt_text, try_say=try_say, speed=default_speed)
+        prompt_text = "Enter 'y' to download files\nEnter any other key to skip this.\n"
+        user_input = get_user_input(prompt_text=prompt_text)
+
+        if (user_input.lower() == 'y'):
+            file_description = "trove_article_"
+            file_description += str(selected_article["year"]) + "_"
+            file_description += str(selected_article["id"])
+            
+            # 1 write json file
+            json_file_name = os.path.join(default_output_path_name, f"{file_description}.json")
+            with open(json_file_name, 'w') as f:
+                json.dump(selected_article_json, f)
+            print(f"json file with article content and metadata: {json_file_name}")
+
+            # 2 write pdf file
+            pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
+            pdf_url = selected_article_json["pdf"][0]
+            response = requests.get(pdf_url)
+            with open(pdf_file_name, 'wb') as f:
+                f.write(response.content)
+            print(f"PDF image of article: {pdf_file_name}")
+
+            # 3 html of article text
+            html_file_name = os.path.join(default_output_path_name, f"{file_description}.html")
+            with open(html_file_name, 'w') as f:
+                f.write(selected_article_html)
+            print(f"HTML of article text: {html_file_name}")
+
+            file_name_to_open = json_file_name
+            if (operating_system == 'mac'):
+                subprocess.call(('open', file_name_to_open))
+            elif (operating_system == 'win32'):
+                os.startfile(file_name_to_open)
+            elif (operating_system == 'linux'):
+                subprocess.call(('xdg-open', file_name_to_open))
+
+            #TODO: check most effective order of events here with reading, saving, etc.
 
 say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 
-# TODO: map potential here

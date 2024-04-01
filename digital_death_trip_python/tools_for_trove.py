@@ -332,7 +332,7 @@ def fetch_trove_newspaper_article(trove_article_id,
                                 result_reclevel='full',
                                 result_include='articletext',
                                 result_encoding='json',
-                                also_print=True):
+                                also_print=False):
     """
     Fetches individual Trove article
     #e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>

@@ -324,7 +324,7 @@ def filter_trove_result_df(trove_result_df,
         return(trove_result_df)
 
 
-#e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>
+
 
 def fetch_trove_newspaper_article(trove_article_id,
                                 trove_key,
@@ -332,7 +332,12 @@ def fetch_trove_newspaper_article(trove_article_id,
                                 result_reclevel='full',
                                 result_include='articletext',
                                 result_encoding='json',
-                                also_print=True):
+                                also_print=False):
+    """
+    Fetches individual Trove article
+    #e.g. https://api.trove.nla.gov.au/newspaper/45649893?reclevel=full&key=<insert key here>
+    """
+    trove_article = None
     try:
         print(f"Attempting to fetch newspaper article {trove_article_id}")
         request_list = []
@@ -342,32 +347,22 @@ def fetch_trove_newspaper_article(trove_article_id,
         request_list.append(f"encoding={result_encoding}")
         request_string = "&".join(request_list)
         trove_article_url = trove_article_base + str(trove_article_id) + '?' + request_string
-        
+        if (also_print):
+            print(trove_article_url)
         trove_article_result = requests.get(trove_article_url)
         print(trove_article_result)
         if (trove_article_result.status_code == 200):
-            trove_article_result = json.loads(trove_article_result.content)
-            if (also_print==True):
-                print(trove_article_result)
-        return(trove_article_result)    
+            trove_article = json.loads(trove_article_result.content)
+            #trove_article = trove_article_result.content
+            if (also_print):
+                print(trove_article)
+        return(trove_article)    
 
     except:
         print("Error getting article...")
-        return(None)
+        return(trove_article)
 
 
 
-# def fetch_trove_newspaper_article(trove_article_id, trove_key, trove_api_base_request="https://api.trove.nla.gov.au/v2/newspaper/")
-#    # Added August 18th: fetches individual article
-#    # Note: add more functions to handle this kind of return value
-#    puts("\nFetching individual article: #{trove_article_id}...")
-#    trove_api_request = trove_api_base_request + trove_article_id + "?key=" + trove_key + "&reclevel=full&include=articletext"
-#    begin
-#       uri = URI(trove_api_request)
-#       response = Net::HTTP.get(uri)
-#       trove_api_results = Nokogiri::XML.parse(response)
-#       #puts(trove_api_results)
-#    rescue
-#       puts "Error getting API results"
-#       return(0)
-#    end
+# TODO: get state for publication title https://api.trove.nla.gov.au/v2/newspaper/title/225?key=KEY
+# use this to filter where state = VIC or state matches town

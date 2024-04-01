@@ -160,15 +160,15 @@ if (continue_script == True and trove_result_file_name == ''):
 if (continue_script == True):
     trove_result_df = pandas.read_csv(trove_result_file_name)
     trove_result_df = filter_trove_result_df(trove_result_df)
-    available_result_count = return_trove_file_result_count(trove_result_file_name)
     # TODO: deal with possible zero or near-zero results after filtering
+    available_result_count = return_trove_file_result_count(trove_result_file_name)
     summary_fields = []
     for field_name in ["year", "trove_article_heading", "heading", "snippet"]:
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
     # NOTE: I think this summary is better than the random picker
-    print("\n**SUMMARY VIEW**\n")
+    print(f"\n**SUMMARY: {search_town} {search_word}**\n")
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
@@ -191,6 +191,8 @@ if (continue_script == True):
 
 selected_article_number = None
 while (continue_script == True and selected_article_number == None):
+    print(f"\n**SUMMARY: {search_town} {search_word}**\n")
+    print(trove_result_df[summary_fields])
     prompt_text = "\nI will default to a random selection."
     prompt_text += "\nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.\n"
     user_input = get_user_input(prompt_text = prompt_text)
@@ -219,6 +221,7 @@ while (continue_script == True and selected_article_number == None):
 
     if (continue_script == True and selected_article_number != None):
         print("\n***")
+        say_something(f"ARTICLE\n{selected_article_number}", try_say=try_say, speed=default_speed)
         for field_name in ["year", "heading", "snippet"]:
             say_something(field_name.upper(), try_say=try_say, speed=default_speed)
             say_something(selected_article[field_name], try_say=try_say, speed=default_speed)
@@ -247,8 +250,8 @@ if (continue_script == True and selected_article_number != None):
         continue_script = False
     else:
         # TODO: neaten this section / put in function
+        # TODO: make download optional only
         file_description = "trove_article_"
-        file_description += search_town + "_"
         file_description += str(selected_article["year"]) + "_"
         file_description += str(selected_article["id"])
         
@@ -257,17 +260,17 @@ if (continue_script == True and selected_article_number != None):
         print(selected_article_json)
         with open(json_file_name, 'w') as f:
             json.dump(selected_article_json, f)
-        print(f"Full article content written to json file: {html_file_name}")
+        print(f"Article content written to json file: {json_file_name}")
 
         # 2 write pdf file
         pdf_file_name = os.path.join(default_output_path_name, f"{file_description}.pdf")
         print(pdf_file_name)
-        pdf_url = article_html["pdf"][0]
+        pdf_url = selected_article_json["pdf"][0]
         print(pdf_url)
         response = requests.get(pdf_url)
         with open(pdf_file_name, 'wb') as f:
             f.write(response.content)
-        print(f"PDF written to: {pdf_file_name}")
+        print(f"PDF of article image written to: {pdf_file_name}")
 
 
         # 3 html of article text
@@ -276,7 +279,7 @@ if (continue_script == True and selected_article_number != None):
         selected_article_html = selected_article_json["articleText"]
         with open(html_file_name, 'w') as f:
             f.write(selected_article_html)
-
+        print(f"HTML of article text written to: {pdf_file_name}")
 
         # 4 read article out loud (optional)
         # prompt_text = "Would you like me to read the full article text?\n"

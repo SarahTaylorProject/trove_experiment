@@ -30,9 +30,11 @@ else:
 default_speed = 180
 max_articles_to_read = 3
 max_calls = 10
-try_say = test_say_something()
+#try_say = test_say_something()
+try_say = False
 continue_script = True
 trove_result_file_name = ''
+filter_to_publication_state = False
 
 # directory setup
 script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -116,17 +118,13 @@ if (continue_script == True and trove_result_file_name == ''):
         trove_search_result_metadata = parse_trove_result_metadata(trove_search_result=trove_search_result, search_word=search_word, search_town=search_town)
         print(trove_search_result_metadata)
         result_count = trove_search_result_metadata["total"]
-        print(f"\n{result_count} total result/s found for {search_town}")
+        print(f"\n{result_count} total result/s for {search_town}")
         if (result_count == 0):
             continue_script = False
         else:
             say_something(f"\nI found {result_count} total results.", try_say=try_say, speed=default_speed)
             trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
-            print(len(trove_result_df))
-            print("Before filtering")
-            trove_result_df = filter_trove_result_df(trove_result_df)
-            print(len(trove_result_df))
-            print("After filtering")
+            trove_result_df = filter_trove_result_df(trove_result_df, filter_to_publication_state=filter_to_publication_state)
             trove_result_file_name = os.path.join(default_output_path_name, f"trove_result_{search_town}_{search_word}.csv")
             print(trove_result_file_name)
             # TODO: give option to create multiple calls or not
@@ -143,13 +141,10 @@ if (continue_script == True and trove_result_file_name == ''):
                 trove_result_df = parse_trove_result_records_to_df(trove_search_result=trove_search_result, result_metadata=trove_search_result_metadata)
                 print(f"Total results from search {search_town} {search_word}: {result_count}")
                 print(f"API call number {call_count} of maximum {max_calls}")
-                print(len(trove_result_df))
-                print("Before filtering")
-                trove_result_df = filter_trove_result_df(trove_result_df)
-                print(len(trove_result_df))
-                print("After filtering")
-                print(f"Appending to {trove_result_file_name}")
-                trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
+                trove_result_df = filter_trove_result_df(trove_result_df, filter_to_publication_state=filter_to_publication_state)
+                if (len(trove_result_df) > 0):
+                    print(f"Appending to {trove_result_file_name}")
+                    trove_result_df.to_csv(trove_result_file_name, mode='a', header=False, index=False)
                 next_url = return_next_url_from_trove_result_metadata(trove_result_metadata=trove_search_result_metadata)
                 print(f"\n{next_url}")
                 # TODO: clear up the clutter above!!
@@ -158,7 +153,7 @@ if (continue_script == True and trove_result_file_name == ''):
 # summarise results
 if (continue_script == True):
     trove_result_df = pandas.read_csv(trove_result_file_name)
-    trove_result_df = filter_trove_result_df(trove_result_df)
+    trove_result_df = filter_trove_result_df(trove_result_df, filter_to_publication_state=filter_to_publication_state)
     # TODO: deal with possible zero or near-zero results after filtering
     available_result_count = return_trove_file_result_count(trove_result_file_name)
     summary_fields = []
@@ -166,20 +161,18 @@ if (continue_script == True):
         if (field_name in trove_result_df):
             summary_fields.append(field_name)
     
-    # NOTE: I think this summary is better than the random picker
     print(f"\n**SUMMARY: {search_town} {search_word}**\n")
     print(trove_result_df[summary_fields])
 
     word_list = return_word_list_from_df(df=trove_result_df, field_list=["heading", "snippet"])
+    most_common_words = return_summary_of_most_common_words(input_words=word_list, freq_limit=5)
+    summary_text = f'\nThe most common words are {most_common_words}'
+    say_something(summary_text, try_say=try_say, speed=default_speed)
     # print(word_list)
-    # TODO: reduce summary work: just the most common words; plus maybe pairs of words
-    word_summary_list = return_custom_word_summary_list(input_words_all=word_list)
+    # TODO: most common VERBS; plus say this
+    #word_summary_list = return_custom_word_summary_list(input_words_all=word_list)
     
     #print(word_summary_list)
-    for summary in word_summary_list:
-        say_something(summary, try_say=try_say, speed=default_speed)
-    # TODO: reduce this area to just the most common words, nouns, verbs
-    # TODO: read some random headlines
 
 
 if (continue_script == True): 
@@ -188,8 +181,7 @@ if (continue_script == True):
 
 selected_article_number = None
 while (continue_script == True and selected_article_number == None):
-    print(f"\n**SUMMARY: {search_town} {search_word}**\n")
-    print(trove_result_df[summary_fields])
+
     prompt_text = "\nI will default to a random selection."
     prompt_text += "\nPlease enter 'pick' if you would like to pick. \nEnter 'exit' to cancel.\n"
     user_input = get_user_input(prompt_text = prompt_text)
@@ -222,9 +214,10 @@ while (continue_script == True and selected_article_number == None):
         for field_name in ["year", "heading", "snippet"]:
             say_something(field_name.upper(), try_say=try_say, speed=default_speed)
             say_something(f"{selected_article[field_name]}", try_say=try_say, speed=default_speed)
-        print("***\n")
+        print("TITLE (publication)")
+        print(selected_article["title"])        
 
-        say_something("\nWould you like to continue with this article? Or would you like to choose another?", try_say=try_say, speed = default_speed)  
+        say_something("\nWould you like to continue with this article?", try_say=try_say, speed = default_speed)  
         prompt_text = "\nPlease enter 'n' if you would like to pick another article. \nEnter 'exit' to cancel."
         prompt_text += "\nEnter any other key to continue with this article.\n"
         user_input = get_user_input(prompt_text = prompt_text)
@@ -232,12 +225,14 @@ while (continue_script == True and selected_article_number == None):
             continue_script = False
         elif (user_input.upper() == 'N'):
             selected_article_number = None
+            print(f"\n**SUMMARY: {search_town} {search_word}**\n")
+            print(trove_result_df[summary_fields])
         else:
             say_something("\nOk, I will continue with this article...", try_say=try_say, speed=default_speed)
             
 
 if (continue_script == True and selected_article_number != None):  
-    say_something("\nI am going to fetch the complete article from the Trove API, please wait...", try_say=try_say, speed=default_speed)             
+    say_something("\nPlease wait while I obtain the complete article...", try_say=try_say, speed=default_speed)             
     
     selected_article_json = fetch_trove_newspaper_article(trove_key=trove_key, 
         trove_article_id=selected_article["id"])
@@ -246,7 +241,7 @@ if (continue_script == True and selected_article_number != None):
         say_something("\nSorry, I encountered an error searching for this article...")
         continue_script = False
     else:
-        say_something("\nHere is an overview of what I found...", try_say=try_say, speed=default_speed)             
+        say_something("\nHere is an overview...", try_say=try_say, speed=default_speed)             
         print("\n***")
         print(selected_article_json)
         print("***\n")
@@ -263,7 +258,8 @@ if (continue_script == True and selected_article_number != None):
             selected_article_text = soup.get_text()
             say_something(selected_article_text, try_say=try_say, speed=default_speed)
 
-        prompt_text = "Would you like me to download this information to files?\n"
+        prompt_text = f"\nOk, so that was a {search_word} from {search_town}."
+        prompt_text += "Would you like me to download this information into files?\n"
         say_something(prompt_text, try_say=try_say, speed=default_speed)
         prompt_text = "Enter 'y' to download files\nEnter any other key to skip this.\n"
         user_input = get_user_input(prompt_text=prompt_text)
@@ -301,7 +297,7 @@ if (continue_script == True and selected_article_number != None):
             elif (operating_system == 'linux'):
                 subprocess.call(('xdg-open', file_name_to_open))
 
-            #TODO: check most effective order of events here with reading, saving, etc.
+            say_something("\nI have downloaded the files to your directory.", try_say=try_say, speed=default_speed)
 
 say_something("\nThank you, goodbye.", try_say=try_say, speed=default_speed)
 

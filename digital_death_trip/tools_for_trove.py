@@ -210,7 +210,7 @@ def build_trove_search_url(trove_key='',
 
 def fetch_trove_search_result(trove_key='',
                               trove_search_url='',
-                              also_print=True):
+                              also_print=False):
     trove_search_result = None
     try:
         if ('key=' not in trove_search_url):
@@ -299,7 +299,9 @@ def parse_trove_result_records_to_df(trove_search_result,
 def filter_trove_result_df(trove_result_df, 
         remove_advertising=True, 
         min_heading_length=5,
-        min_snippet_length=15):
+        min_snippet_length=15,
+        filter_to_publication_state=False,
+        publication_state="Vic."):
     try:
 
         if (("heading" in trove_result_df.columns) and (min_heading_length > 0)):
@@ -316,6 +318,12 @@ def filter_trove_result_df(trove_result_df,
             print("Removing advertising...")
             trove_result_df = trove_result_df[trove_result_df["heading"].str.contains("dvertising") == False]
             # TODO: make case insensitive
+            print(len(trove_result_df))
+
+        if (("title" in trove_result_df.columns) and filter_to_publication_state == True):
+            print(f"Restricting to publication state {publication_state}...")
+            state_string = "(?i)" + publication_state + " :"
+            trove_result_df = trove_result_df[trove_result_df["title"].str.contains(state_string)]
             print(len(trove_result_df))
 
         return(trove_result_df)
@@ -350,10 +358,8 @@ def fetch_trove_newspaper_article(trove_article_id,
         if (also_print):
             print(trove_article_url)
         trove_article_result = requests.get(trove_article_url)
-        print(trove_article_result)
         if (trove_article_result.status_code == 200):
             trove_article = json.loads(trove_article_result.content)
-            #trove_article = trove_article_result.content
             if (also_print):
                 print(trove_article)
         return(trove_article)    
